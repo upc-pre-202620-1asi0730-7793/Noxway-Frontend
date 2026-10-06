@@ -1,0 +1,12 @@
+{
+  "dashboard": [
+    {
+      "id": 1,
+      "safeTripsPercentage": 100,
+      "trustedContactStatus": "Contacto activo",
+      "restStatus": "Descanso",
+      "servicesStatus": "Servicios 24h",
+      "journeyStatus": "Esperando salida"
+    }
+  ]
+}
