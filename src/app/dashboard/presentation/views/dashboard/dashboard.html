@@ -28,8 +28,12 @@
       <div class="stat-icon green"></div>
 
       <div>
-        <strong>100%</strong>
+        <strong>
+          {{ dashboardData()?.safeTripsPercentage }}%
+        </strong>
+
         <span>Trayectos seguros</span>
+
         <small class="green-text">
           ✓ Trayectos confirmados
         </small>
@@ -40,8 +44,12 @@
       <div class="stat-icon blue"></div>
 
       <div>
-        <strong>Contacto activo</strong>
+        <strong>
+          {{ dashboardData()?.trustedContactStatus }}
+        </strong>
+
         <span>Contacto de confianza</span>
+
         <small class="blue-text">
           ✓ Vinculado correctamente
         </small>
@@ -52,8 +60,12 @@
       <div class="stat-icon amber"></div>
 
       <div>
-        <strong>Descanso</strong>
+        <strong>
+          {{ dashboardData()?.restStatus }}
+        </strong>
+
         <span>Bienestar nocturno</span>
+
         <small class="amber-text">
           Consulta tu registro diario
         </small>
@@ -64,8 +76,12 @@
       <div class="stat-icon green"></div>
 
       <div>
-        <strong>Servicios 24h</strong>
+        <strong>
+          {{ dashboardData()?.servicesStatus }}
+        </strong>
+
         <span>Servicios disponibles</span>
+
         <small class="green-text">
           ✓ Validados por la comunidad
         </small>
@@ -81,13 +97,14 @@
       <div class="card-heading">
         <div>
           <h2>Monitoreo de Trayecto Habitual</h2>
+
           <p>
             Consulta el estado de tu trayecto nocturno configurado.
           </p>
         </div>
 
         <span class="waiting-badge">
-          Esperando salida
+          {{ dashboardData()?.journeyStatus }}
         </span>
       </div>
 
@@ -163,13 +180,19 @@
           </div>
 
           <div>
-            <strong>Contacto vinculado</strong>
-            <span>Disponible para acompañamiento</span>
+            <strong>
+              {{ dashboardData()?.trustedContactStatus }}
+            </strong>
+
+            <span>
+              Disponible para acompañamiento
+            </span>
           </div>
         </div>
 
         <div class="notification-box">
           📲 Notificaciones configuradas
+
           <strong>
             El contacto recibirá avisos durante tus trayectos activos.
           </strong>
@@ -191,7 +214,9 @@
           <strong class="green-text">
             ✓ SERVICIO VALIDADO
           </strong>
+
           <b>Servicio nocturno disponible</b>
+
           <span>
             Información verificada por la comunidad.
           </span>
@@ -201,7 +226,9 @@
           <strong class="amber-text">
             ⚠ ZONA DE PRECAUCIÓN
           </strong>
+
           <b>Reporte comunitario activo</b>
+
           <span>
             Revisa las recomendaciones antes de continuar.
           </span>
@@ -211,6 +238,7 @@
           <strong class="blue-text">
             ● RED NOCTURNA
           </strong>
+
           <b>Monitoreo comunitario disponible</b>
         </div>
 
