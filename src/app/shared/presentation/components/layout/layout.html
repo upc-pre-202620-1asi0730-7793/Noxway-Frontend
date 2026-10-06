@@ -1,56 +1,112 @@
-<mat-sidenav-container class="layout-container" autosize>
+<div class="app-shell">
 
-  <mat-sidenav
-    mode="side"
-    opened
-    [class.collapsed]="collapsed()"
-    class="sidenav">
+  <aside class="sidebar">
 
     <div class="brand">
-      <button
-        mat-icon-button
-        (click)="toggleMenu()"
-        aria-label="Toggle navigation">
+      <div class="brand-icon">
+        ◆
+      </div>
 
-        <mat-icon>menu</mat-icon>
-      </button>
-
-      @if (!collapsed()) {
-        <span>Noxway</span>
-      }
+      <div>
+        <h1>Noxway</h1>
+        <span>BY NOCTIVA · 2026</span>
+      </div>
     </div>
 
-    <mat-nav-list>
-      @for (option of options; track option.link) {
-        <a
-          mat-list-item
-          [routerLink]="option.link"
-          routerLinkActive="active">
+    <div class="user-card">
+      <div class="avatar">
+        JL
+      </div>
 
-          <mat-icon matListItemIcon>
+      <div class="user-info">
+        <strong>Jorge Luis Huamán</strong>
+        <span>Vigilante Nocturno</span>
+      </div>
+    </div>
+
+    <p class="menu-title">
+      MÓDULOS DEL TRABAJADOR
+    </p>
+
+    <nav class="navigation">
+
+      @for (option of options; track option.link) {
+
+        <a
+          [routerLink]="option.link"
+          routerLinkActive="active"
+          class="nav-item">
+
+          <mat-icon class="nav-dot">
             {{ option.icon }}
           </mat-icon>
 
-          @if (!collapsed()) {
-            <span matListItemTitle>
-              {{ option.label }}
+          <span class="nav-label">
+            {{ option.label }}
+          </span>
+
+          @if (option.badge) {
+            <span
+              class="badge"
+              [class.success]="option.badgeClass === 'success'"
+              [class.danger]="option.badgeClass === 'danger'">
+
+              {{ option.badge }}
+
             </span>
           }
 
         </a>
+
       }
-    </mat-nav-list>
 
-  </mat-sidenav>
+    </nav>
 
-  <mat-sidenav-content class="content-shell">
+    <div class="sidebar-footer">
+      <button class="sos-button">
+        ⚠ ALERTA SOS
+      </button>
+    </div>
 
-    <main class="page-content">
+  </aside>
+
+  <section class="main-shell">
+
+    <header class="topbar">
+
+      <div class="page-title">
+        Dashboard del Trabajador
+      </div>
+
+      <div class="network-status">
+        <span class="status-dot"></span>
+        Red Nocturna Activa 24h
+      </div>
+
+      <div class="topbar-actions">
+
+        <div class="clock">
+          🕒 02:45:18 AM
+        </div>
+
+        <button
+          class="notification-button"
+          aria-label="Notificaciones">
+          <span></span>
+        </button>
+
+        <button class="logout-button">
+          Salir ↗
+        </button>
+
+      </div>
+
+    </header>
+
+    <main class="content">
       <router-outlet/>
     </main>
 
-    <app-footer-content/>
+  </section>
 
-  </mat-sidenav-content>
-
-</mat-sidenav-container>
+</div>

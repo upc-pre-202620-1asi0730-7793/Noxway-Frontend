@@ -1,10 +1,6 @@
-import {Component, signal} from '@angular/core';
+import {Component} from '@angular/core';
 import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
-import {MatListModule} from '@angular/material/list';
-import {FooterContent} from '../footer-content/footer-content';
 
 @Component({
   selector: 'app-layout',
@@ -12,28 +8,57 @@ import {FooterContent} from '../footer-content/footer-content';
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    MatSidenavModule,
-    MatButtonModule,
-    MatIconModule,
-    MatListModule,
-    FooterContent
+    MatIconModule
   ],
   templateUrl: './layout.html',
   styleUrl: './layout.css'
 })
 export class Layout {
-  readonly collapsed = signal(false);
 
   readonly options = [
-    {link: '/home', label: 'Inicio', icon: 'home'},
-    {link: '/dashboard', label: 'Panel', icon: 'dashboard'},
-    {link: '/check-in', label: 'Check-in seguro', icon: 'location_on'},
-    {link: '/services', label: 'Servicios nocturnos', icon: 'store'},
-    {link: '/incidents', label: 'Reportes de incidentes', icon: 'warning'},
-    {link: '/community', label: 'Comunidad', icon: 'groups'}
+    {
+      link: '/dashboard',
+      label: 'Dashboard',
+      icon: 'circle'
+    },
+    {
+      link: '/journey',
+      label: 'Mi Trayecto',
+      icon: 'circle',
+      badge: 'ACTIVO',
+      badgeClass: 'success'
+    },
+    {
+      link: '/map',
+      label: 'Mapa 24 Horas',
+      icon: 'circle'
+    },
+    {
+      link: '/community',
+      label: 'Comunidad',
+      icon: 'circle',
+      badge: '3',
+      badgeClass: 'danger'
+    },
+    {
+      link: '/wellness',
+      label: 'Bienestar & Sueño',
+      icon: 'circle'
+    },
+    {
+      link: '/benefits',
+      label: 'Beneficios & Planes',
+      icon: 'circle'
+    },
+    {
+      link: '/trusted-contacts',
+      label: 'Contactos Confianza',
+      icon: 'circle'
+    },
+    {
+      link: '/profile',
+      label: 'Mi Perfil',
+      icon: 'circle'
+    }
   ];
-
-  toggleMenu(): void {
-    this.collapsed.update(value => !value);
-  }
 }
