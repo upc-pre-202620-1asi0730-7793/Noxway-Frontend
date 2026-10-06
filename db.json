@@ -2,11 +2,11 @@
   "dashboard": [
     {
       "id": 1,
-      "safeTripsPercentage": 50,
+      "safeTripsPercentage": 100,
       "trustedContactStatus": "Contacto activo",
       "restStatus": "Descanso",
       "servicesStatus": "Servicios 24h",
-      "journeyStatus": "Esperando salida"
+      "journeyStatus": "Esperando"
     }
   ]
 }
