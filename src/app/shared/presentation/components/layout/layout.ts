@@ -25,12 +25,12 @@ export class Layout {
   readonly collapsed = signal(false);
 
   readonly options = [
-    {link: '/home', label: 'Home', icon: 'home'},
-    {link: '/dashboard', label: 'Dashboard', icon: 'dashboard'},
-    {link: '/check-in', label: 'Safe Check-in', icon: 'location_on'},
-    {link: '/services', label: 'Night Services', icon: 'store'},
-    {link: '/incidents', label: 'Incident Reports', icon: 'warning'},
-    {link: '/community', label: 'Community', icon: 'groups'}
+    {link: '/home', label: 'Inicio', icon: 'home'},
+    {link: '/dashboard', label: 'Panel', icon: 'dashboard'},
+    {link: '/check-in', label: 'Check-in seguro', icon: 'location_on'},
+    {link: '/services', label: 'Servicios nocturnos', icon: 'store'},
+    {link: '/incidents', label: 'Reportes de incidentes', icon: 'warning'},
+    {link: '/community', label: 'Comunidad', icon: 'groups'}
   ];
 
   toggleMenu(): void {
