@@ -24,9 +24,7 @@ export class Layout {
     {
       link: '/journey',
       label: 'Mi Trayecto',
-      icon: 'circle',
-      badge: 'ACTIVO',
-      badgeClass: 'success'
+      icon: 'circle'
     },
     {
       link: '/map',
@@ -36,9 +34,7 @@ export class Layout {
     {
       link: '/community',
       label: 'Comunidad',
-      icon: 'circle',
-      badge: '3',
-      badgeClass: 'danger'
+      icon: 'circle'
     },
     {
       link: '/wellness',

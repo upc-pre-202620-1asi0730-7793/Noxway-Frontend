@@ -145,26 +145,6 @@
   font-size: 14px;
 }
 
-.badge {
-  min-width: 28px;
-  padding: 4px 8px;
-  border-radius: 5px;
-  text-align: center;
-  font-size: 9px;
-  font-weight: 700;
-}
-
-.badge.success {
-  background: #16c784;
-  color: white;
-}
-
-.badge.danger {
-  background: #ff4949;
-  color: white;
-  border-radius: 12px;
-}
-
 .sidebar-footer {
   margin-top: auto;
   padding: 18px 16px 26px;

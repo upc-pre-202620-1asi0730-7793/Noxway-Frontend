@@ -45,17 +45,6 @@
             {{ option.label }}
           </span>
 
-          @if (option.badge) {
-            <span
-              class="badge"
-              [class.success]="option.badgeClass === 'success'"
-              [class.danger]="option.badgeClass === 'danger'">
-
-              {{ option.badge }}
-
-            </span>
-          }
-
         </a>
 
       }
