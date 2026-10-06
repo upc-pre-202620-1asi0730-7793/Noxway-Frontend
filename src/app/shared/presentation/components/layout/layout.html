@@ -1,1 +1,56 @@
-<p>layout works!</p>
+<mat-sidenav-container class="layout-container" autosize>
+
+  <mat-sidenav
+    mode="side"
+    opened
+    [class.collapsed]="collapsed()"
+    class="sidenav">
+
+    <div class="brand">
+      <button
+        mat-icon-button
+        (click)="toggleMenu()"
+        aria-label="Toggle navigation">
+
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      @if (!collapsed()) {
+        <span>Noxway</span>
+      }
+    </div>
+
+    <mat-nav-list>
+      @for (option of options; track option.link) {
+        <a
+          mat-list-item
+          [routerLink]="option.link"
+          routerLinkActive="active">
+
+          <mat-icon matListItemIcon>
+            {{ option.icon }}
+          </mat-icon>
+
+          @if (!collapsed()) {
+            <span matListItemTitle>
+              {{ option.label }}
+            </span>
+          }
+
+        </a>
+      }
+    </mat-nav-list>
+
+  </mat-sidenav>
+
+  <mat-sidenav-content class="content-shell">
+
+    <main class="page-content">
+      <router-outlet/>
+    </main>
+
+    <app-footer-content/>
+
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

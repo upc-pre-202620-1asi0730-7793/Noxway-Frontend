@@ -1,0 +1,37 @@
+.layout-container {
+  min-height: 100vh;
+}
+
+.sidenav {
+  width: 230px;
+  transition: width 180ms ease;
+}
+
+.sidenav.collapsed {
+  width: 72px;
+}
+
+.brand {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.active {
+  background: var(--mat-sys-secondary-container);
+}
+
+.content-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content {
+  flex: 1;
+  padding: 24px;
+}
