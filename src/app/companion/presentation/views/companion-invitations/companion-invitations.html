@@ -1,0 +1,147 @@
+<div class="invitations-container">
+
+  <!-- Pending Invitation Alert Card (Amber/Gold Border) -->
+  @if (pending(); as inv) {
+    @if (pendingStatus() === 'pending') {
+      <mat-card class="pending-invitation-card">
+        <div class="inv-left-content">
+          <div class="inv-icon-box">
+            <mat-icon class="mail-icon">mail</mat-icon>
+          </div>
+
+          <div class="inv-details">
+            <div class="inv-title-row">
+              <h2 class="inv-title">Nueva Solicitud de Vínculo de Confianza</h2>
+              <span class="inv-badge-pending">{{ inv.status }}</span>
+            </div>
+
+            <p class="inv-desc">
+              <strong>{{ inv.name }}</strong> {{ inv.relation }} {{ inv.message }}
+            </p>
+
+            <div class="inv-meta">
+              <span>Rubro: {{ inv.category }}</span>
+              <span class="meta-separator">&bull;</span>
+              <span>Horario: {{ inv.schedule }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-actions">
+          <button
+            mat-flat-button
+            class="accept-link-btn"
+            (click)="onAcceptInvitation()">
+            Aceptar Vínculo
+          </button>
+
+          <button
+            mat-stroked-button
+            class="reject-link-btn"
+            (click)="onRejectInvitation()">
+            Rechazar
+          </button>
+        </div>
+      </mat-card>
+    } @else if (pendingStatus() === 'accepted') {
+      <div class="invitation-feedback success">
+        <mat-icon>check_circle</mat-icon>
+        <span>Vínculo de confianza con {{ inv.name }} aceptado y activo en tu red.</span>
+      </div>
+    } @else {
+      <div class="invitation-feedback rejected">
+        <mat-icon>cancel</mat-icon>
+        <span>Solicitud de {{ inv.name }} rechazada.</span>
+      </div>
+    }
+  }
+
+  <!-- Accompanied Workers List -->
+  <div class="section-block">
+    <h3 class="section-title">Trabajadores que Estás Acompañando</h3>
+
+    <div class="workers-list">
+      @for (w of activeWorkers(); track w.id) {
+        <mat-card class="accompanied-worker-card">
+
+          <div class="worker-card-left">
+            <div class="worker-avatar">
+              {{ w.avatar }}
+            </div>
+
+            <div class="worker-card-info">
+              <div class="worker-name-row">
+                <h4 class="worker-card-name">{{ w.name }}</h4>
+                <span class="active-link-badge">{{ w.badge }}</span>
+              </div>
+
+              <div class="worker-card-sub">
+                <span>Relación: <strong>{{ w.relation }}</strong></span>
+                <span class="meta-separator">&bull;</span>
+                <span>{{ w.role }}</span>
+                <span class="meta-separator">&bull;</span>
+                <span>Vinculado desde {{ w.linkedSince }}</span>
+              </div>
+
+              <div class="worker-card-checklist">
+                <div class="check-item">
+                  <mat-icon class="check-ico">check</mat-icon>
+                  <span>GPS en tiempo real: Habilitado</span>
+                </div>
+
+                <div class="check-item">
+                  <mat-icon class="check-ico">check</mat-icon>
+                  <span>Alarma de parada prolongada: Habilitada</span>
+                </div>
+
+                <div class="check-item">
+                  <mat-icon class="check-ico">check</mat-icon>
+                  <span>Notificaciones WhatsApp: {{ w.whatsappNotification }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="worker-card-action">
+            <a
+              mat-flat-button
+              routerLink="/companion/live"
+              class="monitor-now-btn">
+              Monitorear Ahora
+            </a>
+          </div>
+
+        </mat-card>
+      }
+    </div>
+  </div>
+
+  <!-- Educational / Process Explanation Block -->
+  <mat-card class="how-it-works-card">
+    <div class="how-it-works-header">
+      <h3 class="how-title">&iquest;Cómo Funciona la Red de Contactos de Confianza?</h3>
+      <p class="how-subtitle">Mecanismo seguro de consentimiento mutuo para la supervisión nocturna</p>
+    </div>
+
+    <div class="steps-grid">
+      @for (st of steps(); track st.step) {
+        <div class="step-card">
+          <div class="step-number"
+               [class.num-blue]="st.step === '01'"
+               [class.num-green]="st.step === '02'"
+               [class.num-amber]="st.step === '03'">
+            {{ st.step }}
+          </div>
+
+          <h4 class="step-title">{{ st.title }}</h4>
+
+          <div class="step-text-group">
+            <p class="step-paragraph">{{ st.desc1 }}</p>
+            <p class="step-paragraph">{{ st.desc2 }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </mat-card>
+
+</div>
