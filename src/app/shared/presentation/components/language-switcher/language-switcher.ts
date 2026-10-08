@@ -1,6 +1,6 @@
-import {Component, inject} from '@angular/core';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import {LanguageService, SupportedLanguage} from '../../../infrastructure/language.service';
+import { Component, inject } from '@angular/core';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { LanguageService, SupportedLanguage } from '../../../infrastructure/language.service';
 
 /**
  * Language switcher presentation component.
@@ -10,7 +10,7 @@ import {LanguageService, SupportedLanguage} from '../../../infrastructure/langua
   selector: 'app-language-switcher',
   imports: [MatButtonToggleModule],
   templateUrl: './language-switcher.html',
-  styleUrl: './language-switcher.css'
+  styleUrl: './language-switcher.css',
 })
 export class LanguageSwitcher {
   protected readonly languageService = inject(LanguageService);
