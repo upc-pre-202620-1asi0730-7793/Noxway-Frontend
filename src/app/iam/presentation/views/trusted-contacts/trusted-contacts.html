@@ -1,0 +1,143 @@
+﻿<section class="contacts-container">
+
+  <!-- Hero Banner -->
+  <mat-card class="hero-banner-card">
+    <div class="banner-info">
+      <span class="privacy-badge">
+        <mat-icon class="badge-mat-icon">lock</mat-icon>
+        <span>PRIVACIDAD GARANTIZADA</span>
+      </span>
+
+      <h1 class="banner-title">Red de Contactos de Confianza Vinculados</h1>
+      <p class="banner-desc">
+        Tus contactos vinculados reciben notificaciones automáticas al iniciar trayecto, llegar o ante demoras.
+      </p>
+    </div>
+
+    <button
+      mat-flat-button
+      class="link-contact-btn"
+      (click)="onLinkContact()">
+      <mat-icon class="btn-icon">person_add</mat-icon>
+      <span>Vincular Contacto</span>
+    </button>
+  </mat-card>
+
+  <!-- Contacts 2-column Grid -->
+  <div class="contacts-grid">
+    @for (contact of contacts(); track contact.id) {
+      <mat-card class="contact-card" [class.pending-card]="contact.statusType === 'pending'">
+
+        <!-- Header -->
+        <div class="card-header-row">
+          <div class="contact-avatar-wrapper" [class.pending-avatar]="contact.statusType === 'pending'">
+            {{ contact.avatar }}
+          </div>
+
+          <div class="contact-titles">
+            <h2 class="contact-name">{{ contact.name }}</h2>
+            <span class="contact-relation">{{ contact.relationship }}</span>
+          </div>
+
+          <span
+            class="status-tag"
+            [class.active-tag]="contact.statusType === 'active'"
+            [class.pending-tag]="contact.statusType === 'pending'">
+            <mat-icon class="status-mat-icon">
+              {{ contact.statusType === 'active' ? 'check_circle' : 'hourglass_empty' }}
+            </mat-icon>
+            <span>{{ contact.status }}</span>
+          </span>
+        </div>
+
+        <!-- Details Fields List -->
+        <div class="fields-list">
+          <div class="field-item">
+            <span class="item-label">Teléfono:</span>
+            <strong class="item-value">{{ contact.phone }}</strong>
+          </div>
+
+          @if (contact.channel) {
+            <div class="field-item">
+              <span class="item-label">Canal:</span>
+              <strong class="item-value">{{ contact.channel }}</strong>
+            </div>
+          }
+
+          @if (contact.permissions) {
+            <div class="field-item">
+              <span class="item-label">Permisos:</span>
+              <strong class="item-value">{{ contact.permissions }}</strong>
+            </div>
+          }
+
+          @if (contact.sentDate) {
+            <div class="field-item">
+              <span class="item-label">Enviado:</span>
+              <strong class="item-value">{{ contact.sentDate }}</strong>
+            </div>
+          }
+
+          @if (contact.note) {
+            <div class="field-item">
+              <span class="item-label">Nota:</span>
+              <strong class="item-value">{{ contact.note }}</strong>
+            </div>
+          }
+        </div>
+
+        <!-- Information / Last Interaction Box -->
+        @if (contact.lastInteraction) {
+          <div class="interaction-box">
+            <small class="box-label">ÚLTIMA INTERACCIÓN</small>
+            <p class="box-text">{{ contact.lastInteraction }}</p>
+          </div>
+        }
+
+        @if (contact.description) {
+          <div class="info-note-box">
+            <p class="box-text">{{ contact.description }}</p>
+          </div>
+        }
+
+        <!-- Actions Row -->
+        <div class="card-actions-row">
+          @if (contact.statusType === 'active') {
+            <button
+              mat-stroked-button
+              class="test-ping-btn"
+              (click)="onSendTestPing(contact)">
+              <mat-icon class="btn-icon">sensors</mat-icon>
+              <span>Enviar Ping de Prueba</span>
+            </button>
+
+            <button
+              mat-flat-button
+              class="companion-view-btn"
+              (click)="onViewCompanion(contact)">
+              <mat-icon class="btn-icon">visibility</mat-icon>
+              <span>Ver como Contacto (Companion)</span>
+            </button>
+          } @else {
+            <button
+              mat-stroked-button
+              class="resend-btn"
+              (click)="onResendLink(contact)">
+              <mat-icon class="btn-icon">send</mat-icon>
+              <span>Reenviar Enlace de Invitación</span>
+            </button>
+
+            <button
+              mat-stroked-button
+              class="cancel-btn"
+              (click)="onCancelInvitation(contact)">
+              <span>Cancelar</span>
+            </button>
+          }
+        </div>
+
+      </mat-card>
+    }
+  </div>
+
+</section>
