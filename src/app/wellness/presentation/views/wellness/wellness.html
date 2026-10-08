@@ -1,0 +1,170 @@
+<section class="wellness-container">
+
+  <!-- Top Banner Card -->
+  <mat-card class="wellness-banner">
+    <div class="banner-content">
+      <span class="health-badge">
+        <mat-icon class="badge-icon">bedtime</mat-icon>
+        <span>SALUD DEL SUEÑO DIURNO</span>
+      </span>
+
+      <h1 class="banner-title">Bitácora de Descanso & Hábitos Nocturnos</h1>
+
+      <p class="banner-desc">
+        Registra tus horas diurnas para detectar déficit acumulado y optimizar tus reflejos en turno.
+      </p>
+    </div>
+
+    <button
+      mat-flat-button
+      class="primary-btn"
+      (click)="onRegisterRest()">
+      <mat-icon class="btn-icon">add</mat-icon>
+      <span>Registrar Descanso</span>
+    </button>
+  </mat-card>
+
+  <!-- 4 Stat Cards Grid -->
+  <div class="stats-grid">
+
+    <mat-card class="stat-card">
+      <div class="stat-body">
+        <strong class="stat-value">{{ summary()?.lastRestDuration }}</strong>
+        <span class="stat-title">Último Descanso Diurno</span>
+        <small class="stat-sub green-text">{{ summary()?.lastRestSchedule }}</small>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-body">
+        <strong class="stat-value">{{ summary()?.weeklyAverage }}</strong>
+        <span class="stat-title">Promedio Semanal</span>
+        <small class="stat-sub muted-text">{{ summary()?.weeklyTarget }}</small>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-body">
+        <strong class="stat-value amber-text">{{ summary()?.accumulatedDeficit }}</strong>
+        <span class="stat-title">Déficit Acumulado</span>
+        <small class="stat-sub amber-text">{{ summary()?.fatigueStatus }}</small>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-body">
+        <strong class="stat-value green-text">{{ summary()?.perceivedQuality }}</strong>
+        <span class="stat-title">Calidad Percibida</span>
+        <small class="stat-sub green-text">{{ summary()?.perceivedQualityRating }}</small>
+      </div>
+    </mat-card>
+
+  </div>
+
+  <!-- Main Grid: Chart & Logs (Left) + Suggestions (Right) -->
+  <div class="wellness-main-grid">
+
+    <!-- Left Column -->
+    <div class="left-column">
+
+      <!-- Weekly Chart Card -->
+      <mat-card class="chart-card">
+        <div class="chart-header">
+          <h2 class="chart-title">Historial Semanal de Descanso Diurno</h2>
+          <p class="chart-subtitle">Comparativa de horas descansadas de día vs. umbral saludable (7.5h)</p>
+        </div>
+
+        <div class="chart-visual-wrapper">
+
+          <!-- Target line -->
+          <div class="target-line">
+            <span class="target-label">Meta: 7.5 hrs</span>
+            <div class="dashed-line"></div>
+          </div>
+
+          <!-- Bar Chart Columns -->
+          <div class="bars-container">
+            @for (item of summary()?.weeklyHistory; track item.day) {
+              <div class="bar-column">
+                <span class="bar-value-label">{{ item.hours }}h</span>
+
+                <div class="bar-track">
+                  <div
+                    class="bar-fill"
+                    [class.good]="item.status === 'good'"
+                    [class.warning]="item.status === 'warning'"
+                    [class.danger]="item.status === 'danger'"
+                    [class.today]="item.status === 'today'"
+                    [style.height.%]="(item.hours / 8.5) * 100">
+                  </div>
+                </div>
+
+                <span class="bar-day-label" [class.today-day]="item.isToday">
+                  {{ item.isToday ? 'Hoy' : item.day }}
+                </span>
+              </div>
+            }
+          </div>
+
+        </div>
+
+      </mat-card>
+
+      <!-- Recent Sleep Logs -->
+      <div class="recent-logs-section">
+        <h3 class="logs-section-title">Registros de Descanso Recientes</h3>
+
+        <div class="logs-list">
+          @for (log of summary()?.recentLogs; track log.id) {
+            <mat-card class="log-card">
+              <div class="log-info">
+                <strong class="log-date">{{ log.date }} · {{ log.schedule }}</strong>
+                <span class="log-notes">{{ log.notes }}</span>
+              </div>
+              <div class="log-duration-pill">
+                {{ log.duration }}
+              </div>
+            </mat-card>
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Suggestions -->
+    <aside class="right-column">
+
+      <mat-card class="suggestions-card">
+        <h3 class="suggestions-title">Sugerencias del Sueño</h3>
+
+        <!-- Deficit Alert Box -->
+        <div class="deficit-alert-box">
+          <div class="alert-box-header">
+            <mat-icon class="alert-icon">info</mat-icon>
+            <strong class="deficit-title">Déficit acumulado detectado (-2.4h)</strong>
+          </div>
+          <p class="deficit-desc">Horas del jueves fueron insuficientes para tu turno.</p>
+        </div>
+
+        <!-- Suggestion Items -->
+        <div class="suggestions-list">
+          @for (sug of summary()?.suggestions; track sug.id) {
+            <div class="suggestion-item">
+              <div class="sug-header">
+                <div class="sug-icon-wrapper">
+                  <mat-icon class="sug-mat-icon">{{ sug.icon }}</mat-icon>
+                </div>
+                <strong class="sug-title">{{ sug.title }}</strong>
+              </div>
+              <p class="sug-desc">{{ sug.description }}</p>
+            </div>
+          }
+        </div>
+
+      </mat-card>
+
+    </aside>
+
+  </div>
+
+</section>
