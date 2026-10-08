@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { UserProfile } from '../domain/model/user-profile.entity';
+import { environment } from '../../../environments/environment';
 
 /**
  * Fallback static user profile for the nocturnal worker.
@@ -34,7 +35,7 @@ const DEFAULT_PROFILE: UserProfile = {
 })
 export class UserProfileService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3000/userProfile';
+  private readonly baseUrl = `${environment.apiUrl}/userProfile`;
 
   /**
    * Fetches the authenticated worker's profile entity.

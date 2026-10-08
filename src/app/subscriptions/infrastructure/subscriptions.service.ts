@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { UserSubscription } from '../domain/model/collective-benefit.entity';
+import { environment } from '../../../environments/environment';
 
 /**
  * Fallback static subscription plan and collective benefits data.
@@ -70,7 +71,7 @@ const DEFAULT_SUBSCRIPTION: UserSubscription = {
 })
 export class SubscriptionsService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3000/subscriptions';
+  private readonly baseUrl = `${environment.apiUrl}/subscriptions`;
 
   /**
    * Retrieves active plan subscription information and partner benefits.

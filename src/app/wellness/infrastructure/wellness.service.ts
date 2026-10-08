@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { WellnessSummary } from '../domain/model/sleep-record.entity';
+import { environment } from '../../../environments/environment';
 
 /**
  * Fallback static wellness summary data.
@@ -75,7 +76,7 @@ const DEFAULT_WELLNESS: WellnessSummary = {
 })
 export class WellnessService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3000/wellness';
+  private readonly baseUrl = `${environment.apiUrl}/wellness`;
 
   /**
    * Retrieves the aggregate wellness summary for the nocturnal worker.
