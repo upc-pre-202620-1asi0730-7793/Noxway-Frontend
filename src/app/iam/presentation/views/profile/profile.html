@@ -1,0 +1,145 @@
+﻿<section class="profile-container">
+
+  @if (profile(); as p) {
+    <div class="profile-main-grid">
+
+      <!-- Left Column: Profile Details & Privacy -->
+      <mat-card class="profile-card">
+
+        <!-- User Header Banner -->
+        <div class="user-header">
+          <div class="user-avatar-large">
+            {{ p.avatar }}
+          </div>
+
+          <div class="user-titles">
+            <h1 class="user-fullname">{{ p.fullName }}</h1>
+            <p class="user-role">{{ p.role }}</p>
+            <span class="user-meta">DNI: {{ p.dni }} · {{ p.memberSince }}</span>
+          </div>
+        </div>
+
+        <!-- Form Fields Grid (2 columns) -->
+        <div class="form-fields-grid">
+
+          <div class="form-group">
+            <label class="form-label">NOMBRE COMPLETO</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="p.fullName" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">TELÉFONO MÓVIL</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="p.phone" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">CORREO ELECTRÓNICO</label>
+            <input
+              type="email"
+              class="form-input"
+              [(ngModel)]="p.email" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">HORARIO HABITUAL DE TURNO</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="p.schedule" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">TRANSPORTE PRINCIPAL</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="p.transport" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">DISTRITO DE RESIDENCIA</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="p.district" />
+          </div>
+
+        </div>
+
+        <!-- Privacy & Geolocation Settings -->
+        <div class="privacy-section">
+          <h2 class="privacy-section-title">Ajustes de Privacidad y Geolocalización</h2>
+
+          <div class="checkbox-group">
+            <mat-checkbox
+              color="primary"
+              [(ngModel)]="p.privacyGpsActiveOnly">
+              Compartir GPS únicamente durante check-ins activos
+            </mat-checkbox>
+
+            <mat-checkbox
+              color="primary"
+              [(ngModel)]="p.privacyEncryptedHistory">
+              Historial de rutas cifrado de extremo a extremo
+            </mat-checkbox>
+
+            <mat-checkbox
+              color="primary"
+              [(ngModel)]="p.privacyAnonymousRatings">
+              Calificaciones anónimas en mapa comunitario
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="form-actions">
+          <button
+            mat-flat-button
+            class="save-btn"
+            (click)="onSave()">
+            <mat-icon class="btn-icon">save</mat-icon>
+            <span>Guardar Modificaciones</span>
+          </button>
+        </div>
+
+      </mat-card>
+
+      <!-- Right Column: Security & Sessions -->
+      <aside class="profile-aside">
+
+        <!-- Account Security Card -->
+        <mat-card class="aside-card">
+          <h3 class="aside-title">Seguridad de Cuenta</h3>
+          <p class="aside-desc">{{ p.passwordUpdated }}</p>
+
+          <button
+            mat-stroked-button
+            class="change-password-btn"
+            (click)="onChangePassword()">
+            <mat-icon class="btn-icon">lock_reset</mat-icon>
+            <span>Cambiar Contraseña</span>
+          </button>
+        </mat-card>
+
+        <!-- Active Sessions Card -->
+        <mat-card class="aside-card">
+          <h3 class="aside-title">Sesiones Activas</h3>
+
+          <div class="session-item">
+            <span class="session-dot"></span>
+            <span class="session-label">{{ p.activeSessions }}</span>
+          </div>
+        </mat-card>
+
+      </aside>
+
+    </div>
+  }
+
+</section>
