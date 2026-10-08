@@ -57,6 +57,7 @@ export class LanguageService {
       'topbar.hubScreens': 'Ver Hub Pantallas',
 
       // Page Titles
+      'title.home': 'Inicio',
       'title.dashboard': 'Dashboard del Trabajador',
       'title.journey': 'Mi Trayecto Activo y Check-In Seguro',
       'title.map': 'Mapa Comunitario 24h y Zonas de Riesgo',
@@ -109,6 +110,7 @@ export class LanguageService {
       'topbar.hubScreens': 'View Screens Hub',
 
       // Page Titles
+      'title.home': 'Home',
       'title.dashboard': 'Night Worker Dashboard',
       'title.journey': 'Active Route & Safe Check-In',
       'title.map': '24h Community Map & Risk Zones',
