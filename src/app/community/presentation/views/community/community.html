@@ -1,0 +1,151 @@
+﻿<section class="community-container">
+
+  <!-- Top Filter & Action Bar -->
+  <div class="community-top-bar">
+    <div class="district-filters">
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedDistrict() === 'all'"
+        (click)="setDistrict('all')">
+        Todos los Distritos
+      </button>
+
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedDistrict() === 'los-olivos'"
+        (click)="setDistrict('los-olivos')">
+        Los Olivos
+      </button>
+
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedDistrict() === 'cercado'"
+        (click)="setDistrict('cercado')">
+        Cercado de Lima
+      </button>
+
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedDistrict() === 'callao'"
+        (click)="setDistrict('callao')">
+        Callao / Faucett
+      </button>
+    </div>
+
+    <button
+      mat-flat-button
+      class="publish-btn"
+      (click)="onPublishNotice()">
+      <mat-icon class="btn-icon">campaign</mat-icon>
+      <span>Publicar Aviso</span>
+    </button>
+  </div>
+
+  <!-- Main Feed & Side Layout -->
+  <div class="community-main-grid">
+
+    <!-- Left Column: Posts Feed -->
+    <div class="feed-column">
+      @for (post of filteredPosts(); track post.id) {
+        <mat-card class="post-card" [class.danger-border]="post.badgeType === 'danger'">
+
+          <div class="post-header">
+            <div class="author-avatar" [class.danger-avatar]="post.badgeType === 'danger'">
+              {{ post.avatar }}
+            </div>
+
+            <div class="author-info">
+              <strong class="author-name">
+                {{ post.authorName }} · <span class="author-role">{{ post.authorRole }}</span>
+              </strong>
+              <span class="post-meta">{{ post.timeAgo }} · {{ post.location }}</span>
+            </div>
+
+            <span
+              class="post-badge"
+              [class.verified-badge]="post.badgeType === 'verified'"
+              [class.danger-badge]="post.badgeType === 'danger'">
+              <mat-icon class="post-badge-icon">
+                {{ post.badgeType === 'verified' ? 'verified' : 'warning' }}
+              </mat-icon>
+              <span>{{ post.badge }}</span>
+            </span>
+          </div>
+
+          <h3 class="post-title">{{ post.title }}</h3>
+          <p class="post-content">{{ post.content }}</p>
+
+          <div class="post-actions">
+            <button
+              mat-stroked-button
+              class="vote-btn"
+              [class.danger-vote]="post.badgeType === 'danger'"
+              (click)="toggleVote(post)">
+              <mat-icon class="vote-icon">
+                {{ post.badgeType === 'verified' ? 'thumb_up' : 'priority_high' }}
+              </mat-icon>
+              <span>{{ post.actionLabel }} (+{{ post.upvotes }})</span>
+            </button>
+          </div>
+
+        </mat-card>
+      }
+    </div>
+
+    <!-- Right Column: Rules & Leaderboard -->
+    <aside class="community-aside">
+
+      <!-- Community Rules Card -->
+      <mat-card class="aside-card">
+        <h3 class="aside-heading">Código de la Comunidad</h3>
+
+        <div class="code-item">
+          <mat-icon class="code-mat-icon blue-icon">shield</mat-icon>
+          <div>
+            <strong>Veracidad:</strong>
+            <p>Los reportes salvan vidas.</p>
+          </div>
+        </div>
+
+        <div class="code-item">
+          <mat-icon class="code-mat-icon amber-icon">lock</mat-icon>
+          <div>
+            <strong>Privacidad:</strong>
+            <p>No publiques datos privados.</p>
+          </div>
+        </div>
+
+        <div class="code-item">
+          <mat-icon class="code-mat-icon green-icon">handshake</mat-icon>
+          <div>
+            <strong>Respaldo:</strong>
+            <p>Valida locales 24h activos.</p>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Leaders of the 24h Network -->
+      <mat-card class="aside-card">
+        <h3 class="aside-heading">Líderes de la Red 24h</h3>
+
+        <div class="leaders-list">
+          @for (leader of leaders(); track leader.rank) {
+            <div class="leader-item" [class.highlight]="leader.isCurrentUser">
+              <span class="leader-rank">{{ leader.rank }}º</span>
+              <strong class="leader-name">{{ leader.name }}</strong>
+              <span class="leader-dots">·</span>
+              <span class="leader-score">{{ leader.contributions }} aportes</span>
+            </div>
+          }
+        </div>
+      </mat-card>
+
+    </aside>
+
+  </div>
+
+</section>
