@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { MapPoint } from '../domain/model/night-service.entity';
 import { CommunityPost, CommunityLeader } from '../domain/model/community-post.entity';
+import { environment } from '../../../environments/environment';
 
 /**
  * Fallback static map points representing key safe havens and risk areas in Lima.
@@ -122,8 +123,8 @@ const DEFAULT_LEADERS: CommunityLeader[] = [
 })
 export class CommunityService {
   private readonly http = inject(HttpClient);
-  private readonly mapUrl = 'http://localhost:3000/mapPoints';
-  private readonly postsUrl = 'http://localhost:3000/communityPosts';
+  private readonly mapUrl = `${environment.apiUrl}/mapPoints`;
+  private readonly postsUrl = `${environment.apiUrl}/communityPosts`;
 
   /**
    * Retrieves verified 24h points of interest and risk zones for map visualization.

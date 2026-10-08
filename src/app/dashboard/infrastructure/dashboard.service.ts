@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 /**
  * Represents aggregated dashboard statistics and active shift summary for the nocturnal worker.
@@ -80,7 +81,7 @@ const DEFAULT_DASHBOARD_DATA: DashboardData = {
 })
 export class DashboardService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3000/dashboard';
+  private readonly baseUrl = `${environment.apiUrl}/dashboard`;
 
   /**
    * Fetches dashboard metric entries.

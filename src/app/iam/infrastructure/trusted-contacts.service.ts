@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { TrustedContact } from '../domain/model/trusted-contact.entity';
+import { environment } from '../../../environments/environment';
 
 /**
  * Fallback static contact roster.
@@ -42,7 +43,7 @@ const DEFAULT_CONTACTS: TrustedContact[] = [
 })
 export class TrustedContactsService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3000/trustedContacts';
+  private readonly baseUrl = `${environment.apiUrl}/trustedContacts`;
 
   /**
    * Retrieves the list of linked and pending trusted contacts.

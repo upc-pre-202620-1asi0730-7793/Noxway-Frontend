@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 import {
   CompanionLiveInfo,
   CompanionHistoryStats,
@@ -320,7 +321,7 @@ const DEFAULT_STEPS: InvitationStep[] = [
 })
 export class CompanionService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3000';
+  private readonly baseUrl = environment.apiUrl;
 
   /**
    * Retrieves live telemetry and route status for the accompanied worker.
