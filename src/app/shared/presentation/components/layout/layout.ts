@@ -118,6 +118,13 @@ export class Layout implements OnInit, OnDestroy {
     const url = this.currentUrlSignal();
     this.languageService.currentLang();
 
+    if (url.includes('/home')) {
+      return this.languageService.translate('title.home');
+    }
+    if (url.includes('/dashboard')) {
+      return this.languageService.translate('title.dashboard');
+    }
+
     // Companion Portal Routes
     if (url.includes('/companion/live')) {
       return this.languageService.translate('title.companion.live');

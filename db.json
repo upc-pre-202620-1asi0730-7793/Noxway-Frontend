@@ -3,10 +3,622 @@
     {
       "id": 1,
       "safeTripsPercentage": 100,
-      "trustedContactStatus": "Contacto activo",
-      "restStatus": "Descanso",
-      "servicesStatus": "Servicios 24h",
-      "journeyStatus": "Esperando"
+      "confirmedTrips": "28 de 28 confirmados",
+      "trustedContactName": "Rosa Elena",
+      "trustedContactStatus": "Conectada (WhatsApp)",
+      "trustedContactRelation": "Madre · Vinculada",
+      "restDuration": "6h 45m",
+      "restComparison": "+45m vs ayer",
+      "servicesCount": 14,
+      "servicesStatus": "Validados por la red",
+      "journeyStatus": "Esperando Salida",
+      "origin": "Planta Industrial San Martín",
+      "originAddress": "Av. Universitaria Nº 3400, Los Olivos",
+      "destination": "Hogar Familiar",
+      "destinationAddress": "Jr. Lampa Nº 820, Cercado de Lima",
+      "distance": "12.4 km",
+      "estimatedTime": "35 min",
+      "tolerance": "+10 min",
+      "transport": "Moto Lineal"
     }
-  ]
+  ],
+  "commute": [
+    {
+      "id": 1,
+      "status": "TRAYECTO EN CURSO · ACOMPAÑAMIENTO ACTIVO",
+      "companionName": "Rosa Elena",
+      "companionPhone": "+51 987654321",
+      "remainingTime": "18:42 min",
+      "estimatedArrival": "03:05 AM",
+      "tolerance": "+10 min",
+      "deviceBattery": "84% (Óptimo)",
+      "origin": "Planta Industrial San Martín, Los Olivos",
+      "destination": "Jr. Lampa Nº 820, Cercado de Lima",
+      "transport": "Moto Lineal (Personal)",
+      "route": "Corredor Iluminado",
+      "routeRating": 5,
+      "routeFeedback": "Vía rápida y con presencia de serenazgo en puentes.",
+      "checkpoints": [
+        { "id": 1, "time": "02:30 AM", "label": "Salida de Planta", "completed": true },
+        { "id": 2, "time": "02:45 AM", "label": "En Tránsito (Av. Colonial)", "completed": true },
+        { "id": 3, "time": "03:05 AM", "label": "Llegada", "completed": false, "estimated": true }
+      ],
+      "telemetry": [
+        { "timestamp": "02:30:12", "message": "Check-in iniciado en Los Olivos.", "type": "info" },
+        {
+          "timestamp": "02:30:14",
+          "message": "Notificación enviada a Rosa Elena (+51 987654321).",
+          "type": "info"
+        },
+        {
+          "timestamp": "02:37:45",
+          "message": "Ping GPS confirmado: -12.0124, -77.0782 (38 km/h).",
+          "type": "info"
+        },
+        {
+          "timestamp": "02:45:00",
+          "message": "Cruce Av. Universitaria con Morales Duárez superado.",
+          "type": "info"
+        },
+        {
+          "timestamp": "02:48:15",
+          "message": "Telemetría normal. Próximo ping en 45s.",
+          "type": "success"
+        }
+      ]
+    }
+  ],
+  "mapPoints": [
+    {
+      "id": 1,
+      "type": "pharmacy",
+      "typeLabel": "FARMACIA 24H",
+      "name": "Inkafarma - Av. Universitaria 3105",
+      "distance": "A 650 metros de tu posición actual · Los Olivos",
+      "communityTrust": "98% Confiable",
+      "validatedBy": "Validado por 24 vigilantes y repartidores.",
+      "safetyMeasures": [
+        "Reja metálica para atención nocturna",
+        "Cámara de seguridad exterior operando",
+        "Vereda con alumbrado público funcional",
+        "Acepta pagos Yape, Plin y tarjetas"
+      ],
+      "lat": -11.992,
+      "lng": -77.072,
+      "icon": "medication",
+      "tag": "Inkafarma 24h"
+    },
+    {
+      "id": 2,
+      "type": "gas_station",
+      "typeLabel": "GRIFO 24H",
+      "name": "Grifo Primax - Av. Mayolo / Universitaria",
+      "distance": "A 1.2 km de tu posición actual · Los Olivos",
+      "communityTrust": "95% Confiable",
+      "validatedBy": "Validado por 32 repartidores nocturnos.",
+      "safetyMeasures": [
+        "Guardia de seguridad 24h",
+        "Buena iluminación en pista y surtidores",
+        "Tienda de conveniencia abierta",
+        "Cámaras de vigilancia activas"
+      ],
+      "lat": -11.995,
+      "lng": -77.075,
+      "icon": "local_gas_station",
+      "tag": "Primax 24h"
+    },
+    {
+      "id": 3,
+      "type": "risk_zone",
+      "typeLabel": "ZONA DE RIESGO",
+      "name": "Tramo Oscuro - Cruce Av. Perú con Dueñas",
+      "distance": "A 3.4 km en tu ruta · San Martín de Porres",
+      "communityTrust": "Alerta Activa",
+      "validatedBy": "Reportado por 19 trabajadores nocturnos.",
+      "safetyMeasures": [
+        "Tres postes de luz apagados",
+        "Poca visibilidad nocturna",
+        "Recomendado desvío por Av. Lima"
+      ],
+      "lat": -12.015,
+      "lng": -77.065,
+      "icon": "warning",
+      "tag": "Tramo Oscuro"
+    }
+  ],
+  "communityPosts": [
+    {
+      "id": 1,
+      "authorName": "Marcos Huamán",
+      "authorRole": "Repartidor Nocturno",
+      "avatar": "MH",
+      "timeAgo": "Hace 24 min",
+      "location": "Los Olivos (Av. Antúnez de Mayolo)",
+      "badge": "Local Verificado",
+      "badgeType": "verified",
+      "district": "los-olivos",
+      "title": "Grifo Primax de Av. Mayolo tiene atención rápida y guardia 24h",
+      "content": "Compañeros, acabo de recargar en el Primax con Universitaria. Tienen guardia armado afuera y excelente iluminación en la pista. Muy seguro para detenerse de noche.",
+      "upvotes": 28,
+      "actionLabel": "Es verídico"
+    },
+    {
+      "id": 2,
+      "authorName": "Valeria Ríos",
+      "authorRole": "Enfermera de Guardia",
+      "avatar": "VR",
+      "timeAgo": "Hace 55 min",
+      "location": "Cercado de Lima (Av. Alfonso Ugarte)",
+      "badge": "Zona Oscura / Riesgo",
+      "badgeType": "danger",
+      "district": "cercado",
+      "title": "Postes apagados en cruce Alfonso Ugarte con Jr. Zepita",
+      "content": "Al salir de mi guardia en el Hospital Loayza noté que la cuadra frente al Metropolitano está sin luz. No hay serenazgo a esta hora. Si van a tomar bus, caminen hacia Av. España que tiene luz.",
+      "upvotes": 19,
+      "actionLabel": "Confirmar alerta"
+    }
+  ],
+  "wellness": [
+    {
+      "id": 1,
+      "lastRestDuration": "6h 45m",
+      "lastRestSchedule": "07:30 AM a 02:15 PM",
+      "weeklyAverage": "6.8 hrs",
+      "weeklyTarget": "Meta: 7.5 hrs",
+      "accumulatedDeficit": "-2.4 hrs",
+      "fatigueStatus": "Alerta leve de fatiga",
+      "perceivedQuality": "82%",
+      "perceivedQualityRating": "4/5 promedio",
+      "weeklyHistory": [
+        { "day": "Lun", "hours": 7.2, "status": "good" },
+        { "day": "Mar", "hours": 6.0, "status": "warning" },
+        { "day": "Mié", "hours": 7.5, "status": "good" },
+        { "day": "Jue", "hours": 5.5, "status": "danger" },
+        { "day": "Vie", "hours": 7.0, "status": "good" },
+        { "day": "Sáb", "hours": 6.8, "status": "good" },
+        { "day": "Dom", "hours": 6.75, "status": "today", "isToday": true }
+      ],
+      "recentLogs": [
+        {
+          "id": 1,
+          "date": "Sábado 16 Sep",
+          "schedule": "07:30 AM - 02:15 PM",
+          "notes": "Ruido medio · Habitación oscura con blackout",
+          "duration": "6h 45m"
+        },
+        {
+          "id": 2,
+          "date": "Viernes 15 Sep",
+          "schedule": "07:45 AM - 02:45 PM",
+          "notes": "Ruido bajo · Uso de tapones de silicona",
+          "duration": "7h 00m"
+        }
+      ],
+      "suggestions": [
+        {
+          "id": 1,
+          "icon": "visibility_off",
+          "title": "Bloqueo de Luz Matutina",
+          "description": "Usa lentes oscuros al salir del turno a las 06:00 AM para no suprimir la melatonina antes de dormir."
+        },
+        {
+          "id": 2,
+          "icon": "coffee",
+          "title": "Corte Límite de Cafeína",
+          "description": "Corta el café a partir de las 03:00 AM. La cafeína tarda hasta 6 horas en metabolizarse en el organismo."
+        },
+        {
+          "id": 3,
+          "icon": "headphones",
+          "title": "Aislamiento Acústico Diurno",
+          "description": "El tráfico diurno de Lima entre 10AM y 1PM fragmenta el descanso. Usa tapones reductores de 32dB."
+        }
+      ]
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": 1,
+      "planName": "Plan Centinela Pro",
+      "price": "S/. 12.00 / mes",
+      "status": "MEMBRESÍA ACTIVA",
+      "billingDetails": "Facturación mensual recurrente. Próxima renovación: 15 de Octubre, 2026",
+      "referralBonus": "Invita a un compañero de turno y ambos reciben 1 mes gratis",
+      "referralDesc": "Comparte tu código único con otros vigilantes o enfermeros para bonificar tu mensualidad.",
+      "referralCode": "JORGE-NOX26",
+      "benefits": [
+        {
+          "id": 1,
+          "name": "Grifos Primax & Repsol Nocturnos",
+          "subtitle": "S/. 1.50 menos por galón entre 10:00 PM y 06:00 AM",
+          "description": "Aplica en todas las estaciones de Lima Metropolitana mostrando tu credencial digital.",
+          "code": "NX-GAS2026",
+          "codeLabel": "Código",
+          "icon": "local_gas_station",
+          "actionLabel": "Ver Cupón QR"
+        },
+        {
+          "id": 2,
+          "name": "Boticas Inkafarma & Mifarma 24h",
+          "subtitle": "15% de descuento en botiquín y vitaminas",
+          "description": "Descuento en bebidas rehidratantes y suplementos para el turno noche.",
+          "code": "BOTICAS-NOX",
+          "codeLabel": "Convenio",
+          "icon": "medication",
+          "actionLabel": "Ver Cupón QR"
+        },
+        {
+          "id": 3,
+          "name": "Seguro Colectivo de Accidentes en Ruta",
+          "subtitle": "Cobertura hasta por S/. 20,000 en convenio con Mapfre",
+          "description": "Gastos médicos hospitalarios durante desplazamientos con check-in activo.",
+          "code": "POL-849201-NOX",
+          "codeLabel": "Póliza",
+          "icon": "shield",
+          "actionLabel": "Certificado"
+        },
+        {
+          "id": 4,
+          "name": "Asesoría Legal Laboral Nocturna",
+          "subtitle": "Consultas sin costo sobre sobretasa nocturna (35%)",
+          "description": "Atención remota 24 horas sobre derechos y compensaciones laborales.",
+          "code": "Canal WhatsApp Jurídico",
+          "codeLabel": "Canal",
+          "icon": "gavel",
+          "actionLabel": "Contactar"
+        }
+      ]
+    }
+  ],
+  "trustedContacts": [
+    {
+      "id": 1,
+      "avatar": "RP",
+      "name": "Rosa Elena Paredes",
+      "relationship": "Madre · Vinculada desde Agosto 2026",
+      "status": "Activo & Enlace OK",
+      "statusType": "active",
+      "phone": "+51 987 654 321 (WhatsApp)",
+      "channel": "Notificación Push + Mensaje WhatsApp",
+      "permissions": "Salida, Llegada, Demoras y Alerta SOS",
+      "lastInteraction": "Recibió notificación de check-in activo hoy a las 02:30 AM."
+    },
+    {
+      "id": 2,
+      "avatar": "CH",
+      "name": "Carlos Huamán",
+      "relationship": "Hermano · Invitación enviada",
+      "status": "Pendiente Enlace",
+      "statusType": "pending",
+      "phone": "+51 912 345 678",
+      "sentDate": "Hace 2 días vía enlace web SMS",
+      "note": "No requiere descargar ninguna app",
+      "description": "Tu hermano podrá acompañarte desde cualquier navegador web."
+    }
+  ],
+  "userProfile": [
+    {
+      "id": 1,
+      "fullName": "Jorge Luis Huamán Quispe",
+      "role": "Vigilante de Seguridad Privada · Securitas Perú (Planta San Martín)",
+      "dni": "44892015",
+      "memberSince": "Miembro Activo desde Agosto 2026",
+      "avatar": "JL",
+      "phone": "+51 987 654 321",
+      "email": "jorge.huaman@vigilancia.pe",
+      "schedule": "22:00 a 06:00 (Lunes a Sábado)",
+      "transport": "Moto Lineal (Personal)",
+      "district": "Cercado de Lima",
+      "privacyGpsActiveOnly": true,
+      "privacyEncryptedHistory": true,
+      "privacyAnonymousRatings": true,
+      "passwordUpdated": "Contraseña actualizada hace 20 días.",
+      "activeSessions": "1 dispositivo conectado (Lima, PE)"
+    }
+  ],
+  "companionLive": [
+    {
+      "id": 1,
+      "workerName": "Jorge Luis Huamán",
+      "workerFullName": "Jorge Luis Huamán Quispe",
+      "workerDni": "44.298.104",
+      "workerAge": "38 años",
+      "employer": "Securitas Perú (Vigilante)",
+      "shift": "Noche 19:00 a 07:00",
+      "vehicle": "Moto Honda CB190R",
+      "plate": "4521-7B (Roja/Negra)",
+      "origin": "Urb. Mercurio (Los Olivos)",
+      "destination": "Torre Financiera San Isidro (Sede Securitas Perú)",
+      "status": "EN TRAYECTO ACTIVO",
+      "statusLabel": "Jorge está en camino a su centro de trabajo",
+      "eta": "03:12 AM",
+      "etaDetail": "faltan ~27 min (4.8 km)",
+      "battery": "84%",
+      "batteryStatus": "Cargando en moto",
+      "speed": "42 km/h",
+      "speedStatus": "Flujo continuo",
+      "lastPing": "Hace 32s",
+      "lastPingDetail": "Satélite 4G",
+      "currentLocation": "Av. Alfonso Ugarte",
+      "workerPhone": "+51 987 654 321",
+      "protectionRules": [
+        "Alerta por parada mayor a 4 min fuera de zona segura",
+        "Aviso de desvío mayor a 400m de la ruta",
+        "Notificación de batería baja si es menor a 15%",
+        "Enlace directo con Serenazgo Lima y San Isidro"
+      ]
+    }
+  ],
+  "companionHistory": {
+    "stats": {
+      "monitoredRoutes": "48 Rutas",
+      "period": "Septiembre 2026",
+      "safeArrivalRate": "100%",
+      "safeArrivalDetails": "48 de 48 confirmados",
+      "avgRouteTime": "31.4 min",
+      "avgDistance": "Distancia: 13.2 km",
+      "deviations": "1 Alerta",
+      "deviationsDetail": "Obras en Av. Brasil (15 Sep)"
+    },
+    "records": [
+      {
+        "id": 1,
+        "date": "Hoy, 18 Sep 2026",
+        "time": "02:22 AM · En Tránsito",
+        "type": "Ida al Trabajo",
+        "transport": "Moto 4521-7B",
+        "origin": "Los Olivos",
+        "destination": "San Isidro",
+        "via": "Vía Panamericana y Ugarte",
+        "duration": "27m restantes",
+        "status": "Monitoreo Activo",
+        "statusType": "active",
+        "isCurrent": true
+      },
+      {
+        "id": 2,
+        "date": "17 Sep 2026",
+        "time": "22:45 - 23:18 PM",
+        "type": "Ida al Trabajo",
+        "transport": "Moto 4521-7B",
+        "origin": "Los Olivos",
+        "destination": "San Isidro",
+        "via": "Sin novedades en ruta",
+        "duration": "33 minutos",
+        "status": "Llegada Segura Confirmada",
+        "statusType": "success",
+        "isCurrent": false
+      },
+      {
+        "id": 3,
+        "date": "17 Sep 2026",
+        "time": "06:05 - 06:36 AM",
+        "type": "Retorno Casa",
+        "transport": "Moto 4521-7B",
+        "origin": "San Isidro",
+        "destination": "Los Olivos",
+        "via": "Vía Expresa y Panamericana",
+        "duration": "31 minutos",
+        "status": "Llegada Segura Confirmada",
+        "statusType": "success",
+        "isCurrent": false
+      },
+      {
+        "id": 4,
+        "date": "15 Sep 2026",
+        "time": "22:50 - 23:35 PM",
+        "type": "Ida al Trabajo",
+        "transport": "Moto 4521-7B",
+        "origin": "Los Olivos",
+        "destination": "San Isidro",
+        "via": "Desvío preventivo obras Av. Brasil",
+        "duration": "45 minutos (+13m)",
+        "status": "Desvío Notificado y Resuelto",
+        "statusType": "warning",
+        "isCurrent": false
+      }
+    ]
+  },
+  "companionAlerts": {
+    "channels": [
+      {
+        "id": "whatsapp",
+        "title": "Notificaciones por WhatsApp",
+        "subtitle": "Enviadas al número +51 912 345 678",
+        "enabled": true
+      },
+      {
+        "id": "sound",
+        "title": "Alarma Sonora Audible (Parada Anómala)",
+        "subtitle": "Suena incluso en modo 'No Molestar'",
+        "enabled": true
+      },
+      {
+        "id": "sms",
+        "title": "Mensajes SMS de Contingencia",
+        "subtitle": "Respaldo si falla cobertura 4G",
+        "enabled": true
+      },
+      {
+        "id": "battery",
+        "title": "Aviso de Batería Baja (< 15%)",
+        "subtitle": "Alerta si el teléfono de Jorge corre riesgo de apagarse",
+        "enabled": true
+      }
+    ],
+    "logs": [
+      {
+        "id": 1,
+        "title": "Checkpoint superado sin novedades",
+        "time": "02:44 AM (Hace 2 min)",
+        "description": "Jorge cruzó el punto de control en Av. Alfonso Ugarte a una velocidad normal de 42 km/h. Batería en 84%.",
+        "type": "check",
+        "icon": "check_circle"
+      },
+      {
+        "id": 2,
+        "title": "Inicio de trayecto nocturno confirmado",
+        "time": "02:22 AM (Hace 24 min)",
+        "description": "Jorge inició trayecto desde Urb. Mercurio (Los Olivos) hacia San Isidro en su moto Honda CB190R.",
+        "type": "play",
+        "icon": "play_circle"
+      },
+      {
+        "id": 3,
+        "title": "Llegada a casa exitosa (Turno anterior)",
+        "time": "17 Sep · 06:36 AM",
+        "description": "Jorge marcó fin de trayecto seguro al ingresar a su domicilio en Los Olivos. Sesión cerrada.",
+        "type": "home",
+        "icon": "home"
+      },
+      {
+        "id": 4,
+        "title": "Desvío preventivo por mantenimiento vial",
+        "time": "15 Sep · 23:05 PM",
+        "description": "Se detectó un cambio de ruta por obras de asfaltado en Av. Alfonso Ugarte. Ruta recalculada.",
+        "type": "warning",
+        "icon": "warning"
+      }
+    ]
+  },
+  "companionEmergency": {
+    "rescueProtocol": {
+      "title": "Protocolo de Auxilio Rápido & Ficha de Rescate",
+      "instruction": "Si Jorge no responde o se activa señal SOS, entrega esta ficha a Serenazgo distrital o PNP con sus datos exactos.",
+      "officialBadge": "FICHA OFICIAL DE ASISTENCIA RÁPIDA (EMITIDA POR NOXWAY):",
+      "worker": "Jorge Luis Huamán Quispe (DNI 44.298.104 · 38 años)",
+      "employer": "Securitas Perú (Vigilancia en Torre Financiera San Isidro)",
+      "vehicle": "Moto Honda CB190R · Placa: 4521-7B (Roja/Negra)",
+      "workerPhone": "+51 987 654 321",
+      "contact": "Rosa Elena Paredes (+51 912 345 678)",
+      "lastGps": "-12.04637, -77.04279 (Av. Alfonso Ugarte con Colonial)"
+    },
+    "serenazgo": [
+      {
+        "id": 1,
+        "district": "Serenazgo Los Olivos",
+        "badge": "24 HORAS",
+        "originType": "Distrito de Origen (Vivienda)",
+        "phone": "(01) 613-6868",
+        "whatsapp": "942 789 123",
+        "base": "Av. Carlos Izaguirre cdra. 8",
+        "isCurrentZone": false
+      },
+      {
+        "id": 2,
+        "district": "Serenazgo Lima Cercado",
+        "badge": "EN ZONA",
+        "originType": "Zona Actual de Jorge (Alfonso Ugarte)",
+        "phone": "(01) 318-5050",
+        "base": "Plaza Dos de Mayo",
+        "responseTime": "~5 min",
+        "isCurrentZone": true
+      },
+      {
+        "id": 3,
+        "district": "Serenazgo San Isidro",
+        "badge": "24 HORAS",
+        "originType": "Distrito de Destino (Laboral)",
+        "phone": "(01) 513-9000",
+        "module": "Canaval y Moreyra",
+        "distance": "350m",
+        "isCurrentZone": false
+      }
+    ],
+    "nationalLines": [
+      {
+        "id": "pnp",
+        "code": "PNP 105",
+        "name": "Policía Nacional / Radio Patrulla",
+        "action": "Marcar 105",
+        "number": "105"
+      },
+      {
+        "id": "samu",
+        "code": "SAMU 106",
+        "name": "Ambulancias de Urgencia Médica",
+        "action": "Marcar 106",
+        "number": "106"
+      },
+      {
+        "id": "bomberos",
+        "code": "Bomberos 116",
+        "name": "Rescate & Accidentes Viales",
+        "action": "Marcar 116",
+        "number": "116"
+      },
+      {
+        "id": "securitas",
+        "code": "Securitas Perú",
+        "name": "Supervisor de Guardia Nocturna",
+        "action": "Llamar Base +51 998",
+        "number": "+51998000111"
+      }
+    ]
+  },
+  "companionInvitations": {
+    "pending": {
+      "id": 1,
+      "name": "Carlos Paredes Morales",
+      "relation": "(tu hermano)",
+      "message": "te ha invitado a ser su contacto protector para sus rutas nocturnas de delivery.",
+      "category": "Repartidor Nocturno (San Martín de Porres -> Miraflores)",
+      "schedule": "20:00 a 04:00 AM",
+      "status": "PENDIENTE DE CONFIRMACIÓN"
+    },
+    "activeWorkers": [
+      {
+        "id": 1,
+        "avatar": "JL",
+        "name": "Jorge Luis Huamán Quispe",
+        "badge": "VÍNCULO ACTIVO",
+        "relation": "Esposo",
+        "role": "Vigilante Nocturno en Securitas Perú",
+        "linkedSince": "15 Ago 2026",
+        "gpsRealTime": true,
+        "stopAlarm": true,
+        "whatsappNotification": "+51 912 345 678"
+      }
+    ],
+    "steps": [
+      {
+        "step": "01",
+        "title": "El Trabajador te Invita",
+        "desc1": "Desde su aplicación web Noxway, Jorge ingresa tu número de WhatsApp o correo electrónico.",
+        "desc2": "Genera un enlace de vinculación seguro y cifrado con caducidad temporal."
+      },
+      {
+        "step": "02",
+        "title": "Tú Aceptas el Vínculo",
+        "desc1": "Para proteger la privacidad de ambos, la visibilidad de ubicación solo se activa cuando inicia un trayecto nocturno.",
+        "desc2": "Puedes revocar o pausar el acompañamiento en cualquier momento."
+      },
+      {
+        "step": "03",
+        "title": "Protección Mutua 24h",
+        "desc1": "Recibes avisos automáticos cuando sale de casa y cuando llega a su trabajo sano y salvo.",
+        "desc2": "Descansas con la certeza de que el sistema vela por su traslado."
+      }
+    ]
+  },
+  "companionProfile": {
+    "avatar": "RP",
+    "fullName": "Rosa Elena Paredes Morales",
+    "verified": true,
+    "verifiedBadge": "CONTACTO VERIFICADO",
+    "relationship": "Contacto de Confianza Primario de Jorge Luis Huamán",
+    "location": "Los Olivos, Lima · Miembro activo de Noxway desde Agosto 2026",
+    "accountProtected": true,
+    "dni": "45.109.872 (Solo lectura)",
+    "phone": "+51 912 345 678",
+    "phoneValidation": "Validado con código de seguridad OTP",
+    "email": "rosaelena.paredes@correo.pe",
+    "address": "Urb. Mercurio Mz. C Lt. 14, Los Olivos",
+    "surveillanceStart": "22:00 PM",
+    "surveillanceEnd": "07:30 AM",
+    "autoRestTitle": "Modo Resguardo Automático",
+    "autoRestDesc": "Cuando Jorge marca llegada a casa por la mañana, el sistema entra en modo reposo para que puedas descansar en calma y sin avisos innecesarios.",
+    "encryptionTitle": "Cifrado de Extremo a Extremo",
+    "encryptionDesc": "Tus datos de contacto y la ubicación GPS de Jorge solo son visibles entre ustedes dos y las centrales de auxilio distrital autorizadas."
+  }
 }
