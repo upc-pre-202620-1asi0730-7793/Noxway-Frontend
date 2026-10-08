@@ -10,8 +10,7 @@ import { CompanionAlertChannel, CompanionAlertLog } from '../../../domain/model/
 @Component({
   selector: 'app-companion-alerts',
   imports: [MatCardModule, MatSlideToggleModule, MatButtonModule, MatIconModule, MatDividerModule],
-  templateUrl:
-    '../../../../../../../../../Desktop/Noxway-Frontend/src/app/companion/presentation/views/companion-alerts/companion-alerts.html',
+  templateUrl: './companion-alerts.html',
   styleUrl: './companion-alerts.css',
 })
 export class CompanionAlerts implements OnInit {
