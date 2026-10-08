@@ -1,0 +1,177 @@
+﻿<section class="journey-container">
+
+  <!-- Active Journey & Check-in Control Card -->
+  <mat-card class="active-commute-card">
+
+    <div class="commute-status-header">
+      <div class="status-pill active-glow">
+        <span class="pulse-dot"></span>
+        <span>{{ commute()?.status }}</span>
+      </div>
+      <div class="sync-info">
+        <span>Sincronizado con:</span>
+        <strong>{{ commute()?.companionName }}</strong>
+      </div>
+    </div>
+
+    <!-- Stepper / Checkpoints -->
+    <div class="checkpoints-row">
+      @for (cp of commute()?.checkpoints; track cp.id) {
+        <div class="checkpoint-item" [class.completed]="cp.completed" [class.estimated]="cp.estimated">
+          <mat-icon class="step-icon">
+            {{ cp.completed ? 'check_circle' : 'radio_button_unchecked' }}
+          </mat-icon>
+          <span class="checkpoint-text">
+            <strong>{{ cp.time }}</strong> - {{ cp.label }}
+          </span>
+        </div>
+      }
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar-wrapper">
+      <mat-progress-bar mode="determinate" [value]="progressPercentage()"></mat-progress-bar>
+    </div>
+
+    <!-- 4 Metrics Grid -->
+    <div class="metrics-grid">
+      <div class="metric-box">
+        <small class="metric-label">TIEMPO RESTANTE</small>
+        <strong class="metric-value">{{ commute()?.remainingTime }}</strong>
+      </div>
+
+      <div class="metric-box">
+        <small class="metric-label">HORA ESTIMADA</small>
+        <strong class="metric-value">{{ commute()?.estimatedArrival }}</strong>
+      </div>
+
+      <div class="metric-box">
+        <small class="metric-label">TOLERANCIA</small>
+        <strong class="metric-value">{{ commute()?.tolerance }}</strong>
+      </div>
+
+      <div class="metric-box">
+        <small class="metric-label">BATERÍA DISPOSITIVO</small>
+        <strong class="metric-value battery">{{ commute()?.deviceBattery }}</strong>
+      </div>
+    </div>
+
+    <!-- Actions Row -->
+    <div class="commute-actions-row">
+      <button
+        mat-flat-button
+        class="confirm-arrival-btn"
+        (click)="confirmArrival()">
+        <mat-icon class="btn-icon">check</mat-icon>
+        <span>CONFIRMAR LLEGADA SEGURA</span>
+      </button>
+
+      <button
+        mat-stroked-button
+        class="delay-btn"
+        (click)="reportDelay()">
+        <mat-icon class="btn-icon">more_time</mat-icon>
+        <span>Reportar Demora (+10m)</span>
+      </button>
+
+      <button
+        mat-stroked-button
+        class="incident-btn"
+        (click)="simulateIncident()">
+        <mat-icon class="btn-icon">error_outline</mat-icon>
+        <span>Simular Incidente</span>
+      </button>
+    </div>
+
+  </mat-card>
+
+  <!-- Two-column Section: Parameters & Telemetry -->
+  <div class="journey-details-grid">
+
+    <!-- Left Column: Parameters -->
+    <mat-card class="panel-card">
+      <h2 class="panel-title">Parámetros del Desplazamiento</h2>
+
+      <div class="field-group">
+        <label class="field-label">PUNTO DE ORIGEN</label>
+        <div class="field-value-box">
+          {{ commute()?.origin }}
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">DESTINO REGISTRADO</label>
+        <div class="field-value-box">
+          {{ commute()?.destination }}
+        </div>
+      </div>
+
+      <div class="two-fields-row">
+        <div class="field-group">
+          <label class="field-label">MEDIO DE TRANSPORTE</label>
+          <div class="field-value-box">
+            {{ commute()?.transport }}
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">RUTA SELECCIONADA</label>
+          <div class="field-value-box">
+            {{ commute()?.route }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Rating Box -->
+      <div class="route-rating-box">
+        <h4 class="rating-title">Calificación Comunitaria de Ruta</h4>
+        <p class="rating-sub">Al confirmar llegada, se habilitará la encuesta rápida:</p>
+        <div class="stars-row">
+          <div class="stars-icons">
+            <mat-icon class="star-icon">star</mat-icon>
+            <mat-icon class="star-icon">star</mat-icon>
+            <mat-icon class="star-icon">star</mat-icon>
+            <mat-icon class="star-icon">star</mat-icon>
+            <mat-icon class="star-icon">star</mat-icon>
+          </div>
+          <strong class="score">5/5</strong>
+        </div>
+        <blockquote class="route-quote">
+          "{{ commute()?.routeFeedback }}"
+        </blockquote>
+      </div>
+
+    </mat-card>
+
+    <!-- Right Column: Telemetry -->
+    <mat-card class="panel-card">
+      <div class="panel-header-row">
+        <h2 class="panel-title">Telemetría de Seguridad y Pings GPS</h2>
+        <span class="gps-badge">GPS ACTIVO</span>
+      </div>
+
+      <!-- Terminal Console Box -->
+      <div class="telemetry-terminal">
+        @for (ping of commute()?.telemetry; track $index) {
+          <div class="terminal-line" [class.success]="ping.type === 'success'" [class.warning]="ping.type === 'warning'" [class.danger]="ping.type === 'danger'">
+            <span class="terminal-prompt">></span>
+            <span class="terminal-ts">[{{ ping.timestamp }}]</span>
+            <span class="terminal-msg">{{ ping.message }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Privacy Guarantee Box -->
+      <div class="privacy-guarantee-card">
+        <div class="privacy-header">
+          <mat-icon class="shield-mat-icon">shield</mat-icon>
+          <strong>Garantía de Privacidad Noxway:</strong>
+        </div>
+        <p>Tu ubicación solo se comparte durante este trayecto activo. Al llegar, el seguimiento se desconecta de inmediato.</p>
+      </div>
+
+    </mat-card>
+
+  </div>
+
+</section>
