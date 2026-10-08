@@ -1,0 +1,695 @@
+<div class="live-container">
+
+  <!-- Top Hero Status Card -->
+  <mat-card class="hero-status-card">
+    <div class="hero-header">
+      <div class="hero-icon-box">
+        <mat-icon class="moto-icon">two_wheeler</mat-icon>
+      </div>
+
+      <div class="hero-title-group">
+        <div class="hero-title-row">
+          <h2 class="hero-title">Jorge está en camino a su centro de trabajo</h2>
+          <span class="active-journey-badge">EN TRAYECTO ACTIVO</span>
+        </div>
+        <p class="hero-route-text">
+          Ruta nocturna: Urb. Mercurio (Los Olivos) &rarr; Torre Financiera San Isidro (Sede Securitas Perú)
+        </p>
+      </div>
+    </div>
+
+    <div class="hero-metrics-grid">
+      <div class="metric-item">
+        <span class="metric-label">HORA ESTIMADA (ETA)</span>
+        <div class="metric-value-row">
+          <span class="metric-main-val">03:12 AM</span>
+          <span class="metric-sub-val green-text">faltan ~27 min (4.8 km)</span>
+        </div>
+      </div>
+
+      <div class="metric-item">
+        <span class="metric-label">BATERÍA DEL TELÉFONO</span>
+        <div class="metric-value-row">
+          <span class="metric-main-val">84%</span>
+          <span class="metric-sub-val">Cargando en moto</span>
+        </div>
+      </div>
+
+      <div class="metric-item">
+        <span class="metric-label">VELOCIDAD &amp; ESTADO</span>
+        <div class="metric-value-row">
+          <span class="metric-main-val">42 km/h</span>
+          <span class="metric-sub-val">Flujo continuo</span>
+        </div>
+      </div>
+
+      <div class="metric-item">
+        <span class="metric-label">ÚLTIMO CHECK-IN GPS</span>
+        <div class="metric-value-row">
+          <span class="metric-main-val">Hace 32s</span>
+          <span class="metric-sub-val gps-status">
+            <span class="dot-gps"></span>
+            Satélite 4G
+          </span>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Main 2-Column Section -->
+  <div class="live-grid">
+
+    <!-- Left Column: HD Tactical Map & Telemetry -->
+    <mat-card class="map-card">
+
+      <!-- Map Top Toolbar with Layers & Zoom Controls -->
+      <div class="map-toolbar">
+        <div class="toolbar-left">
+          <div class="tactical-badge">
+            <span class="badge-radar-dot"></span>
+            <span>NOX-SATELITAL HD &bull; LIMA METROPOLITANA</span>
+          </div>
+          <span class="coords-quick">-12.0463&deg; S, -77.0428&deg; W</span>
+        </div>
+
+        <div class="toolbar-layers">
+          <button
+            type="button"
+            class="layer-chip"
+            [class.active]="layerCorridor()"
+            (click)="toggleLayer('corridor')">
+            <mat-icon class="layer-ico">route</mat-icon>
+            <span>Ruta</span>
+          </button>
+
+          <button
+            type="button"
+            class="layer-chip"
+            [class.active]="layerSerenazgo()"
+            (click)="toggleLayer('serenazgo')">
+            <mat-icon class="layer-ico">security</mat-icon>
+            <span>Serenazgo</span>
+          </button>
+
+          <button
+            type="button"
+            class="layer-chip"
+            [class.active]="layerMedical()"
+            (click)="toggleLayer('medical')">
+            <mat-icon class="layer-ico">local_hospital</mat-icon>
+            <span>Auxilio 24h</span>
+          </button>
+
+          <button
+            type="button"
+            class="layer-chip"
+            [class.active]="layerRisk()"
+            (click)="toggleLayer('risk')">
+            <mat-icon class="layer-ico">warning</mat-icon>
+            <span>Riesgo</span>
+          </button>
+        </div>
+
+        <!-- Zoom & Viewport Controls -->
+        <div class="toolbar-controls">
+          <button
+            mat-icon-button
+            class="ctrl-btn"
+            title="Acercar mapa"
+            (click)="zoomIn()">
+            <mat-icon>add</mat-icon>
+          </button>
+
+          <button
+            mat-icon-button
+            class="ctrl-btn"
+            title="Alejar mapa"
+            (click)="zoomOut()">
+            <mat-icon>remove</mat-icon>
+          </button>
+
+          <button
+            mat-icon-button
+            class="ctrl-btn"
+            [class.ctrl-active]="activeView() === 'jorge'"
+            title="Centrar en Jorge"
+            (click)="focusOnJorge()">
+            <mat-icon>my_location</mat-icon>
+          </button>
+
+          <button
+            mat-icon-button
+            class="ctrl-btn"
+            title="Restablecer vista completa"
+            (click)="resetView()">
+            <mat-icon>zoom_out_map</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- High-Definition Tactical Map Canvas -->
+      <div class="map-viewport-container">
+
+        <div class="map-stage"
+             [style.transform]="activeView() === 'jorge'
+                ? 'scale(' + zoomLevel() * 1.35 + ') translate(-15%, -12%)'
+                : activeView() === 'destination'
+                ? 'scale(' + zoomLevel() * 1.35 + ') translate(-26%, -24%)'
+                : 'scale(' + zoomLevel() + ')'">
+
+          <svg viewBox="0 0 920 540" class="tactical-svg-canvas" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <!-- Glowing neon laser gradients -->
+              <linearGradient id="neonLaserGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#10b981" />
+                <stop offset="60%" stop-color="#34d399" />
+                <stop offset="100%" stop-color="#38bdf8" />
+              </linearGradient>
+
+              <!-- Ocean Gradient -->
+              <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="80%" y2="100%">
+                <stop offset="0%" stop-color="#020611" />
+                <stop offset="60%" stop-color="#050e24" />
+                <stop offset="100%" stop-color="#081836" />
+              </linearGradient>
+
+              <!-- River Gradient -->
+              <linearGradient id="riverGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#0d2847" />
+                <stop offset="50%" stop-color="#1e3a63" />
+                <stop offset="100%" stop-color="#0d2847" />
+              </linearGradient>
+
+              <!-- Headlight Cone Gradient -->
+              <radialGradient id="headlightBeam" cx="30%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#fef08a" stop-opacity="0.55" />
+                <stop offset="70%" stop-color="#eab308" stop-opacity="0.15" />
+                <stop offset="100%" stop-color="#eab308" stop-opacity="0" />
+              </radialGradient>
+
+              <!-- Soft Glow Filter -->
+              <filter id="corridorGlow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="4.5" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
+
+              <!-- Danger Stripe Pattern -->
+              <pattern id="dangerHatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="8" stroke="#ef4444" stroke-width="2.5" stroke-opacity="0.35" />
+              </pattern>
+            </defs>
+
+            <!-- Base Ground Landmass -->
+            <rect width="920" height="540" fill="#080e1c" />
+
+            <!-- Urban District Meshes & Blocks (City Texture) -->
+            <!-- Northern City Grid (Los Olivos & SMP) -->
+            <g opacity="0.4">
+              <path d="M 120 40 L 320 40 L 340 180 L 140 180 Z" fill="#0c162d" stroke="#13203c" stroke-width="0.8" />
+              <line x1="160" y1="40" x2="180" y2="180" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="220" y1="40" x2="240" y2="180" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="280" y1="40" x2="300" y2="180" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="130" y1="90" x2="330" y2="90" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="135" y1="140" x2="335" y2="140" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+            </g>
+
+            <!-- Central City Grid (Cercado, Breña, Jesús María) -->
+            <g opacity="0.4">
+              <path d="M 330 220 L 560 220 L 590 380 L 360 380 Z" fill="#0c162d" stroke="#13203c" stroke-width="0.8" />
+              <line x1="390" y1="220" x2="420" y2="380" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="450" y1="220" x2="480" y2="380" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="510" y1="220" x2="540" y2="380" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="340" y1="270" x2="570" y2="270" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="350" y1="330" x2="580" y2="330" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+            </g>
+
+            <!-- Southern Financial Grid (San Isidro & Lince) -->
+            <g opacity="0.4">
+              <path d="M 520 370 L 780 370 L 810 520 L 550 520 Z" fill="#0c162d" stroke="#13203c" stroke-width="0.8" />
+              <line x1="580" y1="370" x2="610" y2="520" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="650" y1="370" x2="680" y2="520" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="720" y1="370" x2="750" y2="520" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="530" y1="420" x2="790" y2="420" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+              <line x1="540" y1="470" x2="800" y2="470" stroke="#142342" stroke-width="1" stroke-dasharray="3,3" />
+            </g>
+
+            <!-- Pacific Ocean & Costa Verde Coastline -->
+            <path d="M 0 160
+                     Q 45 200, 35 240
+                     T 60 310
+                     Q 90 380, 130 440
+                     Q 170 500, 240 540
+                     L 0 540 Z"
+                  fill="url(#oceanGrad)"
+                  stroke="#1b3558"
+                  stroke-width="2" />
+
+            <!-- Coastline cliff bathymetry contours -->
+            <path d="M 0 180 Q 40 220, 30 255 T 50 325 Q 80 395, 115 450 Q 155 510, 215 540"
+                  fill="none" stroke="#102542" stroke-width="1.5" stroke-dasharray="4,4" />
+            <path d="M 0 210 Q 30 245, 20 275 T 35 345 Q 60 415, 95 470 Q 130 520, 185 540"
+                  fill="none" stroke="#0d1e36" stroke-width="1.2" stroke-dasharray="3,3" />
+
+            <!-- Ocean Label -->
+            <text x="35" y="475" fill="#2d4a6f" font-size="11" font-weight="700" letter-spacing="1.8" transform="rotate(-40 35 475)">
+              OCÉANO PACÍFICO &bull; LITORAL LIMA
+            </text>
+
+            <!-- Río Rímac Corridor -->
+            <path d="M 850 110
+                     Q 650 140, 520 170
+                     T 360 215
+                     Q 240 230, 140 240
+                     L 35 245"
+                  fill="none"
+                  stroke="url(#riverGrad)"
+                  stroke-width="14"
+                  stroke-linecap="round" />
+            <path d="M 850 110 Q 650 140, 520 170 T 360 215 Q 240 230, 140 240 L 35 245"
+                  fill="none" stroke="#2563eb" stroke-width="2" stroke-opacity="0.4" />
+            <text x="610" y="150" fill="#3b82f6" font-size="10" font-weight="600" opacity="0.6" letter-spacing="1">
+              RÍO RÍMAC
+            </text>
+
+            <!-- Urban Parks & Green Reserves -->
+            <!-- Bosque El Olivar (San Isidro) -->
+            <ellipse cx="610" cy="455" rx="32" ry="20" fill="#042f20" stroke="#059669" stroke-width="1" stroke-opacity="0.6" />
+            <text x="590" y="458" fill="#34d399" font-size="9" font-weight="600">El Olivar</text>
+
+            <!-- Campo de Marte (Jesús María) -->
+            <ellipse cx="440" cy="365" rx="26" ry="16" fill="#042f20" stroke="#059669" stroke-width="1" stroke-opacity="0.5" />
+            <text x="418" y="368" fill="#34d399" font-size="8.5" font-weight="600">Campo Marte</text>
+
+            <!-- Landmark: Reserve Park (Magic Water Circuit) -->
+            <rect x="490" y="340" width="30" height="20" rx="4" fill="#042f20" stroke="#059669" stroke-width="1" stroke-opacity="0.5" />
+            <text x="493" y="353" fill="#34d399" font-size="8" font-weight="600">Pque. Reserva</text>
+
+            <!-- District Geographic Boundaries & Labels -->
+            <text x="170" y="55" fill="#475569" font-size="12" font-weight="800" letter-spacing="1.8">LOS OLIVOS</text>
+            <text x="140" y="165" fill="#334155" font-size="10" font-weight="700" letter-spacing="1.5">SAN MARTÍN DE PORRES</text>
+            <text x="460" y="115" fill="#334155" font-size="11" font-weight="700" letter-spacing="1.5">RÍMAC</text>
+            <text x="390" y="245" fill="#475569" font-size="11.5" font-weight="800" letter-spacing="1.8">CERCADO DE LIMA</text>
+            <text x="330" y="335" fill="#334155" font-size="10" font-weight="700" letter-spacing="1.5">BREÑA</text>
+            <text x="390" y="415" fill="#334155" font-size="10" font-weight="700" letter-spacing="1.5">JESÚS MARÍA</text>
+            <text x="495" y="435" fill="#334155" font-size="10" font-weight="700" letter-spacing="1.5">LINCE</text>
+            <text x="640" y="415" fill="#475569" font-size="12" font-weight="800" letter-spacing="1.8">SAN ISIDRO</text>
+            <text x="580" y="525" fill="#334155" font-size="11" font-weight="700" letter-spacing="1.5">MIRAFLORES</text>
+
+            <!-- Major Illuminated Avenues Network -->
+            <!-- 1. Pan-American Highway North & Evitamiento Highway -->
+            <path d="M 270 0 Q 285 90, 310 145 T 355 225 L 430 220"
+                  fill="none" stroke="#162540" stroke-width="12" stroke-linecap="round" />
+            <path d="M 270 0 Q 285 90, 310 145 T 355 225"
+                  fill="none" stroke="#253e66" stroke-width="2.5" />
+            <text x="282" y="25" fill="#475569" font-size="8.5" font-weight="600" transform="rotate(70 282 25)">
+              PANAMERICANA NORTE
+            </text>
+
+            <!-- 2. Av. Universitaria (SMP -> San Miguel) -->
+            <path d="M 180 0 Q 170 120, 185 240 T 145 420"
+                  fill="none" stroke="#14213a" stroke-width="10" />
+            <path d="M 180 0 Q 170 120, 185 240 T 145 420"
+                  fill="none" stroke="#1e3256" stroke-width="1.8" stroke-dasharray="6,4" />
+            <text x="180" y="110" fill="#475569" font-size="8.5" font-weight="600" transform="rotate(80 180 110)">
+              AV. UNIVERSITARIA
+            </text>
+
+            <!-- 3. Alfonso Ugarte Avenue (Ejercito Bridge to Bolognesi) -->
+            <path d="M 355 225 Q 390 270, 415 295 T 465 365"
+                  fill="none" stroke="#1c2d4d" stroke-width="12" stroke-linecap="round" />
+            <path d="M 355 225 Q 390 270, 415 295 T 465 365"
+                  fill="none" stroke="#334f7c" stroke-width="2.5" />
+            <text x="410" y="275" fill="#64748b" font-size="9" font-weight="700">
+              AV. ALFONSO UGARTE
+            </text>
+
+            <!-- 4. Paseo de la Republica Expressway -->
+            <path d="M 500 330 Q 560 395, 630 455 T 720 540"
+                  fill="none" stroke="#162540" stroke-width="14" stroke-linecap="round" />
+            <path d="M 500 330 Q 560 395, 630 455 T 720 540"
+                  fill="none" stroke="#2b4774" stroke-width="3" />
+            <text x="575" y="425" fill="#64748b" font-size="9" font-weight="700" transform="rotate(35 575 425)">
+              VÍA EXPRESA PASEO DE LA REPÚBLICA
+            </text>
+
+            <!-- 5. Av. Arequipa & Av. Salaverry -->
+            <path d="M 470 365 Q 520 420, 580 480"
+                  fill="none" stroke="#14213a" stroke-width="8" />
+            <path d="M 440 375 Q 480 435, 540 500"
+                  fill="none" stroke="#14213a" stroke-width="8" />
+            <text x="510" y="435" fill="#475569" font-size="8.5" font-weight="600" transform="rotate(40 510 435)">
+              AV. AREQUIPA
+            </text>
+
+            <!-- 6. Av. Javier Prado (Transversal Expressway) -->
+            <path d="M 230 485 Q 490 465, 750 455 T 900 450"
+                  fill="none" stroke="#182744" stroke-width="12" />
+            <path d="M 230 485 Q 490 465, 750 455 T 900 450"
+                  fill="none" stroke="#253f68" stroke-width="2" stroke-dasharray="8,6" />
+            <text x="730" y="445" fill="#64748b" font-size="9" font-weight="700">
+              AV. JAVIER PRADO ESTE
+            </text>
+
+            <!-- Historic Roundabouts (Óvalos) -->
+            <!-- Óvalo Habich -->
+            <circle cx="310" cy="145" r="10" fill="#0d1b32" stroke="#253e66" stroke-width="2" />
+            <!-- Plaza Dos de Mayo -->
+            <circle cx="415" cy="295" r="13" fill="#0d1b32" stroke="#334f7c" stroke-width="2.5" />
+            <circle cx="415" cy="295" r="4" fill="#64748b" />
+            <text x="355" y="300" fill="#94a3b8" font-size="8" font-weight="600">Pza. Dos de Mayo</text>
+            <!-- Plaza Bolognesi -->
+            <circle cx="465" cy="365" r="12" fill="#0d1b32" stroke="#2b4774" stroke-width="2" />
+            <circle cx="465" cy="365" r="3.5" fill="#64748b" />
+            <text x="475" y="378" fill="#94a3b8" font-size="8" font-weight="600">Pza. Bolognesi</text>
+
+            <!-- Bridges over Rimac River -->
+            <!-- Ejercito Bridge -->
+            <rect x="345" y="218" width="20" height="12" fill="#3b82f6" fill-opacity="0.3" stroke="#60a5fa" stroke-width="1.5" rx="2" />
+            <text x="275" y="222" fill="#93c5fd" font-size="8" font-weight="600">Pte. del Ejército</text>
+
+            <!-- OPTIONAL LAYER: Risk Zones -->
+            @if (layerRisk()) {
+              <!-- Danger Zone 1: Dark Road Hazard in San Martin de Porres -->
+              <g class="layer-risk-group">
+                <polygon points="190,135 250,150 240,195 180,180" fill="url(#dangerHatch)" stroke="#ef4444" stroke-width="1.8" />
+                <circle cx="215" cy="165" r="10" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.5" />
+                <text x="212" y="170" fill="#fca5a5" font-size="10" font-weight="900">!</text>
+                <text x="228" y="168" fill="#fca5a5" font-size="8.5" font-weight="600">Tramo Oscuro SMP</text>
+              </g>
+            }
+
+            <!-- OPTIONAL LAYER: Municipal Patrol (Serenazgo) Posts & Coverage -->
+            @if (layerSerenazgo()) {
+              <!-- Municipal Patrol: Los Olivos Station -->
+              <g class="layer-serenazgo-group">
+                <circle cx="215" cy="70" r="45" fill="#0d9488" fill-opacity="0.08" stroke="#0d9488" stroke-dasharray="3,3" stroke-width="1.2" />
+                <circle cx="215" cy="70" r="7" fill="#0f766e" stroke="#2dd4bf" stroke-width="1.5" />
+                <text x="180" y="85" fill="#5eead4" font-size="8" font-weight="600">Serenazgo Los Olivos</text>
+              </g>
+
+              <!-- Municipal Patrol: Lima Cercado Station (Current Zone) -->
+              <g class="layer-serenazgo-group">
+                <circle cx="415" cy="295" r="60" fill="#10b981" fill-opacity="0.12" stroke="#10b981" stroke-dasharray="4,4" stroke-width="1.8" />
+                <rect x="425" y="285" width="86" height="18" rx="4" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+                <text x="430" y="297" fill="#34d399" font-size="8" font-weight="700">BASE CERCADO EN ZONA</text>
+              </g>
+
+              <!-- Municipal Patrol: San Isidro Station -->
+              <g class="layer-serenazgo-group">
+                <circle cx="680" cy="460" r="48" fill="#2563eb" fill-opacity="0.08" stroke="#3b82f6" stroke-dasharray="3,3" stroke-width="1.2" />
+                <circle cx="680" cy="460" r="7" fill="#1d4ed8" stroke="#60a5fa" stroke-width="1.5" />
+                <text x="692" y="463" fill="#93c5fd" font-size="8" font-weight="600">Serenazgo San Isidro</text>
+              </g>
+            }
+
+            <!-- OPTIONAL LAYER: 24h Medical Emergency Posts -->
+            @if (layerMedical()) {
+              <!-- Hospital Arzobispo Loayza (Av. Alfonso Ugarte) -->
+              <g class="layer-medical-group" (click)="selectPoint(checkpoints[3])" style="cursor: pointer;">
+                <circle cx="438" cy="312" r="13" fill="#172554" stroke="#3b82f6" stroke-width="1.8" />
+                <rect x="435" y="306" width="6" height="12" fill="#60a5fa" />
+                <rect x="432" y="309" width="12" height="6" fill="#60a5fa" />
+                <rect x="454" y="304" width="98" height="18" rx="4" fill="#0e1f3a" stroke="#2563eb" stroke-width="1" />
+                <text x="459" y="316" fill="#93c5fd" font-size="8.5" font-weight="600">Hosp. Loayza 24h</text>
+              </g>
+
+              <!-- Hospital Rebagliati (Jesús María) -->
+              <g class="layer-medical-group">
+                <circle cx="530" cy="405" r="11" fill="#172554" stroke="#3b82f6" stroke-width="1.5" />
+                <rect x="528" y="400" width="4" height="10" fill="#60a5fa" />
+                <rect x="525" y="403" width="10" height="4" fill="#60a5fa" />
+                <text x="545" y="409" fill="#93c5fd" font-size="8" font-weight="500">Hosp. Rebagliati</text>
+              </g>
+            }
+
+            <!-- LAYER: ACTIVE JOURNEY CORRIDOR (Illuminated Safe Route) -->
+            @if (layerCorridor()) {
+
+              <!-- Completed Path (Illuminated Glowing Laser Line) -->
+              <path d="M 215 70
+                       L 310 145
+                       L 355 225
+                       L 415 295
+                       L 440 325"
+                    stroke="url(#neonLaserGrad)"
+                    stroke-width="5.5"
+                    stroke-linecap="round"
+                    fill="none"
+                    filter="url(#corridorGlow)" />
+
+              <!-- Remaining Trajectory to San Isidro (Animated Dashed Laser) -->
+              <path d="M 440 325
+                       L 465 365
+                       Q 520 415, 590 450
+                       L 670 480"
+                    stroke="#10b981"
+                    stroke-width="3.5"
+                    stroke-dasharray="7,6"
+                    stroke-opacity="0.8"
+                    stroke-linecap="round"
+                    fill="none"
+                    class="anim-route-dash" />
+
+              <!-- Directional Chevrons along completed route -->
+              <polygon points="260,105 264,109 260,113" fill="#ffffff" />
+              <polygon points="332,182 336,186 332,190" fill="#ffffff" />
+              <polygon points="383,258 387,262 383,266" fill="#ffffff" />
+            }
+
+            <!-- CHECKPOINTS ALONG THE ROUTE -->
+
+            <!-- Point 1: Origin (Los Olivos) -->
+            <g class="checkpoint-node" (click)="selectPoint(checkpoints[0])" style="cursor: pointer;">
+              <circle cx="215" cy="70" r="12" fill="#064e3b" stroke="#10b981" stroke-width="2.5" />
+              <circle cx="215" cy="70" r="4.5" fill="#ffffff" />
+              <rect x="232" y="60" width="168" height="22" rx="5" fill="#0a1628" stroke="#10b981" stroke-width="1.2" />
+              <text x="240" y="74" fill="#f8fafc" font-size="9" font-weight="700">Inicio: Urb. Mercurio (02:22 AM)</text>
+            </g>
+
+            <!-- Point 2: Óvalo Habich -->
+            <g class="checkpoint-node" (click)="selectPoint(checkpoints[1])" style="cursor: pointer;">
+              <circle cx="310" cy="145" r="7" fill="#10b981" stroke="#ffffff" stroke-width="1.8" />
+              <text x="322" y="149" fill="#cbd5e1" font-size="9" font-weight="600">&check; Óvalo Habich</text>
+            </g>
+
+            <!-- Point 3: Puente del Ejército -->
+            <g class="checkpoint-node" (click)="selectPoint(checkpoints[2])" style="cursor: pointer;">
+              <circle cx="355" cy="225" r="7" fill="#10b981" stroke="#ffffff" stroke-width="1.8" />
+              <text x="367" y="222" fill="#cbd5e1" font-size="9" font-weight="600">&check; Pto. del Ejército</text>
+            </g>
+
+            <!-- LIVE POSITION: Jorge Huamán on Av. Alfonso Ugarte -->
+            <!-- Concentric Pulse Radar Waves -->
+            <g class="jorge-live-marker" (click)="selectPoint(checkpoints[4])" style="cursor: pointer;">
+              <!-- Radar circle ripples -->
+              <circle cx="440" cy="325" r="40" fill="#10b981" fill-opacity="0.12" class="radar-ripple-3" />
+              <circle cx="440" cy="325" r="26" fill="#10b981" fill-opacity="0.22" class="radar-ripple-2" />
+              <circle cx="440" cy="325" r="14" fill="#10b981" fill-opacity="0.4" class="radar-ripple-1" />
+
+              <!-- Forward Headlight Cone Beam (illuminate southward toward Bolognesi) -->
+              <path d="M 440 325 L 465 375 L 490 355 Z" fill="url(#headlightBeam)" />
+
+              <!-- Motorcycle Center Dot -->
+              <circle cx="440" cy="325" r="8" fill="#10b981" stroke="#ffffff" stroke-width="2.5" />
+              <circle cx="440" cy="325" r="3" fill="#ffffff" />
+
+              <!-- Floating Glassmorphism Telemetry HUD Card -->
+              <g transform="translate(460, 295)">
+                <rect width="180" height="54" rx="8" fill="#0d1b2a" stroke="#d97706" stroke-width="1.8" filter="url(#corridorGlow)" />
+                <circle cx="16" cy="18" r="4" fill="#10b981" />
+                <text x="26" y="22" fill="#ffffff" font-size="11" font-weight="800">JORGE LUIS HUAMÁN</text>
+                <text x="14" y="38" fill="#94a3b8" font-size="9.5">Av. Alfonso Ugarte &bull; 42 km/h</text>
+                <text x="14" y="49" fill="#34d399" font-size="8.5" font-weight="600">Check-in OK (GPS L1/L5)</text>
+              </g>
+            </g>
+
+            <!-- Point 5: Destination (San Isidro) -->
+            <g class="destination-node" (click)="selectPoint(checkpoints[5])" style="cursor: pointer;">
+              <circle cx="670" cy="480" r="14" fill="#1e3a8a" stroke="#3b82f6" stroke-width="2.5" />
+              <circle cx="670" cy="480" r="6" fill="#60a5fa" />
+              <rect x="580" y="498" width="180" height="24" rx="6" fill="#0b1424" stroke="#2563eb" stroke-width="1.2" />
+              <text x="590" y="514" fill="#93c5fd" font-size="9.5" font-weight="700">Torre Financiera San Isidro</text>
+            </g>
+
+            <!-- Tactical Compass Rose (Top Right Corner) -->
+            <g transform="translate(865, 45)">
+              <circle cx="0" cy="0" r="18" fill="#0d172a" stroke="#1e293b" stroke-width="1.5" />
+              <polygon points="0,-14 4,-2 0,0 -4,-2" fill="#ef4444" />
+              <polygon points="0,14 4,2 0,0 -4,2" fill="#64748b" />
+              <text x="-4" y="-17" fill="#ef4444" font-size="8" font-weight="800">N</text>
+            </g>
+
+            <!-- Scale Bar (Bottom Left) -->
+            <g transform="translate(45, 515)">
+              <line x1="0" y1="0" x2="60" y2="0" stroke="#64748b" stroke-width="2" />
+              <line x1="0" y1="-4" x2="0" y2="4" stroke="#64748b" stroke-width="2" />
+              <line x1="60" y1="-4" x2="60" y2="4" stroke="#64748b" stroke-width="2" />
+              <text x="18" y="-6" fill="#64748b" font-size="8" font-weight="600">2.5 km</text>
+            </g>
+
+          </svg>
+
+        </div>
+
+        <!-- Selected Point Popover Overlay -->
+        @if (selectedPoint(); as pt) {
+          <div class="point-detail-popover">
+            <div class="popover-header">
+              <span class="popover-type-badge" [class]="'badge-' + pt.type">
+                {{ pt.type | uppercase }}
+              </span>
+              <button mat-icon-button class="popover-close-btn" (click)="closePointDetail()">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <h4 class="popover-title">{{ pt.name }}</h4>
+            <div class="popover-time">{{ pt.time }}</div>
+            <p class="popover-desc">{{ pt.detail }}</p>
+          </div>
+        }
+
+      </div>
+
+      <!-- Tactical Telemetry HUD Footer Bar -->
+      <div class="map-telemetry-hud">
+        <div class="hud-item">
+          <span class="hud-label">TELEMETRÍA GPS:</span>
+          <span class="hud-value">-12.04637&deg; S, -77.04279&deg; W</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">PRECISIÓN:</span>
+          <span class="hud-value green-hud">&plusmn;1.8m (Diferencial)</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">SATÉLITES:</span>
+          <span class="hud-value">14 Activos (L1/L5)</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">CORREDOR:</span>
+          <span class="hud-value">Iluminado 24h &bull; Flujo Normal</span>
+        </div>
+      </div>
+
+      <!-- Stepper / Route Milestone Footer -->
+      <div class="milestones-bar">
+        <span class="milestones-label">HITOS DE CONTROL EN RUTA:</span>
+        <div class="milestone-steps">
+          <div class="step-point passed" (click)="selectPoint(checkpoints[0])">
+            <span class="step-dot"></span>
+            <span class="step-name">Salida</span>
+          </div>
+          <div class="step-line passed"></div>
+          <div class="step-point passed" (click)="selectPoint(checkpoints[1])">
+            <span class="step-dot"></span>
+            <span class="step-name">Habich</span>
+          </div>
+          <div class="step-line passed"></div>
+          <div class="step-point current" (click)="focusOnJorge()">
+            <span class="step-dot pulse"></span>
+            <span class="step-name">En Tránsito</span>
+          </div>
+          <div class="step-line pending"></div>
+          <div class="step-point pending" (click)="focusOnDestination()">
+            <span class="step-dot"></span>
+            <span class="step-name">San Isidro</span>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Right Column: Quick Actions & Worker Profile -->
+    <div class="side-column">
+
+      <!-- Action Buttons Card -->
+      <mat-card class="side-card">
+        <h4 class="side-card-title">Acciones de Contacto Rápido</h4>
+        <div class="quick-actions-list">
+          <button
+            mat-flat-button
+            class="action-btn-primary"
+            (click)="onCallWorker()">
+            <mat-icon class="btn-icon">phone</mat-icon>
+            Llamar al Celular de Jorge
+          </button>
+
+          <button
+            mat-stroked-button
+            class="action-btn-secondary"
+            (click)="onSendWhatsAppPing()">
+            <mat-icon class="btn-icon">chat</mat-icon>
+            Enviar Ping por WhatsApp
+          </button>
+
+          <a
+            mat-flat-button
+            routerLink="/companion/emergency"
+            class="action-btn-danger">
+            <mat-icon class="btn-icon">local_police</mat-icon>
+            Directorio de Serenazgo &amp; Auxilio
+          </a>
+        </div>
+      </mat-card>
+
+      <!-- Worker Details Sheet Card -->
+      <mat-card class="side-card">
+        <h4 class="side-card-title">Ficha del Trabajador Acompañado</h4>
+
+        <div class="worker-sheet-header">
+          <div class="avatar-circle">
+            JL
+          </div>
+          <div>
+            <h5 class="worker-sheet-name">Jorge Luis Huamán Quispe</h5>
+            <span class="worker-sheet-doc">DNI: 44.298.104 &bull; 38 años</span>
+          </div>
+        </div>
+
+        <div class="worker-sheet-details">
+          <div class="detail-row">
+            <span class="detail-k">Empresa:</span>
+            <span class="detail-v">Securitas Perú (Vigilante)</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-k">Turno:</span>
+            <span class="detail-v">Noche 19:00 a 07:00</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-k">Vehículo:</span>
+            <span class="detail-v">Moto Honda CB190R</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-k">Placa:</span>
+            <span class="plate-badge">4521-7B</span>
+            <span class="detail-v-sub">(Roja/Negra)</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Active Protection Rules Card -->
+      <mat-card class="side-card">
+        <h4 class="side-card-title">Reglas de Protección Activa</h4>
+        <div class="rules-list">
+          <div class="rule-item">
+            <mat-icon class="rule-check">check</mat-icon>
+            <span>Alerta por parada mayor a 4 min fuera de zona segura</span>
+          </div>
+          <div class="rule-item">
+            <mat-icon class="rule-check">check</mat-icon>
+            <span>Aviso de desvío mayor a 400m de la ruta</span>
+          </div>
+          <div class="rule-item">
+            <mat-icon class="rule-check">check</mat-icon>
+            <span>Notificación de batería baja si es menor a 15%</span>
+          </div>
+          <div class="rule-item">
+            <mat-icon class="rule-check">check</mat-icon>
+            <span>Enlace directo con Serenazgo Lima y San Isidro</span>
+          </div>
+        </div>
+      </mat-card>
+
+    </div>
+
+  </div>
+
+</div>

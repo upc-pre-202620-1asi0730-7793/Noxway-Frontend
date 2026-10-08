@@ -1,0 +1,187 @@
+<div class="history-container">
+
+  <!-- 4 Stat Summary Cards -->
+  <div class="stats-row">
+
+    <mat-card class="stat-card">
+      <span class="stat-label">TRAYECTOS MONITOREADOS</span>
+      <div class="stat-number-row">
+        <h3 class="stat-number">48 Rutas</h3>
+      </div>
+      <div class="stat-footer">
+        <span class="dot-green"></span>
+        <span class="stat-subtext">Septiembre 2026</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <span class="stat-label">LLEGADA SEGURA</span>
+      <div class="stat-number-row">
+        <h3 class="stat-number color-green">100%</h3>
+      </div>
+      <div class="stat-footer">
+        <span class="stat-subtext">48 de 48 confirmados</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <span class="stat-label">TIEMPO PROMEDIO EN RUTA</span>
+      <div class="stat-number-row">
+        <h3 class="stat-number color-blue">31.4 min</h3>
+      </div>
+      <div class="stat-footer">
+        <span class="stat-subtext">Distancia: 13.2 km</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <span class="stat-label">DESVÍOS RESUELTOS</span>
+      <div class="stat-number-row">
+        <h3 class="stat-number color-amber">1 Alerta</h3>
+      </div>
+      <div class="stat-footer">
+        <span class="stat-subtext">Obras en Av. Brasil (15 Sep)</span>
+      </div>
+    </mat-card>
+
+  </div>
+
+  <!-- Filter & Actions Bar -->
+  <div class="filters-bar">
+    <div class="filter-chips">
+      <button
+        mat-flat-button
+        class="filter-btn"
+        [class.filter-active]="activeFilter() === 'all'"
+        (click)="setFilter('all')">
+        Todos los Trayectos
+      </button>
+
+      <button
+        mat-stroked-button
+        class="filter-btn"
+        [class.filter-active]="activeFilter() === 'work'"
+        (click)="setFilter('work')">
+        Idas Noche (Trabajo)
+      </button>
+
+      <button
+        mat-stroked-button
+        class="filter-btn"
+        [class.filter-active]="activeFilter() === 'home'"
+        (click)="setFilter('home')">
+        Retornos Madrugada
+      </button>
+    </div>
+
+    <button
+      mat-stroked-button
+      class="download-btn"
+      (click)="onDownloadPdf()">
+      <mat-icon class="btn-icon">download</mat-icon>
+      <span>Descargar Reporte PDF</span>
+    </button>
+  </div>
+
+  <!-- Table Card -->
+  <mat-card class="table-card">
+    <div class="table-card-header">
+      <h3 class="table-card-title">Auditoría y Registro de Desplazamientos Nocturnos</h3>
+    </div>
+
+    <div class="table-responsive">
+      <table class="audit-table">
+        <thead>
+        <tr>
+          <th>FECHA &amp; HORARIO</th>
+          <th>TIPO &amp; TRANSPORTE</th>
+          <th>ORIGEN &rarr; DESTINO</th>
+          <th>DURACIÓN</th>
+          <th>ESTADO DE SEGURIDAD</th>
+          <th class="th-action">ACCIÓN</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (record of filteredRecords; track record.id) {
+            <tr [class.row-current]="record.isCurrent">
+
+              <!-- Date & Time -->
+              <td>
+                <div class="cell-primary">{{ record.date }}</div>
+                <div class="cell-sub" [class.sub-green]="record.isCurrent">{{ record.time }}</div>
+              </td>
+
+              <!-- Type & Vehicle -->
+              <td>
+                <div class="cell-primary"
+                     [class.type-work]="record.type.includes('Ida')"
+                     [class.type-home]="record.type.includes('Retorno')">
+                  {{ record.type }}
+                </div>
+                <div class="cell-sub">{{ record.transport }}</div>
+              </td>
+
+              <!-- Origin & Destination -->
+              <td>
+                <div class="cell-primary">{{ record.origin }} &rarr; {{ record.destination }}</div>
+                <div class="cell-sub" [class.sub-amber]="record.statusType === 'warning'">
+                  {{ record.via }}
+                </div>
+              </td>
+
+              <!-- Duration -->
+              <td>
+                <div class="duration-text"
+                     [class.dur-active]="record.isCurrent"
+                     [class.dur-warning]="record.statusType === 'warning'">
+                  {{ record.duration }}
+                </div>
+              </td>
+
+              <!-- Status Badge -->
+              <td>
+                @if (record.isCurrent) {
+                  <span class="badge-status-active">
+                    <span class="pulse-dot"></span>
+                    {{ record.status }}
+                  </span>
+                } @else if (record.statusType === 'success') {
+                  <span class="badge-status-success">
+                    <mat-icon class="status-icon">check</mat-icon>
+                    {{ record.status }}
+                  </span>
+                } @else if (record.statusType === 'warning') {
+                  <span class="badge-status-warning">
+                    <mat-icon class="status-icon">warning</mat-icon>
+                    {{ record.status }}
+                  </span>
+                }
+              </td>
+
+              <!-- Action Button -->
+              <td class="td-action">
+                @if (record.isCurrent) {
+                  <a
+                    mat-flat-button
+                    routerLink="/companion/live"
+                    class="action-btn-live">
+                    Ver en Vivo
+                  </a>
+                } @else {
+                  <button
+                    mat-stroked-button
+                    class="action-btn-detail"
+                    (click)="onViewDetail(record)">
+                    Ver Detalle
+                  </button>
+                }
+              </td>
+
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </mat-card>
+
+</div>
