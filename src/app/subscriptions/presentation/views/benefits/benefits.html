@@ -1,0 +1,98 @@
+<section class="benefits-container">
+
+  <!-- Active Plan Hero Banner -->
+  <mat-card class="membership-card">
+    <div class="membership-info">
+      <span class="membership-badge">
+        <mat-icon class="badge-mat-icon">verified</mat-icon>
+        <span>{{ subscription()?.status }}</span>
+      </span>
+
+      <h1 class="plan-title">{{ subscription()?.planName }} · {{ subscription()?.price }}</h1>
+
+      <p class="plan-desc">
+        {{ subscription()?.billingDetails }}
+      </p>
+    </div>
+
+    <button
+      mat-flat-button
+      class="manage-btn"
+      (click)="onManageMembership()">
+      <mat-icon class="btn-icon">settings</mat-icon>
+      <span>Administrar Membresía</span>
+    </button>
+  </mat-card>
+
+  <!-- Negotiated Collective Agreements Section -->
+  <section class="agreements-section">
+    <div class="section-header">
+      <h2 class="section-title">Convenios Colectivos Negociados</h2>
+    </div>
+
+    <div class="benefits-grid">
+      @for (benefit of subscription()?.benefits; track benefit.id) {
+        <mat-card class="benefit-card">
+
+          <div class="benefit-header">
+            <div class="benefit-icon-wrapper">
+              <mat-icon class="benefit-mat-icon">{{ benefit.icon }}</mat-icon>
+            </div>
+
+            <div class="benefit-titles">
+              <strong class="benefit-name">{{ benefit.name }}</strong>
+              <span class="benefit-subtitle">{{ benefit.subtitle }}</span>
+            </div>
+          </div>
+
+          <p class="benefit-desc">
+            {{ benefit.description }}
+          </p>
+
+          <div class="benefit-footer">
+            <div class="code-info">
+              <span class="code-label">{{ benefit.codeLabel }}:</span>
+              <strong class="code-value">{{ benefit.code }}</strong>
+            </div>
+
+            <button
+              mat-stroked-button
+              class="action-btn"
+              (click)="onViewCoupon(benefit)">
+              <span>{{ benefit.actionLabel }}</span>
+            </button>
+          </div>
+
+        </mat-card>
+      }
+    </div>
+  </section>
+
+  <!-- Referral Program Banner -->
+  <mat-card class="referral-card">
+
+    <div class="referral-content">
+      <span class="referral-badge">
+        <mat-icon class="badge-mat-icon">card_giftcard</mat-icon>
+        <span>PROGRAMA DE REFERIDOS</span>
+      </span>
+
+      <h2 class="referral-title">{{ subscription()?.referralBonus }}</h2>
+      <p class="referral-desc">{{ subscription()?.referralDesc }}</p>
+    </div>
+
+    <div class="referral-code-box">
+      <span class="code-box-label">TU CÓDIGO ÚNICO</span>
+      <strong class="code-box-value">{{ subscription()?.referralCode }}</strong>
+      <button
+        mat-flat-button
+        class="copy-code-btn"
+        (click)="onCopyReferralCode()">
+        <mat-icon class="btn-icon">content_copy</mat-icon>
+        <span>Copiar Enlace</span>
+      </button>
+    </div>
+
+  </mat-card>
+
+</section>
