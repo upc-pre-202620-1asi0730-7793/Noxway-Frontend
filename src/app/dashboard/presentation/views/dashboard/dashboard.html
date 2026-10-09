@@ -1,0 +1,246 @@
+<section class="dashboard-container">
+
+  <!-- Welcome / Active Shift Card -->
+  <mat-card class="welcome-card">
+    <div class="welcome-content">
+      <span class="shift-badge">
+        <mat-icon class="badge-icon">bedtime</mat-icon>
+        <span>Turno Noche 22:00 - 06:00</span>
+      </span>
+
+      <h1 class="welcome-title">Buenas noches, Jorge Luis</h1>
+
+      <p class="welcome-desc">
+        Acompañamiento pasivo listo. Inicia tu check-in al salir de Planta San Martín para que Rosa Elena te acompañe.
+      </p>
+    </div>
+
+    <button
+      mat-flat-button
+      class="primary-btn check-in-btn"
+      routerLink="/journey">
+      <mat-icon class="btn-icon">play_arrow</mat-icon>
+      <span>Iniciar Check-In</span>
+    </button>
+  </mat-card>
+
+  <!-- Quick Stats Grid -->
+  <section class="stats-grid">
+
+    <mat-card class="stat-card">
+      <div class="stat-icon-wrapper green-bg">
+        <mat-icon class="stat-mat-icon green-icon">verified_user</mat-icon>
+      </div>
+      <div class="stat-info">
+        <strong class="stat-value">{{ dashboardData()?.safeTripsPercentage }}%</strong>
+        <span class="stat-label">Trayectos Seguros</span>
+        <div class="stat-sub green-text">
+          <mat-icon class="mini-check">check</mat-icon>
+          <span>{{ dashboardData()?.confirmedTrips }}</span>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-icon-wrapper blue-bg">
+        <mat-icon class="stat-mat-icon blue-icon">people</mat-icon>
+      </div>
+      <div class="stat-info">
+        <strong class="stat-value">{{ dashboardData()?.trustedContactName }}</strong>
+        <span class="stat-label">Contacto Vinculado</span>
+        <div class="stat-sub blue-text">
+          <mat-icon class="mini-check">check</mat-icon>
+          <span>{{ dashboardData()?.trustedContactStatus }}</span>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-icon-wrapper amber-bg">
+        <mat-icon class="stat-mat-icon amber-icon">bedtime</mat-icon>
+      </div>
+      <div class="stat-info">
+        <strong class="stat-value">{{ dashboardData()?.restDuration }}</strong>
+        <span class="stat-label">Descanso Diurno</span>
+        <div class="stat-sub amber-text">
+          <mat-icon class="mini-check">check</mat-icon>
+          <span>{{ dashboardData()?.restComparison }}</span>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-icon-wrapper teal-bg">
+        <mat-icon class="stat-mat-icon teal-icon">storefront</mat-icon>
+      </div>
+      <div class="stat-info">
+        <strong class="stat-value">{{ dashboardData()?.servicesCount }} Locales</strong>
+        <span class="stat-label">Servicios 24h en ruta</span>
+        <div class="stat-sub teal-text">
+          <mat-icon class="mini-check">check</mat-icon>
+          <span>{{ dashboardData()?.servicesStatus }}</span>
+        </div>
+      </div>
+    </mat-card>
+
+  </section>
+
+  <!-- Main Grid: Route Card + Aside -->
+  <section class="dashboard-body">
+
+    <!-- Routine Commute Monitor -->
+    <mat-card class="route-card">
+
+      <div class="card-header-row">
+        <div>
+          <h2 class="section-title">Monitoreo de Trayecto Habitual</h2>
+          <p class="section-subtitle">Ruta preconfigurada: Los Olivos a Cercado de Lima</p>
+        </div>
+        <span class="status-pill waiting">
+          {{ dashboardData()?.journeyStatus }}
+        </span>
+      </div>
+
+      <div class="route-path-box">
+
+        <div class="route-endpoint">
+          <small class="endpoint-type">ORIGEN (SALIDA 06:00 AM)</small>
+          <strong class="endpoint-name">{{ dashboardData()?.origin }}</strong>
+          <span class="endpoint-address">{{ dashboardData()?.originAddress }}</span>
+        </div>
+
+        <div class="route-connector">
+          <div class="connector-line"></div>
+          <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+        </div>
+
+        <div class="route-endpoint">
+          <small class="endpoint-type">DESTINO SEGURO</small>
+          <strong class="endpoint-name">{{ dashboardData()?.destination }}</strong>
+          <span class="endpoint-address">{{ dashboardData()?.destinationAddress }}</span>
+        </div>
+
+      </div>
+
+      <div class="route-meta-bar">
+        <span>Distancia: <strong>{{ dashboardData()?.distance }}</strong></span>
+        <span class="separator">|</span>
+        <span>Tiempo Est.: <strong>{{ dashboardData()?.estimatedTime }}</strong></span>
+        <span class="separator">|</span>
+        <span>Tolerancia: <strong>{{ dashboardData()?.tolerance }}</strong></span>
+        <span class="separator">|</span>
+        <span>Medio: <strong>{{ dashboardData()?.transport }}</strong></span>
+      </div>
+
+      <!-- Vector Preview Map -->
+      <div class="route-preview-map">
+        <svg class="map-svg" viewBox="0 0 700 200" preserveAspectRatio="none">
+          <!-- Grid lines -->
+          <line x1="0" y1="100" x2="700" y2="100" stroke="#1e293b" stroke-width="2" />
+          <line x1="160" y1="0" x2="160" y2="200" stroke="#1e293b" stroke-width="2" />
+          <line x1="440" y1="0" x2="440" y2="200" stroke="#1e293b" stroke-width="2" />
+
+          <!-- Commute path: starts at green dot, peaks, goes to red dot -->
+          <path d="M 60 130 L 160 130 L 360 65 L 620 150" fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="6,4" />
+
+          <!-- Start circle (green) -->
+          <circle cx="60" cy="130" r="8" fill="#10b981" />
+          <circle cx="60" cy="130" r="14" fill="none" stroke="#10b981" stroke-opacity="0.35" stroke-width="3" />
+
+          <!-- End circle (red) -->
+          <circle cx="620" cy="150" r="8" fill="#ef4444" />
+          <circle cx="620" cy="150" r="14" fill="none" stroke="#ef4444" stroke-opacity="0.35" stroke-width="3" />
+        </svg>
+
+        <span class="map-label">[Mapa 24h: Corredor Iluminado Universitario]</span>
+      </div>
+
+      <div class="route-actions-row">
+        <button
+          mat-flat-button
+          class="primary-btn"
+          routerLink="/journey">
+          <mat-icon class="btn-icon">navigation</mat-icon>
+          <span>Abrir Pantalla de Trayecto Activo</span>
+        </button>
+
+        <button
+          mat-stroked-button
+          class="secondary-btn"
+          routerLink="/map">
+          <mat-icon class="btn-icon">map</mat-icon>
+          <span>Explorar Servicios en Mapa 24h</span>
+        </button>
+      </div>
+
+    </mat-card>
+
+    <!-- Aside column -->
+    <aside class="dashboard-aside">
+
+      <!-- Trusted contact -->
+      <mat-card class="aside-card">
+        <h3 class="aside-title">Contacto de Confianza</h3>
+
+        <div class="contact-row">
+          <div class="contact-avatar">RP</div>
+          <div class="contact-details">
+            <strong class="contact-name">Rosa Elena Paredes</strong>
+            <span class="contact-sub">Madre · Vinculada</span>
+          </div>
+        </div>
+
+        <div class="notification-alert-box">
+          <mat-icon class="notif-mat-icon">sms</mat-icon>
+          <div>
+            <strong>Notificaciones configuradas:</strong>
+            <p>WhatsApp y SMS automáticos al salir y llegar.</p>
+          </div>
+        </div>
+
+        <button
+          mat-stroked-button
+          class="full-width-btn"
+          routerLink="/trusted-contacts">
+          <span>Administrar Vínculo</span>
+          <mat-icon class="mini-arrow">arrow_forward</mat-icon>
+        </button>
+      </mat-card>
+
+      <!-- Night Notices -->
+      <mat-card class="aside-card">
+        <h3 class="aside-title">Avisos de la Noche</h3>
+
+        <div class="notice-item">
+          <div class="notice-badge green-badge">
+            <mat-icon class="notice-icon">verified</mat-icon>
+            <span>COMERCIO VALIDADO</span>
+          </div>
+          <strong class="notice-name">Grifo Primax Av. Universitaria</strong>
+          <p class="notice-text">Abierto con reja y vigilancia 24h.</p>
+        </div>
+
+        <div class="notice-item">
+          <div class="notice-badge amber-badge">
+            <mat-icon class="notice-icon">warning</mat-icon>
+            <span>TRAMO OSCURO</span>
+          </div>
+          <strong class="notice-name">Cruce Av. Perú con Dueñas</strong>
+          <p class="notice-text">Tres postes apagados. Desviar por Lima.</p>
+        </div>
+
+        <div class="notice-item">
+          <div class="notice-badge blue-badge">
+            <mat-icon class="notice-icon">local_police</mat-icon>
+            <span>PATRULLAJE ACTIVO</span>
+          </div>
+          <strong class="notice-name">Serenazgo fijo en paradero Pilas</strong>
+        </div>
+
+      </mat-card>
+
+    </aside>
+
+  </section>
+
+</section>

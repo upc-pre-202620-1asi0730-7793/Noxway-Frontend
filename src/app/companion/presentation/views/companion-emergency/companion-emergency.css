@@ -1,0 +1,349 @@
+:host {
+  display: block;
+}
+
+.emergency-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Protocol Card */
+.protocol-card {
+  background: #0d1527 !important;
+  border: 1px solid #ef4444 !important;
+  border-radius: 12px !important;
+  padding: 24px 28px !important;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.12) !important;
+}
+
+.protocol-header {
+  margin-bottom: 20px;
+}
+
+.protocol-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.protocol-icon {
+  color: #ef4444;
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+}
+
+.protocol-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.protocol-instruction {
+  margin: 6px 0 0 38px;
+  font-size: 13.5px;
+  color: #94a3b8;
+}
+
+/* Official Sheet Box */
+.official-sheet-box {
+  background: #0a1120;
+  border: 1px solid #1e3a8a;
+  border-radius: 10px;
+  padding: 20px 24px;
+}
+
+.official-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #172554;
+}
+
+.sheet-badge-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #60a5fa;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.copy-sheet-btn {
+  height: 32px !important;
+  padding: 0 14px !important;
+  font-size: 12px !important;
+  border-radius: 6px !important;
+  border: 1px solid #2563eb !important;
+  color: #93c5fd !important;
+  background: #172554 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.copy-sheet-btn:hover {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+}
+
+.sheet-data-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.sheet-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.data-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.data-label {
+  color: #64748b;
+  min-width: 140px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.data-val {
+  color: #e2e8f0;
+}
+
+.data-val.bold {
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.gps-highlight {
+  color: #34d399;
+  font-weight: 600;
+}
+
+/* Sections */
+.section-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.group-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+/* Municipal Patrol (Serenazgo) 3-Card Grid */
+.serenazgo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.serenazgo-card {
+  background: #0d1527 !important;
+  border: 1px solid #1c2a47 !important;
+  border-radius: 12px !important;
+  padding: 24px 26px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  transition: all 150ms ease;
+}
+
+.serenazgo-card.card-current-zone {
+  border: 1.5px solid #059669 !important;
+  background: #0a1728 !important;
+  box-shadow: 0 4px 18px rgba(5, 150, 105, 0.15) !important;
+}
+
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.district-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.zone-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.badge-hours {
+  background: #0d383b;
+  color: #2dd4bf;
+  border: 1px solid #0d9488;
+}
+
+.badge-active-zone {
+  background: #064e3b;
+  color: #34d399;
+  border: 1px solid #10b981;
+}
+
+.origin-type-label {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: -6px;
+}
+
+.card-current-zone .origin-type-label {
+  color: #34d399;
+}
+
+.unit-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 6px 0 10px;
+}
+
+.unit-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12.5px;
+}
+
+.u-k {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.u-v {
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.green-highlight {
+  color: #34d399;
+}
+
+.card-btn-footer {
+  margin-top: auto;
+}
+
+.call-btn-default {
+  width: 100% !important;
+  height: 42px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.call-btn-default:hover {
+  background: #1d4ed8 !important;
+}
+
+.call-btn-zone {
+  width: 100% !important;
+  height: 42px !important;
+  background: #059669 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.call-btn-zone:hover {
+  background: #047857 !important;
+}
+
+.btn-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* National Lines 4 Cards */
+.national-lines-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.national-card {
+  background: #0d1527 !important;
+  border: 1px solid #1c2a47 !important;
+  border-radius: 12px !important;
+  padding: 22px 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  gap: 8px !important;
+}
+
+.nat-code {
+  font-size: 16.5px;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.nat-name {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 12px;
+  min-height: 28px;
+}
+
+.nat-call-btn {
+  width: 100% !important;
+  height: 38px !important;
+  background: #111c34 !important;
+  border: 1px solid #1c2a47 !important;
+  color: #cbd5e1 !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+.nat-call-btn:hover {
+  background: #1c2a47 !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 1100px) {
+  .serenazgo-grid {
+    grid-template-columns: 1fr;
+  }
+  .national-lines-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sheet-data-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,184 @@
+<div class="profile-container">
+
+  <!-- Top Hero Profile Card -->
+  @if (profile(); as p) {
+    <mat-card class="profile-hero-card">
+      <div class="hero-left">
+        <div class="profile-avatar">
+          {{ p.avatar }}
+        </div>
+
+        <div class="profile-hero-info">
+          <div class="name-badge-row">
+            <h2 class="profile-full-name">{{ p.fullName }}</h2>
+            <span class="verified-badge">
+              <mat-icon class="badge-icon">check</mat-icon>
+              {{ p.verifiedBadge }}
+            </span>
+          </div>
+
+          <p class="profile-relationship">
+            {{ p.relationship }}
+          </p>
+
+          <div class="profile-meta-row">
+            <mat-icon class="pin-icon">place</mat-icon>
+            <span>{{ p.location }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="protected-pill">
+          <mat-icon class="pill-check">check</mat-icon>
+          <span>Cuenta Protegida</span>
+        </div>
+      </div>
+    </mat-card>
+  }
+
+  <!-- Main 2-Column Section -->
+  <div class="profile-grid">
+
+    <!-- Left Column: Personal Contact Information -->
+    <mat-card class="section-card">
+      <div class="section-header">
+        <h3 class="section-title">Datos Personales del Contacto</h3>
+      </div>
+
+      <form class="contact-form" (ngSubmit)="onSaveProfile()">
+
+        <!-- Full Name -->
+        <div class="form-group">
+          <label class="form-label" for="fullNameInput">Nombres y Apellidos Completos</label>
+          <input
+            id="fullNameInput"
+            type="text"
+            class="form-input"
+            name="fullName"
+            [(ngModel)]="fullName"
+            placeholder="Nombres completos" />
+        </div>
+
+        <!-- DNI (Readonly) -->
+        <div class="form-group">
+          <label class="form-label" for="dniInput">Documento Nacional de Identidad (DNI)</label>
+          <input
+            id="dniInput"
+            type="text"
+            class="form-input readonly-input"
+            name="dni"
+            [value]="dni"
+            readonly />
+        </div>
+
+        <!-- Phone Mobile -->
+        <div class="form-group">
+          <label class="form-label" for="phoneInput">Teléfono Móvil (WhatsApp Activo)</label>
+          <input
+            id="phoneInput"
+            type="text"
+            class="form-input"
+            name="phone"
+            [(ngModel)]="phone"
+            placeholder="+51 900 000 000" />
+          <div class="validation-note">
+            <mat-icon class="valid-icon">check</mat-icon>
+            <span>Validado con código de seguridad OTP</span>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label class="form-label" for="emailInput">Correo Electrónico</label>
+          <input
+            id="emailInput"
+            type="email"
+            class="form-input"
+            name="email"
+            [(ngModel)]="email"
+            placeholder="correo@ejemplo.com" />
+        </div>
+
+        <!-- Home Address -->
+        <div class="form-group">
+          <label class="form-label" for="addressInput">Dirección de Domicilio Habitual</label>
+          <input
+            id="addressInput"
+            type="text"
+            class="form-input"
+            name="address"
+            [(ngModel)]="address"
+            placeholder="Dirección habitual" />
+        </div>
+
+        <!-- Save Button -->
+        <button
+          type="submit"
+          mat-flat-button
+          class="save-btn"
+          [disabled]="isSaving()">
+          <mat-icon class="btn-icon">save</mat-icon>
+          <span>{{ isSaving() ? 'Guardando...' : 'Guardar Cambios de Perfil' }}</span>
+        </button>
+
+      </form>
+    </mat-card>
+
+    <!-- Right Column: Monitoring Schedules & Privacy -->
+    <mat-card class="section-card">
+      <div class="section-header">
+        <h3 class="section-title">Horarios de Monitoreo &amp; Privacidad</h3>
+      </div>
+
+      <div class="surveillance-intro">
+        <h4 class="intro-heading">Ventana de Vigilancia Nocturna</h4>
+        <p class="intro-desc">
+          Horario en que el sistema emitirá alarmas audibles prioritarias en tu teléfono:
+        </p>
+      </div>
+
+      <!-- Time Window Boxes -->
+      <div class="time-boxes-row">
+        <div class="time-box">
+          <span class="time-box-label">DESDE:</span>
+          <span class="time-box-val">22:00 PM</span>
+        </div>
+
+        <div class="time-box">
+          <span class="time-box-label">HASTA:</span>
+          <span class="time-box-val">07:30 AM</span>
+        </div>
+      </div>
+
+      <!-- Feature Info Box 1: Auto Rest -->
+      <div class="info-card-box">
+        <h5 class="info-box-title">Modo Resguardo Automático</h5>
+        <p class="info-box-text">
+          Cuando Jorge marca llegada a casa por la mañana, el sistema entra en modo reposo para que puedas descansar en calma y sin avisos innecesarios.
+        </p>
+      </div>
+
+      <!-- Feature Info Box 2: End-to-end Encryption -->
+      <div class="info-card-box highlight-box">
+        <h5 class="info-box-title green-title">Cifrado de Extremo a Extremo</h5>
+        <p class="info-box-text">
+          Tus datos de contacto y la ubicación GPS de Jorge solo son visibles entre ustedes dos y las centrales de auxilio distrital autorizadas.
+        </p>
+      </div>
+
+      <!-- Logout Action -->
+      <div class="logout-action-area">
+        <button
+          type="button"
+          mat-stroked-button
+          class="logout-danger-btn"
+          (click)="onLogout()">
+          Cerrar Sesión Segura
+        </button>
+      </div>
+    </mat-card>
+
+  </div>
+
+</div>

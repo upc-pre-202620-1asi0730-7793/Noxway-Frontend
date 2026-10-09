@@ -1,0 +1,173 @@
+<div class="emergency-container">
+
+  <!-- Top Distress Protocol Card (Red Accent Border) -->
+  <mat-card class="protocol-card">
+    <div class="protocol-header">
+      <div class="protocol-title-row">
+        <mat-icon class="protocol-icon">emergency</mat-icon>
+        <h2 class="protocol-title">Protocolo de Auxilio Rápido &amp; Ficha de Rescate</h2>
+      </div>
+      <p class="protocol-instruction">
+        Si Jorge no responde o se activa señal SOS, entrega esta ficha a Serenazgo distrital o PNP con sus datos exactos.
+      </p>
+    </div>
+
+    @if (protocol(); as p) {
+      <div class="official-sheet-box">
+        <div class="official-sheet-header">
+          <span class="sheet-badge-title">{{ p.officialBadge }}</span>
+          <button
+            mat-stroked-button
+            class="copy-sheet-btn"
+            (click)="onCopyProtocol()">
+            <mat-icon class="btn-icon">content_copy</mat-icon>
+            <span>{{ copied() ? 'Copiado' : 'Copiar Ficha' }}</span>
+          </button>
+        </div>
+
+        <div class="sheet-data-grid">
+          <div class="sheet-col">
+            <div class="data-item">
+              <span class="data-label">Trabajador:</span>
+              <span class="data-val bold">{{ p.worker }}</span>
+            </div>
+            <div class="data-item">
+              <span class="data-label">Empleador:</span>
+              <span class="data-val">{{ p.employer }}</span>
+            </div>
+            <div class="data-item">
+              <span class="data-label">Vehículo:</span>
+              <span class="data-val">{{ p.vehicle }}</span>
+            </div>
+          </div>
+
+          <div class="sheet-col">
+            <div class="data-item">
+              <span class="data-label">Teléfono Trabajador:</span>
+              <span class="data-val bold">{{ p.workerPhone }}</span>
+            </div>
+            <div class="data-item">
+              <span class="data-label">Contacto de Confianza:</span>
+              <span class="data-val">{{ p.contact }}</span>
+            </div>
+            <div class="data-item">
+              <span class="data-label">Última Ubicación GPS:</span>
+              <span class="data-val gps-highlight">{{ p.lastGps }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </mat-card>
+
+  <!-- Middle Section: Serenazgo Stations Along the Route -->
+  <div class="section-group">
+    <h3 class="group-title">Centrales de Serenazgo en la Ruta de Jorge</h3>
+
+    <div class="serenazgo-grid">
+      @for (unit of serenazgoList(); track unit.id) {
+        <mat-card
+          class="serenazgo-card"
+          [class.card-current-zone]="unit.isCurrentZone">
+
+          <div class="card-top-row">
+            <h4 class="district-name">{{ unit.district }}</h4>
+            <span
+              class="zone-badge"
+              [class.badge-active-zone]="unit.isCurrentZone"
+              [class.badge-hours]="!unit.isCurrentZone">
+              {{ unit.badge }}
+            </span>
+          </div>
+
+          <span class="origin-type-label">{{ unit.originType }}</span>
+
+          <div class="unit-details-list">
+            <div class="unit-row">
+              <span class="u-k">Central Telefónica:</span>
+              <span class="u-v">{{ unit.phone }}</span>
+            </div>
+
+            @if (unit.whatsapp) {
+              <div class="unit-row">
+                <span class="u-k">WhatsApp Alerta:</span>
+                <span class="u-v">{{ unit.whatsapp }}</span>
+              </div>
+            }
+
+            @if (unit.base) {
+              <div class="unit-row">
+                <span class="u-k">Base Operativa:</span>
+                <span class="u-v">{{ unit.base }}</span>
+              </div>
+            }
+
+            @if (unit.module) {
+              <div class="unit-row">
+                <span class="u-k">Módulo:</span>
+                <span class="u-v">{{ unit.module }}</span>
+              </div>
+            }
+
+            @if (unit.responseTime) {
+              <div class="unit-row">
+                <span class="u-k">Tiempo de respuesta estimado:</span>
+                <span class="u-v green-highlight">{{ unit.responseTime }}</span>
+              </div>
+            }
+
+            @if (unit.distance) {
+              <div class="unit-row">
+                <span class="u-k">Distancia a torre laboral:</span>
+                <span class="u-v">{{ unit.distance }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="card-btn-footer">
+            @if (unit.isCurrentZone) {
+              <button
+                mat-flat-button
+                class="call-btn-zone"
+                (click)="onCall(unit.district, unit.phone)">
+                <mat-icon class="btn-icon">phone</mat-icon>
+                Llamar a Base Actual Cercado
+              </button>
+            } @else {
+              <button
+                mat-flat-button
+                class="call-btn-default"
+                (click)="onCall(unit.district, unit.phone)">
+                <mat-icon class="btn-icon">phone</mat-icon>
+                Llamar a Central {{ unit.district.replace('Serenazgo ', '') }}
+              </button>
+            }
+          </div>
+
+        </mat-card>
+      }
+    </div>
+  </div>
+
+  <!-- Bottom Section: National Emergency Free Lines -->
+  <div class="section-group">
+    <h3 class="group-title">Líneas Nacionales de Urgencia Gratuita</h3>
+
+    <div class="national-lines-grid">
+      @for (line of nationalLines(); track line.id) {
+        <mat-card class="national-card">
+          <div class="nat-code">{{ line.code }}</div>
+          <div class="nat-name">{{ line.name }}</div>
+
+          <button
+            mat-stroked-button
+            class="nat-call-btn"
+            (click)="onCall(line.code, line.number)">
+            {{ line.action }}
+          </button>
+        </mat-card>
+      }
+    </div>
+  </div>
+
+</div>
