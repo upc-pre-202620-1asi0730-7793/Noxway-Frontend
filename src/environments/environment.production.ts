@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  apiUrl: 'https://noxwayapi.free.beeceptor.com',
   apiUrls: {
     // Cuenta 1 (noxwayapi)
     dashboard: 'https://noxwayapi.free.beeceptor.com/dashboard',
