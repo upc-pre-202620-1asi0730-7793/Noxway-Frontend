@@ -1,4 +1,4 @@
-﻿import { inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -59,7 +59,7 @@ export class CommuteService {
   private readonly baseUrl = 'http://localhost:3000/commute';
 
   /**
-   * Retrieves the currently active journey for the night worker.
+   * Retrieves the currently active journey for the shift worker.
    */
   getActiveCommute(): Observable<Commute> {
     return this.http.get<Commute[]>(this.baseUrl).pipe(

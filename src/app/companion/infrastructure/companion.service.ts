@@ -25,7 +25,7 @@ const DEFAULT_LIVE: CompanionLiveInfo = {
   workerDni: '44.298.104',
   workerAge: '38 años',
   employer: 'Securitas Perú (Vigilante)',
-  shift: 'Noche 19:00 a 07:00',
+  shift: 'Nocturno · 19:00 a 07:00 (+1 día)',
   vehicle: 'Moto Honda CB190R',
   plate: '4521-7B (Roja/Negra)',
   origin: 'Urb. Mercurio (Los Olivos)',
@@ -159,7 +159,7 @@ const DEFAULT_ALERT_LOGS: CompanionAlertLog[] = [
   },
   {
     id: 2,
-    title: 'Inicio de trayecto nocturno confirmado',
+    title: 'Inicio de trayecto confirmado',
     time: '02:22 AM (Hace 24 min)',
     description:
       'Jorge inició trayecto desde Urb. Mercurio (Los Olivos) hacia San Isidro en su moto Honda CB190R.',
@@ -257,7 +257,7 @@ const DEFAULT_NATIONAL_LINES: NationalLine[] = [
   {
     id: 'securitas',
     code: 'Securitas Perú',
-    name: 'Supervisor de Guardia Nocturna',
+    name: 'Supervisor de Guardia',
     action: 'Llamar Base +51 998',
     number: '+51998000111',
   },
@@ -267,8 +267,8 @@ const DEFAULT_PENDING_INVITATION: PendingInvitation = {
   id: 1,
   name: 'Carlos Paredes Morales',
   relation: '(tu hermano)',
-  message: 'te ha invitado a ser su contacto protector para sus rutas nocturnas de delivery.',
-  category: 'Repartidor Nocturno (San Martín de Porres -> Miraflores)',
+  message: 'te ha invitado a ser su contacto protector para sus trayectos de delivery.',
+  category: 'Repartidor (San Martín de Porres -> Miraflores)',
   schedule: '20:00 a 04:00 AM',
   status: 'PENDIENTE DE CONFIRMACIÓN',
 };
@@ -280,7 +280,7 @@ const DEFAULT_ACTIVE_WORKERS: AccompaniedWorker[] = [
     name: 'Jorge Luis Huamán Quispe',
     badge: 'VÍNCULO ACTIVO',
     relation: 'Esposo',
-    role: 'Vigilante Nocturno en Securitas Perú',
+    role: 'Vigilante de Seguridad en Securitas Perú',
     linkedSince: '15 Ago 2026',
     gpsRealTime: true,
     stopAlarm: true,
@@ -300,7 +300,7 @@ const DEFAULT_STEPS: InvitationStep[] = [
     step: '02',
     title: 'Tú Aceptas el Vínculo',
     desc1:
-      'Para proteger la privacidad de ambos, la visibilidad de ubicación solo se activa cuando inicia un trayecto nocturno.',
+      'Para proteger la privacidad de ambos, la visibilidad de ubicación solo se activa cuando inicia un trayecto activo.',
     desc2: 'Puedes revocar o pausar el acompañamiento en cualquier momento.',
   },
   {
@@ -469,11 +469,11 @@ const DEFAULT_COMPANION_PROFILE: CompanionProfile = {
   phoneValidation: 'Validado con código de seguridad OTP',
   email: 'rosaelena.paredes@correo.pe',
   address: 'Urb. Mercurio Mz. C Lt. 14, Los Olivos',
-  surveillanceStart: '22:00 PM',
+  surveillanceStart: '22:00',
   surveillanceEnd: '07:30 AM',
   autoRestTitle: 'Modo Resguardo Automático',
   autoRestDesc:
-    'Cuando Jorge marca llegada a casa por la mañana, el sistema entra en modo reposo para que puedas descansar en calma y sin avisos innecesarios.',
+    'Cuando Jorge confirma su llegada, de día o noche, se pausa el seguimiento de ese trayecto y sus avisos.',
   encryptionTitle: 'Cifrado de Extremo a Extremo',
   encryptionDesc:
     'Tus datos de contacto y la ubicación GPS de Jorge solo son visibles entre ustedes dos y las centrales de auxilio distrital autorizadas.',

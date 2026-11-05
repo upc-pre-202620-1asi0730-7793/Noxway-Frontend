@@ -55,13 +55,13 @@ export class Community implements OnInit {
   onPublishNotice(): void {
     const title = prompt('Título del aviso comunitario:');
     if (!title) return;
-    const desc = prompt('Detalle del reporte o aviso nocturno:');
+    const desc = prompt('Detalle del reporte o aviso comunitario:');
     if (!desc) return;
 
     const newPost: CommunityPost = {
       id: Date.now(),
       authorName: 'Jorge Luis Huamán',
-      authorRole: 'Vigilante Nocturno',
+      authorRole: 'Vigilante de Seguridad',
       avatar: 'JL',
       timeAgo: 'Hace un momento',
       location: 'Lima Norte',

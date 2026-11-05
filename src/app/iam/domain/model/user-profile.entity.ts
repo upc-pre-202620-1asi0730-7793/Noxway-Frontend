@@ -1,4 +1,4 @@
-﻿import { BaseEntity } from '../../../shared/domain/model/base-entity';
+import { BaseEntity } from '../../../shared/domain/model/base-entity';
 
 /**
  * Represents the authenticated worker's identity, occupational role, and privacy settings.
@@ -20,6 +20,8 @@ export interface UserProfile extends BaseEntity {
   email: string;
   /** Working shift schedule and operational days */
   schedule: string;
+  /** Day, night or rotating work shift. Optional for existing API records. */
+  shiftType?: 'day' | 'night' | 'rotating';
   /** Primary commuting vehicle or transport mode */
   transport: string;
   /** Home district */

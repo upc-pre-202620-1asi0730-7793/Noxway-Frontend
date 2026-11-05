@@ -1,8 +1,8 @@
-﻿import { BaseEntity } from '../../../shared/domain/model/base-entity';
+import { BaseEntity } from '../../../shared/domain/model/base-entity';
 
 /**
  * Represents a trusted contact (family member or partner) invited
- * to oversee the nocturnal worker's safety and live telemetry.
+ * to oversee the shift worker's safety and live telemetry.
  */
 export interface TrustedContact extends BaseEntity {
   /** Avatar initials or visual token */

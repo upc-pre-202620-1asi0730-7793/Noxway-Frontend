@@ -1,8 +1,8 @@
-﻿import { inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { MapPoint } from '../domain/model/night-service.entity';
+import { MapPoint } from '../domain/model/service-point.entity';
 import { CommunityPost, CommunityLeader } from '../domain/model/community-post.entity';
 import { environment } from '../../../environments/environment';
 
@@ -13,6 +13,8 @@ const DEFAULT_MAP_POINTS: MapPoint[] = [
   {
     id: 1,
     type: 'pharmacy',
+    timeZone: 'America/Lima',
+    openingHours: [{ opens: '00:00', closes: '24:00' }],
     typeLabel: 'FARMACIA 24H',
     name: 'Inkafarma - Av. Universitaria 3105',
     distance: 'A 650 metros de tu posición actual · Los Olivos',
@@ -32,11 +34,13 @@ const DEFAULT_MAP_POINTS: MapPoint[] = [
   {
     id: 2,
     type: 'gas_station',
-    typeLabel: 'GRIFO 24H',
+    timeZone: 'America/Lima',
+    openingHours: [{ opens: '06:00', closes: '23:00' }],
+    typeLabel: 'GRIFO',
     name: 'Grifo Primax - Av. Mayolo / Universitaria',
     distance: 'A 1.2 km de tu posición actual · Los Olivos',
     communityTrust: '95% Confiable',
-    validatedBy: 'Validado por 32 repartidores nocturnos.',
+    validatedBy: 'Validado por 32 repartidores.',
     safetyMeasures: [
       'Guardia de seguridad 24h',
       'Buena iluminación en pista y surtidores',
@@ -46,7 +50,7 @@ const DEFAULT_MAP_POINTS: MapPoint[] = [
     lat: -11.995,
     lng: -77.075,
     icon: 'local_gas_station',
-    tag: 'Primax 24h',
+    tag: 'Primax',
   },
   {
     id: 3,
@@ -55,7 +59,7 @@ const DEFAULT_MAP_POINTS: MapPoint[] = [
     name: 'Tramo Oscuro - Cruce Av. Perú con Dueñas',
     distance: 'A 3.4 km en tu ruta · San Martín de Porres',
     communityTrust: 'Alerta Activa',
-    validatedBy: 'Reportado por 19 trabajadores nocturnos.',
+    validatedBy: 'Reportado por 19 trabajadores.',
     safetyMeasures: [
       'Tres postes de luz apagados',
       'Poca visibilidad nocturna',
@@ -69,13 +73,13 @@ const DEFAULT_MAP_POINTS: MapPoint[] = [
 ];
 
 /**
- * Fallback nocturnal community posts for local feed.
+ * Fallback community posts for local feed.
  */
 const DEFAULT_POSTS: CommunityPost[] = [
   {
     id: 1,
     authorName: 'Marcos Huamán',
-    authorRole: 'Repartidor Nocturno',
+    authorRole: 'Repartidor',
     avatar: 'MH',
     timeAgo: 'Hace 24 min',
     location: 'Los Olivos (Av. Antúnez de Mayolo)',
@@ -107,7 +111,7 @@ const DEFAULT_POSTS: CommunityPost[] = [
 ];
 
 /**
- * Fallback nocturnal safety contributors and leaders.
+ * Fallback commute safety contributors and leaders.
  */
 const DEFAULT_LEADERS: CommunityLeader[] = [
   { rank: 1, name: 'Jorge Luis Huamán (Tú)', contributions: 38, isCurrentUser: true },
@@ -116,7 +120,7 @@ const DEFAULT_LEADERS: CommunityLeader[] = [
 ];
 
 /**
- * Service managing community safety reports, leaderboards, and nocturnal map points of interest.
+ * Service managing community safety reports, leaderboards, and community map points of interest.
  */
 @Injectable({
   providedIn: 'root',
@@ -127,7 +131,7 @@ export class CommunityService {
   private readonly postsUrl = `${environment.apiUrl}/communityPosts`;
 
   /**
-   * Retrieves verified 24h points of interest and risk zones for map visualization.
+   * Retrieves verified service points of interest and risk zones for map visualization.
    * Falls back to high-fidelity mock data if the JSON server is unavailable.
    */
   getMapPoints(): Observable<MapPoint[]> {
@@ -138,7 +142,7 @@ export class CommunityService {
   }
 
   /**
-   * Retrieves nocturnal community posts, street updates, and warnings.
+   * Retrieves community posts, street updates, and warnings.
    */
   getCommunityPosts(): Observable<CommunityPost[]> {
     return this.http.get<CommunityPost[]>(this.postsUrl).pipe(
@@ -148,7 +152,7 @@ export class CommunityService {
   }
 
   /**
-   * Retrieves the ranking of top nocturnal community contributors.
+   * Retrieves the ranking of top community contributors.
    */
   getLeaders(): Observable<CommunityLeader[]> {
     return of(DEFAULT_LEADERS);

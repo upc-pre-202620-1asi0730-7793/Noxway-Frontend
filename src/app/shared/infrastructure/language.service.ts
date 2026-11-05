@@ -24,7 +24,7 @@ export class LanguageService {
       // Worker Navigation
       'nav.dashboard': 'Dashboard',
       'nav.journey': 'Mi Trayecto',
-      'nav.map': 'Mapa 24 Horas',
+      'nav.map': 'Servicios Cercanos',
       'nav.community': 'Comunidad',
       'nav.wellness': 'Bienestar & Sueño',
       'nav.benefits': 'Beneficios & Planes',
@@ -45,7 +45,7 @@ export class LanguageService {
       'sidebar.accompaniedBy': 'ACOMPAÑANDO A:',
       'sidebar.onMotorcycle': 'En moto',
       'sidebar.companionRole': 'Contacto de Confianza',
-      'sidebar.workerRole': 'Vigilante Nocturno',
+      'sidebar.workerRole': 'Vigilante de Seguridad',
       'sidebar.callJorge': 'LLAMAR A JORGE',
       'sidebar.sosAlert': 'ALERTA SOS',
       'sidebar.switchPortal': 'Portal Contacto',
@@ -53,15 +53,15 @@ export class LanguageService {
 
       // Topbar
       'topbar.activeJourney': 'Jorge en trayecto activo',
-      'topbar.activeNetwork': 'Red Nocturna Activa 24h',
+      'topbar.activeNetwork': 'Red Activa · Día y Noche',
       'topbar.hubScreens': 'Ver Hub Pantallas',
 
       // Page Titles
       'title.home': 'Inicio',
       'title.dashboard': 'Dashboard del Trabajador',
       'title.journey': 'Mi Trayecto Activo y Check-In Seguro',
-      'title.map': 'Mapa Comunitario 24h y Zonas de Riesgo',
-      'title.community': 'Comunidad Nocturna & Reportes Colaborativos',
+      'title.map': 'Servicios Cercanos y Zonas de Riesgo',
+      'title.community': 'Comunidad & Reportes Colaborativos',
       'title.wellness': 'Bitácora de Descanso & Salud del Sueño',
       'title.benefits': 'Beneficios Colectivos & Membresía',
       'title.trustedContacts': 'Gestión de Contactos de Confianza',
@@ -77,7 +77,7 @@ export class LanguageService {
       // Worker Navigation
       'nav.dashboard': 'Dashboard',
       'nav.journey': 'My Route',
-      'nav.map': '24-Hour Map',
+      'nav.map': 'Nearby Services',
       'nav.community': 'Community',
       'nav.wellness': 'Wellness & Sleep',
       'nav.benefits': 'Benefits & Plans',
@@ -98,7 +98,7 @@ export class LanguageService {
       'sidebar.accompaniedBy': 'ACCOMPANYING:',
       'sidebar.onMotorcycle': 'On motorcycle',
       'sidebar.companionRole': 'Trusted Contact',
-      'sidebar.workerRole': 'Night Security Guard',
+      'sidebar.workerRole': 'Security Guard',
       'sidebar.callJorge': 'CALL JORGE',
       'sidebar.sosAlert': 'SOS ALERT',
       'sidebar.switchPortal': 'Companion View',
@@ -106,15 +106,15 @@ export class LanguageService {
 
       // Topbar
       'topbar.activeJourney': 'Jorge on active commute',
-      'topbar.activeNetwork': 'Active Night Network 24h',
+      'topbar.activeNetwork': 'Active Network · Day & Night',
       'topbar.hubScreens': 'View Screens Hub',
 
       // Page Titles
       'title.home': 'Home',
-      'title.dashboard': 'Night Worker Dashboard',
+      'title.dashboard': 'Worker Dashboard',
       'title.journey': 'Active Route & Safe Check-In',
-      'title.map': '24h Community Map & Risk Zones',
-      'title.community': 'Night Community & Collaborative Reports',
+      'title.map': 'Nearby Services & Risk Zones',
+      'title.community': 'Community & Collaborative Reports',
       'title.wellness': 'Rest Log & Sleep Health',
       'title.benefits': 'Collective Benefits & Membership',
       'title.trustedContacts': 'Trusted Contacts Management',

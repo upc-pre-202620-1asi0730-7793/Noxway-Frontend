@@ -1,4 +1,4 @@
-﻿<section class="map-view-container">
+<section class="map-view-container">
 
   <!-- Top Filter & Actions Bar -->
   <div class="filter-actions-bar">
@@ -9,7 +9,7 @@
         class="filter-chip"
         [class.active]="selectedFilter() === 'all'"
         (click)="setFilter('all')">
-        <span>Todos (18)</span>
+        <span>Todos ({{ allPoints().length }})</span>
       </button>
 
       <button
@@ -18,7 +18,7 @@
         [class.active]="selectedFilter() === 'pharmacy'"
         (click)="setFilter('pharmacy')">
         <mat-icon class="chip-icon">medication</mat-icon>
-        <span>Farmacias 24h (6)</span>
+        <span>Farmacias ({{ countType('pharmacy') }})</span>
       </button>
 
       <button
@@ -27,7 +27,7 @@
         [class.active]="selectedFilter() === 'gas_station'"
         (click)="setFilter('gas_station')">
         <mat-icon class="chip-icon">local_gas_station</mat-icon>
-        <span>Grifos 24h (5)</span>
+        <span>Grifos ({{ countType('gas_station') }})</span>
       </button>
 
       <button
@@ -36,7 +36,7 @@
         [class.active]="selectedFilter() === 'risk_zone'"
         (click)="setFilter('risk_zone')">
         <mat-icon class="chip-icon">warning</mat-icon>
-        <span>Zonas de Riesgo (4)</span>
+        <span>Zonas de Riesgo ({{ countType('risk_zone') }})</span>
       </button>
     </div>
 
@@ -60,6 +60,22 @@
 
   </div>
 
+  <div class="availability-filters">
+    <label for="availability">Disponibilidad</label>
+    <select id="availability" [ngModel]="availability()" (ngModelChange)="availability.set($event); refreshAvailability()">
+      <option value="all">Todos los horarios</option>
+      <option value="now">Abiertos ahora</option>
+      <option value="arrival">Abiertos al llegar</option>
+    </select>
+    @if (availability() === 'arrival') {
+      <label for="arrival-time">Hora de llegada (Lima)</label>
+      <input id="arrival-time" type="time" required [ngModel]="arrivalTime()" (ngModelChange)="arrivalTime.set($event); refreshAvailability()" />
+    }
+    <button mat-stroked-button (click)="refreshAvailability()">Actualizar disponibilidad</button>
+    <small>Hora local del servicio · Lima (UTC−5). Zonas de riesgo siempre visibles.</small>
+  </div>
+  @if (!filteredPoints().length) { <p role="status">No hay servicios con horario confirmado para este filtro.</p> }
+
   <!-- Map Layout Grid -->
   <div class="map-content-grid">
 
@@ -70,7 +86,7 @@
       <div class="map-hd-toolbar">
         <div class="map-hd-left">
           <span class="hud-status-dot"></span>
-          <span class="hud-title">MAPA COMUNITARIO 24H &bull; SECTOR LIMA NORTE Y CERCADO</span>
+          <span class="hud-title">MAPA DE SERVICIOS CERCANOS &bull; SECTOR LIMA NORTE Y CERCADO</span>
         </div>
 
         <div class="map-hd-controls">
@@ -154,7 +170,7 @@
             <path d="M 170 0 Q 155 180, 185 330 T 150 540"
                   fill="none" stroke="#059669" stroke-width="3" stroke-dasharray="8,6" filter="url(#neonSafeGlow)" />
             <text x="165" y="80" fill="#34d399" font-size="9" font-weight="700" transform="rotate(85 165 80)">
-              AV. UNIVERSITARIA (CORREDOR NOCTURNO ILUMINADO)
+              AV. UNIVERSITARIA (CORREDOR ILUMINADO)
             </text>
 
             <!-- 2. AV. ANTÚNEZ DE MAYOLO -->
@@ -191,7 +207,7 @@
             <text x="380" y="340" fill="#94a3b8" font-size="8" font-weight="600">Pza. Dos de Mayo</text>
 
             <!-- Danger Zone Polygon (San Martín de Porres) -->
-            @if (selectedFilter() === 'all' || selectedFilter() === 'risk_zone') {
+            @if (hasPoint(3)) {
               <polygon points="210,215 300,225 285,280 190,265"
                        fill="url(#dangerHatchComm)"
                        stroke="#ef4444"
@@ -212,11 +228,11 @@
           <!-- Interactive Pins Layer positioned over the tactical map -->
 
           <!-- PIN 1: Inkafarma 24h (Universitaria) -->
-          @if (selectedFilter() === 'all' || selectedFilter() === 'pharmacy') {
+          @if (hasPoint(1)) {
             <div
               class="map-pin pin-inkafarma-hd"
               [class.selected]="selectedPoint()?.id === 1"
-              (click)="selectPoint(allPoints()[0])">
+              (click)="selectPointById(1)">
               <span class="pin-tag">Inkafarma 24h</span>
               <div class="pin-badge green-badge">
                 <mat-icon class="pin-mat-icon">medication</mat-icon>
@@ -224,13 +240,13 @@
             </div>
           }
 
-          <!-- PIN 2: Primax 24h (Mayolo / Universitaria) -->
-          @if (selectedFilter() === 'all' || selectedFilter() === 'gas_station') {
+          <!-- PIN 2: Primax (Mayolo / Universitaria) -->
+          @if (hasPoint(2)) {
             <div
               class="map-pin pin-primax-hd"
               [class.selected]="selectedPoint()?.id === 2"
-              (click)="selectPoint(allPoints()[1])">
-              <span class="pin-tag">Primax 24h</span>
+              (click)="selectPointById(2)">
+              <span class="pin-tag">Primax</span>
               <div class="pin-badge blue-badge">
                 <mat-icon class="pin-mat-icon">local_gas_station</mat-icon>
               </div>
@@ -238,11 +254,11 @@
           }
 
           <!-- PIN 3: Dark Road Hazard (Duenas / Av. Peru) -->
-          @if (selectedFilter() === 'all' || selectedFilter() === 'risk_zone') {
+          @if (hasPoint(3)) {
             <div
               class="map-pin pin-danger-hd"
               [class.selected]="selectedPoint()?.id === 3"
-              (click)="selectPoint(allPoints()[2])">
+              (click)="selectPointById(3)">
               <span class="pin-tag danger-tag">Tramo Oscuro</span>
               <div class="pin-badge red-badge">
                 <mat-icon class="pin-mat-icon">warning</mat-icon>
@@ -255,7 +271,7 @@
 
       <!-- Telemetry Footer Bar -->
       <div class="map-hd-footer">
-        <span>RED COMUNITARIA ACTIVA &bull; 18 PUNTOS VALIDADOS</span>
+        <span>RED COMUNITARIA ACTIVA &bull; {{ filteredPoints().length }} PUNTOS VISIBLES</span>
         <span>LAT -11.992&deg; S &bull; LON -77.072&deg; W</span>
       </div>
 
@@ -277,6 +293,7 @@
 
         <h2 class="detail-title">{{ point.name }}</h2>
         <span class="detail-distance">{{ point.distance }}</span>
+        @if (point.type !== 'risk_zone') { <p class="service-hours">Horario: {{ hoursLabel(point) }} · {{ point.timeZone || 'America/Lima' }}</p> }
 
         <!-- Community Verification Box -->
         <div class="community-trust-box">

@@ -1,4 +1,4 @@
-﻿import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -68,7 +68,7 @@ export class Journey implements OnInit {
 
     const newPing: TelemetryPing = {
       timestamp: new Date().toLocaleTimeString('en-US', { hour12: false }),
-      message: 'Demora de +10m reportada por tráfico nocturno. Tolerancia recalculada.',
+      message: 'Demora de +10m reportada por tráfico. Tolerancia recalculada.',
       type: 'warning',
     };
 

@@ -1,4 +1,4 @@
-﻿import { inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -6,7 +6,7 @@ import { UserProfile } from '../domain/model/user-profile.entity';
 import { environment } from '../../../environments/environment';
 
 /**
- * Fallback static user profile for the nocturnal worker.
+ * Fallback static user profile for the shift worker.
  */
 const DEFAULT_PROFILE: UserProfile = {
   id: 1,
@@ -17,7 +17,8 @@ const DEFAULT_PROFILE: UserProfile = {
   avatar: 'JL',
   phone: '+51 987 654 321',
   email: 'jorge.huaman@vigilancia.pe',
-  schedule: '22:00 a 06:00 (Lunes a Sábado)',
+  schedule: '22:00 a 06:00 (+1 día) · Lunes a Sábado',
+  shiftType: 'night',
   transport: 'Moto Lineal (Personal)',
   district: 'Cercado de Lima',
   privacyGpsActiveOnly: true,
@@ -40,10 +41,20 @@ export class UserProfileService {
   /**
    * Fetches the authenticated worker's profile entity.
    */
+  saveProfile(profile: UserProfile): void {
+    localStorage.setItem('noxway_worker_profile', JSON.stringify(profile));
+  }
+
   getProfile(): Observable<UserProfile> {
     return this.http.get<UserProfile[]>(this.baseUrl).pipe(
       map((list) => (list && list.length > 0 ? list[0] : DEFAULT_PROFILE)),
       catchError(() => of(DEFAULT_PROFILE)),
+      map((profile) => {
+        try {
+          const saved = JSON.parse(localStorage.getItem('noxway_worker_profile') || 'null');
+          return saved && saved.id === profile.id ? { ...profile, ...saved } : profile;
+        } catch { return profile; }
+      }),
     );
   }
 }

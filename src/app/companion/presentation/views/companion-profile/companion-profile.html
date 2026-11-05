@@ -132,7 +132,7 @@
       </div>
 
       <div class="surveillance-intro">
-        <h4 class="intro-heading">Ventana de Vigilancia Nocturna</h4>
+        <h4 class="intro-heading">Horario de Alertas Prioritarias</h4>
         <p class="intro-desc">
           Horario en que el sistema emitirá alarmas audibles prioritarias en tu teléfono:
         </p>
@@ -142,20 +142,24 @@
       <div class="time-boxes-row">
         <div class="time-box">
           <span class="time-box-label">DESDE:</span>
-          <span class="time-box-val">22:00 PM</span>
+          <input aria-label="Inicio de alertas prioritarias" type="time" [(ngModel)]="alertStart" />
         </div>
 
         <div class="time-box">
           <span class="time-box-label">HASTA:</span>
-          <span class="time-box-val">07:30 AM</span>
+          <input aria-label="Fin de alertas prioritarias" type="time" [(ngModel)]="alertEnd" />
         </div>
       </div>
+
+      <p>Horario local de Lima (UTC−5). Si el fin es anterior al inicio, corresponde al día siguiente.</p>
+      <button mat-stroked-button (click)="saveAlertSchedule()">Guardar preferencia de horario</button>
+      <p>Esta preferencia se guarda en este navegador; no modifica el envío de alertas del servidor.</p>
 
       <!-- Feature Info Box 1: Auto Rest -->
       <div class="info-card-box">
         <h5 class="info-box-title">Modo Resguardo Automático</h5>
         <p class="info-box-text">
-          Cuando Jorge marca llegada a casa por la mañana, el sistema entra en modo reposo para que puedas descansar en calma y sin avisos innecesarios.
+          Cuando Jorge confirma su llegada, de día o noche, se pausa el seguimiento de ese trayecto y sus avisos.
         </p>
       </div>
 

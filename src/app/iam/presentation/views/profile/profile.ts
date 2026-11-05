@@ -1,4 +1,4 @@
-﻿import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,6 +25,10 @@ export class Profile implements OnInit {
   }
 
   onSave(): void {
+    const profile = this.profile();
+    if (!profile) return;
+    try { this.profileService.saveProfile(profile); }
+    catch { alert('No fue posible guardar los cambios en este navegador.'); return; }
     alert(
       'Cambios guardados: Se actualizaron los datos del trabajador y los ajustes de privacidad.',
     );

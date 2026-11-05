@@ -36,7 +36,7 @@ export class CompanionInvitations implements OnInit {
   onAcceptInvitation(): void {
     this.pendingStatus.set('accepted');
     alert(
-      'Vínculo de confianza aceptado con éxito. Ahora también podrás acompañar a Carlos en sus turnos nocturnos.',
+      'Vínculo de confianza aceptado con éxito. Ahora también podrás acompañar a Carlos en sus turnos diurnos o nocturnos.',
     );
   }
 

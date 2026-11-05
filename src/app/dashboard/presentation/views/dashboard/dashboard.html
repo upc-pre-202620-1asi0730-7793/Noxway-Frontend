@@ -5,10 +5,10 @@
     <div class="welcome-content">
       <span class="shift-badge">
         <mat-icon class="badge-icon">bedtime</mat-icon>
-        <span>Turno Noche 22:00 - 06:00</span>
+        <span>{{ workerProfile()?.shiftType === 'day' ? 'Turno Diurno' : workerProfile()?.shiftType === 'rotating' ? 'Turno Rotativo' : workerProfile()?.shiftType === 'night' ? 'Turno Nocturno' : 'Mi Turno' }} · {{ workerProfile()?.schedule || 'Configura tu horario en Mi Perfil' }}</span>
       </span>
 
-      <h1 class="welcome-title">Buenas noches, Jorge Luis</h1>
+      <h1 class="welcome-title">Hola, Jorge Luis</h1>
 
       <p class="welcome-desc">
         Acompañamiento pasivo listo. Inicia tu check-in al salir de Planta San Martín para que Rosa Elena te acompañe.
@@ -61,7 +61,7 @@
       </div>
       <div class="stat-info">
         <strong class="stat-value">{{ dashboardData()?.restDuration }}</strong>
-        <span class="stat-label">Descanso Diurno</span>
+        <span class="stat-label">Descanso</span>
         <div class="stat-sub amber-text">
           <mat-icon class="mini-check">check</mat-icon>
           <span>{{ dashboardData()?.restComparison }}</span>
@@ -75,7 +75,7 @@
       </div>
       <div class="stat-info">
         <strong class="stat-value">{{ dashboardData()?.servicesCount }} Locales</strong>
-        <span class="stat-label">Servicios 24h en ruta</span>
+        <span class="stat-label">Servicios en Ruta</span>
         <div class="stat-sub teal-text">
           <mat-icon class="mini-check">check</mat-icon>
           <span>{{ dashboardData()?.servicesStatus }}</span>
@@ -152,7 +152,7 @@
           <circle cx="620" cy="150" r="14" fill="none" stroke="#ef4444" stroke-opacity="0.35" stroke-width="3" />
         </svg>
 
-        <span class="map-label">[Mapa 24h: Corredor Iluminado Universitario]</span>
+        <span class="map-label">[Mapa: Corredor Iluminado Universitario]</span>
       </div>
 
       <div class="route-actions-row">
@@ -169,7 +169,7 @@
           class="secondary-btn"
           routerLink="/map">
           <mat-icon class="btn-icon">map</mat-icon>
-          <span>Explorar Servicios en Mapa 24h</span>
+          <span>Explorar Servicios Cercanos</span>
         </button>
       </div>
 
@@ -209,7 +209,7 @@
 
       <!-- Night Notices -->
       <mat-card class="aside-card">
-        <h3 class="aside-title">Avisos de la Noche</h3>
+        <h3 class="aside-title">Avisos del Trayecto</h3>
 
         <div class="notice-item">
           <div class="notice-badge green-badge">

@@ -1,7 +1,7 @@
 import { BaseEntity } from '../../../shared/domain/model/base-entity';
 
 /**
- * Represents a collective discount, corporate perk, or nocturnal safety service benefit.
+ * Represents a collective discount, corporate perk, or commute safety service benefit.
  */
 export interface CollectiveBenefit extends BaseEntity {
   /** Name of partner merchant or service provider */
@@ -21,7 +21,7 @@ export interface CollectiveBenefit extends BaseEntity {
 }
 
 /**
- * Represents the worker's active nocturnal protection plan and benefits package.
+ * Represents the worker's active commute protection plan and benefits package.
  */
 export interface UserSubscription extends BaseEntity {
   /** Commercial plan title (e.g. 'Plan Centinela Pro') */

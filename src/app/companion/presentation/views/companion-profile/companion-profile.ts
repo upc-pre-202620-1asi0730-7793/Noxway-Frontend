@@ -26,8 +26,24 @@ export class CompanionProfile implements OnInit {
   phone = '';
   email = '';
   address = '';
+  alertStart = '22:00';
+  alertEnd = '07:30';
+
+  saveAlertSchedule(): void {
+    if (!this.alertStart || !this.alertEnd) { alert('Completa ambas horas.'); return; }
+    try {
+      localStorage.setItem('noxway_alert_schedule', JSON.stringify({start: this.alertStart, end: this.alertEnd}));
+      alert('Preferencia de horario guardada en este navegador.');
+    } catch { alert('No fue posible guardar la preferencia.'); }
+  }
+
 
   ngOnInit(): void {
+    try {
+      const saved = JSON.parse(localStorage.getItem('noxway_alert_schedule') || 'null');
+      if (saved) { this.alertStart = saved.start; this.alertEnd = saved.end; }
+    } catch { /* Use the default schedule when storage is unavailable. */ }
+
     this.companionService.getProfile().subscribe((data) => {
       this.profile.set(data);
       this.fullName = data.fullName;

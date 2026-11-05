@@ -1,7 +1,7 @@
-﻿import { BaseEntity } from '../../../shared/domain/model/base-entity';
+import { BaseEntity } from '../../../shared/domain/model/base-entity';
 
 /**
- * Represents a community post published by nocturnal workers,
+ * Represents a community post published by shift workers,
  * sharing live safety alerts, road hazards, or verified 24h services.
  */
 export interface CommunityPost extends BaseEntity {
@@ -32,7 +32,7 @@ export interface CommunityPost extends BaseEntity {
 }
 
 /**
- * Represents a recognized community contributor or nocturnal guardian.
+ * Represents a recognized community contributor or community guardian.
  */
 export interface CommunityLeader {
   /** Leaderboard position ranking */

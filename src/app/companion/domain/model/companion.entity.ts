@@ -126,7 +126,7 @@ export interface NationalLine {
 }
 
 /**
- * Pending trusted bond request from a nocturnal worker.
+ * Pending trusted bond request from a shift worker.
  */
 export interface PendingInvitation {
   id: number;
@@ -139,7 +139,7 @@ export interface PendingInvitation {
 }
 
 /**
- * Active nocturnal worker currently accompanied by this contact.
+ * Active shift worker currently accompanied by this contact.
  */
 export interface AccompaniedWorker {
   id: number;
