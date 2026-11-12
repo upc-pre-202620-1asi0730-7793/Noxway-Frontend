@@ -23,17 +23,19 @@ la entrevista. Después inicia sesión. En **Mi Perfil** puedes editar y guardar
 datos y preferencias. En **Mi Trayecto** puedes registrar una salida, confirmar la
 llegada y ver tu historial. Pulsa **Salir** entre entrevistas.
 
-El servidor temporal escucha en el puerto 3000. Guarda las cuentas y trayectos
+El servidor temporal escucha en el puerto 3000. Guarda las cuentas, los trayectos y los registros personales
 en `server/accounts.local.json`, que se crea al arrancar y se excluye de Git.
 Al reiniciar la API, los datos se conservan y es necesario iniciar sesión de nuevo.
 
 La opción **Abrir demostración con datos de ejemplo** permite explorar las
-pantallas anteriores. La prueba con cuenta propia abarca el perfil y el registro
-manual de trayectos. El menú también permite abrir los otros módulos con datos
-de ejemplo. Las
-preferencias de privacidad se guardan como valores y la prueba local no activa
-GPS, cifrado del historial ni avisos externos. La integración con Spring Boot
-y MySQL queda pendiente.
+pantallas de demostración. Las cuentas registradas empiezan con listas vacías.
+Cada cuenta puede guardar trayectos, reportes de lugares, avisos privados,
+descansos y contactos. Los planes empiezan sin suscripción activa.
+
+La prueba local guarda las preferencias de privacidad. La integración con
+Spring Boot y MySQL, el mapa en vivo, la publicación comunitaria, los envíos
+de invitaciones, el cifrado del historial y la contratación de planes están
+pendientes.
 
 ## Code scaffolding
 
