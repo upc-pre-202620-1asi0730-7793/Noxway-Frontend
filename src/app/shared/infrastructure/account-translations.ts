@@ -150,4 +150,12 @@ export const accountTranslations: Readonly<Record<string, string>> = {
   "No se pudieron cargar los servicios de OpenStreetMap. Vuelve a intentarlo.": "Could not load places from OpenStreetMap. Try again.",
   "No se pudo obtener tu ubicación. Mueve el mapa y busca en esa zona.": "Could not get your location. Move the map and search that area.",
   "Establecimiento sin nombre": "Unnamed place"
+,
+  "Mapa del lugar del aviso": "Notice location map",
+  "Marcar el centro del mapa": "Mark the map center",
+  "Ubicación marcada": "Location selected",
+  "Ver ubicación del aviso": "View notice location",
+  "Lugar del aviso": "Notice location",
+  "Haz clic en el mapa para marcar dónde ocurrió.": "Click the map to mark where it happened.",
+  "Marca el lugar del aviso en el mapa.": "Mark the notice location on the map."
 };

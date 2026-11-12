@@ -1,3 +1,4 @@
+import { ReportLocation, type ReportCoordinates } from './report-location';
 import { LanguageService } from '../../../infrastructure/language.service';
 import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
@@ -12,6 +13,7 @@ interface PersonalRecord {
   id: string;
   title: string;
   details: string;
+  location?: ReportCoordinates;
 }
 
 const sections = {
@@ -51,7 +53,7 @@ const sections = {
 };
 
 @Component({
-  imports: [FormsModule, MatIconModule],
+  imports: [FormsModule, MatIconModule, ReportLocation],
   templateUrl: './personal-module.html',
   styleUrl: './personal-module.css',
 })
@@ -67,6 +69,7 @@ export class PersonalModule implements OnInit {
   readonly records = signal<PersonalRecord[] | null>(null);
   readonly busy = signal(false);
   readonly error = signal('');
+  readonly location = signal<ReportCoordinates | null>(null);
 
   title = '';
   category = '';
@@ -101,14 +104,20 @@ export class PersonalModule implements OnInit {
       details = `${this.category} · ${details}`;
     }
 
-    if (!title || !details) return;
+    const location = this.location();
+    if (!title || !details || (this.section === 'community' && !location)) return;
 
     this.run(this.http.post<PersonalRecord>(this.endpoint, {
-      title, details,
+      title, details, ...(location && { location }),
     }, this.session.requestOptions()), (record) => {
       this.records.update((records) => [record, ...(records ?? [])]);
       form.resetForm();
+      this.location.set(null);
     });
+  }
+
+  reportMapUrl({ lat, lon }: ReportCoordinates): string {
+    return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=17/${lat}/${lon}`;
   }
 
   private run<T>(request: Observable<T>, apply: (result: T) => void): void {

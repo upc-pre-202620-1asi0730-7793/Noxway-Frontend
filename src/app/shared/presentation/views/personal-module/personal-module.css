@@ -64,3 +64,7 @@ button:disabled { opacity: .6; cursor: default; }
 @media (max-width: 760px) {
   .module-grid { grid-template-columns: 1fr; }
 }
+
+.report-location { min-width: 0; margin: 0; padding: 10px; border: 1px solid #415779; border-radius: 8px; }
+.report-location p { margin: 0 0 10px; }
+.report-map-link { display: inline-block; margin-top: 6px; color: #93c5fd; }

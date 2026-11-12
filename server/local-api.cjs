@@ -166,6 +166,13 @@ server.post('/me/records/:section', (req, res) => {
   }
 
   const record = { id: randomBytes(12).toString('hex'), title, details };
+  if (section === 'community') {
+    const { lat, lon } = req.body?.location ?? {};
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+      return res.status(400).json({ message: 'Marca el lugar del aviso en el mapa.' });
+    }
+    record.location = { lat, lon };
+  }
   account.assign({ records: { ...records, [section]: [record, ...(records[section] ?? [])] } }).write();
   return res.status(201).json(record);
 });
