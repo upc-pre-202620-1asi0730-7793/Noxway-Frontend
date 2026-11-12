@@ -45,13 +45,24 @@ describe('Noxway access', () => {
     const labels = harness.routeNativeElement?.querySelectorAll('mat-checkbox');
     expect(labels?.length).toBe(3);
     expect(labels?.[0].textContent).toContain('Compartir GPS');
-    await harness.navigateByUrl('/map');
-    const records = http.expectOne('http://127.0.0.1:3000/me/records/services');
-    expect(records.request.headers.get('Authorization')).toBe('Bearer test-token');
-    records.flush([]);
-    harness.detectChanges();
-    expect(harness.routeNativeElement?.textContent).toContain('Aún no has registrado servicios');
-    expect(harness.routeNativeElement?.textContent).not.toContain('Primax');
+    for (const [route, section, empty] of [
+      ['/map', 'services', 'Aún no has registrado servicios'],
+      ['/community', 'community', 'Aún no has creado ningún aviso'],
+      ['/wellness', 'wellness', 'Aún no has registrado descansos'],
+      ['/trusted-contacts', 'contacts', 'Aún no has agregado contactos'],
+    ]) {
+      await harness.navigateByUrl(route);
+      const records = http.expectOne(`http://127.0.0.1:3000/me/records/${section}`);
+      expect(records.request.headers.get('Authorization')).toBe('Bearer test-token');
+      records.flush([]);
+      harness.detectChanges();
+      expect(harness.routeNativeElement?.textContent).toContain(empty);
+      expect(harness.routeNativeElement?.querySelector('form')).toBeTruthy();
+      expect(harness.routeNativeElement?.textContent).not.toContain('Primax');
+    }
+
+    await harness.navigateByUrl('/benefits');
+    expect(harness.routeNativeElement?.textContent).toContain('Sin plan activo');
     http.verify();
   });
 });
