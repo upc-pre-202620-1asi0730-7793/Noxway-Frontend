@@ -1,0 +1,44 @@
+.access {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 24px;
+  background: #060b17;
+  color: #f8fafc;
+  font-family: system-ui, sans-serif;
+}
+
+.panel {
+  display: grid;
+  gap: 16px;
+  width: min(100%, 430px);
+  box-sizing: border-box;
+  padding: clamp(20px, 5vw, 32px);
+  border: 1px solid #253552;
+  border-radius: 16px;
+  background: #10192b;
+}
+
+h1, p { margin: 0; }
+h1 { font-size: 1.55rem; }
+p, small { color: #cbd5e1; }
+form, label { display: grid; gap: 8px; }
+form { gap: 16px; }
+input, select, button {
+  font: inherit;
+  color: inherit;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #4b6082;
+  background: #0b1323;
+}
+
+button {
+  background: #1d4ed8;
+  cursor: pointer;
+}
+
+button:disabled { opacity: .65; cursor: default; }
+.demo { background: #18243b; }
+a { color: #a6c9ff; }
+.error { color: #fda4af; }
