@@ -33,9 +33,12 @@ Cada cuenta puede guardar trayectos, reportes de lugares, avisos privados,
 descansos y contactos. Los planes empiezan sin suscripción activa.
 
 La prueba local guarda las preferencias de privacidad. La integración con
-Spring Boot y MySQL, el mapa en vivo, la publicación comunitaria, los envíos
+Spring Boot y MySQL, la publicación comunitaria, los envíos
 de invitaciones, el cifrado del historial y la contratación de planes están
 pendientes.
+
+Servicios Cercanos incluye un mapa de Lima de OpenStreetMap que requiere
+conexión a Internet. Los reportes privados permanecen en la cuenta local.
 
 ## Code scaffolding
 
