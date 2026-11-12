@@ -59,14 +59,8 @@ button:disabled { opacity: .6; cursor: default; }
 .module-card > button { margin-top: 12px; }
 .error, [role='alert'] { color: #fda4af; }
 .membership-status { display: inline-block; padding: 5px 10px; border-radius: 16px; color: #bfdbfe; background: #182f55; }
-.service-filters { display: flex; flex-wrap: wrap; gap: 8px; }
-.service-filters button { background: #111c30; }
-.service-filters button[aria-pressed='true'] { background: #1d4ed8; border-color: #60a5fa; }
 .contacts-layout article { background: #0b1323; border: 1px solid #203353; border-radius: 8px; padding: 14px; }
 .contacts-layout article + article { margin-top: 10px; }
 @media (max-width: 760px) {
   .module-grid { grid-template-columns: 1fr; }
 }
-
-.map-card iframe { display: block; width: 100%; height: clamp(270px, 40vh, 470px); border: 0; border-radius: 8px; background: #182641; }
-.map-card a { display: inline-block; margin-top: 10px; color: #93c5fd; }

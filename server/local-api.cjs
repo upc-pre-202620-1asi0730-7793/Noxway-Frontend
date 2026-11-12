@@ -144,11 +144,18 @@ server.param('section', (req, res, next, section) => {
 
 server.get('/me/records/:section', (req, res) => {
   const records = res.locals.account.value().records ?? {};
-  return res.json(records[req.params.section] ?? []);
+  const section = req.params.section;
+  if (section === 'community') {
+    return res.json([...(records.community ?? []), ...(records.services ?? [])]);
+  }
+  return res.json(records[section] ?? []);
 });
 
 server.post('/me/records/:section', (req, res) => {
   const section = req.params.section;
+  if (section === 'services') {
+    return res.status(405).json({ message: 'Crea los avisos desde Comunidad.' });
+  }
   const account = res.locals.account;
   const records = account.value().records ?? {};
   const title = clean(req.body?.title);

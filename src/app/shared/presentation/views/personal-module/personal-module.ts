@@ -1,6 +1,6 @@
 import { LanguageService } from '../../../infrastructure/language.service';
 import { HttpClient } from '@angular/common/http';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { restPeriod } from '../../../../wellness/domain/model/rest-period';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -14,20 +14,7 @@ interface PersonalRecord {
   details: string;
 }
 
-const serviceTypes = ['Farmacia', 'Grifo', 'Zona de riesgo', 'Otro servicio'];
-
 const sections = {
-  services: {
-    icon: 'place',
-    listTitle: 'Mis reportes',
-    formTitle: 'Reportar lugar o peligro',
-    title: 'Servicios Cercanos y Zonas de Riesgo',
-    empty: 'Aún no has registrado servicios ni zonas de riesgo.',
-    titleLabel: 'Nombre del lugar o zona',
-    detailsLabel: 'Dirección y descripción',
-    action: 'Guardar reporte',
-    note: 'Tus reportes se guardan en tu cuenta. La verificación comunitaria está pendiente.',
-  },
   community: {
     icon: 'forum',
     listTitle: 'Mis avisos',
@@ -78,13 +65,6 @@ export class PersonalModule implements OnInit {
 
   readonly module = this.section === 'benefits' ? null : sections[this.section];
   readonly records = signal<PersonalRecord[] | null>(null);
-  readonly serviceTypes = serviceTypes;
-  readonly serviceFilter = signal('');
-  readonly visibleRecords = computed(() => {
-    const entries = this.records() ?? [];
-    const filter = this.serviceFilter();
-    return filter ? entries.filter((record) => record.details.startsWith(filter + ' · ')) : entries;
-  });
   readonly busy = signal(false);
   readonly error = signal('');
 

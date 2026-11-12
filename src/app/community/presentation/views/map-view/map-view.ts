@@ -97,18 +97,4 @@ export class MapView implements OnInit {
       `Confirmación registrada: Has validado la veracidad de las medidas de seguridad de este local.`,
     );
   }
-
-  onReportLocal(): void {
-    const local = prompt('Ingrese el nombre, dirección y horario del servicio cercano a registrar:');
-    if (local) {
-      alert(`Local "${local}" enviado a revisión comunitaria.`);
-    }
-  }
-
-  onReportDanger(): void {
-    const danger = prompt('Describe la zona de riesgo o poste apagado:');
-    if (danger) {
-      alert(`Alerta de riesgo comunitaria reportada para verificación.`);
-    }
-  }
 }
