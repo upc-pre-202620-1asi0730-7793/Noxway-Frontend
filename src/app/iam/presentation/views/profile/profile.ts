@@ -1,3 +1,4 @@
+import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { SessionService } from '../../../infrastructure/session.service';
@@ -16,6 +17,7 @@ import { UserProfileService } from '../../../infrastructure/user-profile.service
   styleUrl: './profile.css',
 })
 export class Profile implements OnInit {
+  readonly t = inject(LanguageService).ui;
   private readonly profileService = inject(UserProfileService);
 
   readonly session = inject(SessionService);

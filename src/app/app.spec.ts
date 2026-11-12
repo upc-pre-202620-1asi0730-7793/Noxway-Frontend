@@ -1,3 +1,4 @@
+import { LanguageService } from './shared/infrastructure/language.service';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { firstValueFrom } from 'rxjs';
@@ -63,6 +64,11 @@ describe('Noxway access', () => {
 
     await harness.navigateByUrl('/benefits');
     expect(harness.routeNativeElement?.textContent).toContain('Sin plan activo');
+    TestBed.inject(LanguageService).currentLang.set('en');
+    harness.detectChanges();
+    expect(harness.routeNativeElement?.textContent).toContain('No active plan');
+    await harness.navigateByUrl('/dashboard');
+    expect(harness.routeNativeElement?.textContent).toContain('Hello, QA Entrevista');
     http.verify();
   });
 });

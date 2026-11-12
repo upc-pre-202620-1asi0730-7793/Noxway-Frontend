@@ -1,3 +1,4 @@
+import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { UserProfileService } from '../../../../iam/infrastructure/user-profile.service';
@@ -24,6 +25,7 @@ import { DashboardData, DashboardService } from '../../../infrastructure/dashboa
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
+  readonly t = inject(LanguageService).ui;
   private readonly dashboardService = inject(DashboardService);
 
   readonly session = inject(SessionService);

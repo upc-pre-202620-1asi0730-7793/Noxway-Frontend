@@ -2,11 +2,11 @@
   <section class="active-commute-card">
     <header class="commute-status-header">
       <div>
-        <h1>Mi trayecto</h1>
-        <p>Registra tu salida y confirma tu llegada.</p>
+        <h1>{{ t('Mi trayecto') }}</h1>
+        <p>{{ t('Registra tu salida y confirma tu llegada.') }}</p>
       </div>
       @if (journeys()) {
-        <span class="status-pill">{{ active() ? 'Trayecto en curso' : 'Sin trayecto activo' }}</span>
+        <span class="status-pill">{{ active() ? t('Trayecto en curso') : t('Sin trayecto activo') }}</span>
       }
     </header>
 
@@ -14,53 +14,53 @@
       <div class="checkpoints-row">
         <div class="checkpoint-item">
           <span class="journey-step"><mat-icon>trip_origin</mat-icon></span>
-          <div><strong>Salida registrada</strong><p>{{ journey.startedAt | date:'dd/MM/yyyy HH:mm' }}</p></div>
+          <div><strong>{{ t('Salida registrada') }}</strong><p>{{ journey.startedAt | date:'dd/MM/yyyy HH:mm' }}</p></div>
         </div>
         <div class="checkpoint-item">
           <span class="journey-step pending"><mat-icon>flag</mat-icon></span>
-          <div><strong>Llegada</strong><p>Pendiente de confirmación</p></div>
+          <div><strong>{{ t('Llegada') }}</strong><p>{{ t('Pendiente de confirmación') }}</p></div>
         </div>
       </div>
       <div class="metrics-grid local-metrics">
-        <div class="metric-box"><span class="metric-label">Origen</span><strong>{{ journey.origin }}</strong></div>
-        <div class="metric-box"><span class="metric-label">Destino</span><strong>{{ journey.destination }}</strong></div>
+        <div class="metric-box"><span class="metric-label">{{ t('Origen') }}</span><strong>{{ journey.origin }}</strong></div>
+        <div class="metric-box"><span class="metric-label">{{ t('Destino') }}</span><strong>{{ journey.destination }}</strong></div>
       </div>
       <div class="commute-actions-row">
-        <button class="confirm-arrival-btn" type="button" [disabled]="busy()" (click)="finish(journey)">Confirmar llegada</button>
+        <button class="confirm-arrival-btn" type="button" [disabled]="busy()" (click)="finish(journey)">{{ t('Confirmar llegada') }}</button>
       </div>
     } @else if (journeys()) {
       <form #form="ngForm" (ngSubmit)="start(form)">
         <div class="local-fields">
-          <label>Origen<input name="origin" [(ngModel)]="origin" required maxlength="150" /></label>
-          <label>Destino<input name="destination" [(ngModel)]="destination" required maxlength="150" /></label>
+          <label>{{ t('Origen') }}<input name="origin" [(ngModel)]="origin" required maxlength="150" /></label>
+          <label>{{ t('Destino') }}<input name="destination" [(ngModel)]="destination" required maxlength="150" /></label>
         </div>
-        <button type="submit" [disabled]="form.invalid || busy()">Iniciar trayecto</button>
+        <button type="submit" [disabled]="form.invalid || busy()">{{ t('Iniciar trayecto') }}</button>
       </form>
     } @else if (busy()) {
-      <p role="status">Cargando tus trayectos…</p>
+      <p role="status">{{ t('Cargando tus trayectos…') }}</p>
     } @else {
-      <button type="button" (click)="load()">Volver a cargar</button>
+      <button type="button" (click)="load()">{{ t('Volver a cargar') }}</button>
     }
 
-    @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+    @if (error()) { <p class="error" role="alert">{{ t(error()) }}</p> }
   </section>
 
   @if (journeys()) {
     <div class="journey-details-grid">
       <section class="panel-card">
-        <h2 class="panel-title">Historial de trayectos</h2>
+        <h2 class="panel-title">{{ t('Historial de trayectos') }}</h2>
         @for (journey of history(); track journey.id) {
           <article>
             <strong>{{ journey.origin }} → {{ journey.destination }}</strong>
-            <p>Salida {{ journey.startedAt | date:'dd/MM/yyyy HH:mm' }} · Llegada {{ journey.finishedAt | date:'dd/MM/yyyy HH:mm' }}</p>
+            <p>{{ t('Salida') }} {{ journey.startedAt | date:'dd/MM/yyyy HH:mm' }} · {{ t('Llegada') }} {{ journey.finishedAt | date:'dd/MM/yyyy HH:mm' }}</p>
           </article>
         } @empty {
-          <p>Cuando confirmes tu primera llegada, el trayecto aparecerá aquí.</p>
+          <p>{{ t('Cuando confirmes tu primera llegada, el trayecto aparecerá aquí.') }}</p>
         }
       </section>
       <section class="panel-card">
-        <h2 class="panel-title">Seguimiento del trayecto</h2>
-        <p>El seguimiento de esta cuenta registra la salida y la llegada manualmente. El GPS y los avisos externos están pendientes.</p>
+        <h2 class="panel-title">{{ t('Seguimiento del trayecto') }}</h2>
+        <p>{{ t('El seguimiento de esta cuenta registra la salida y la llegada manualmente. El GPS y los avisos externos están pendientes.') }}</p>
       </section>
     </div>
   }

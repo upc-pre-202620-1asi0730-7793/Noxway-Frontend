@@ -1,3 +1,4 @@
+import { accountTranslations } from './account-translations';
 import { Injectable, signal, computed } from '@angular/core';
 
 export type SupportedLanguage = 'es' | 'en';
@@ -18,6 +19,11 @@ export class LanguageService {
    * Reactive signal tracking the currently selected language ('es' or 'en').
    */
   readonly currentLang = signal<SupportedLanguage>('es');
+
+  readonly ui = (text: string): string =>
+    this.currentLang() === 'en' && Object.hasOwn(accountTranslations, text)
+      ? accountTranslations[text]
+      : text;
 
   private readonly translations: Record<SupportedLanguage, TranslationDictionary> = {
     es: {

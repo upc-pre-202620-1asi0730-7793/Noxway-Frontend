@@ -14,8 +14,8 @@
 
           <div class="user-titles">
             <h1 class="user-fullname">{{ p.fullName }}</h1>
-            <p class="user-role">{{ p.role }}</p>
-            <span class="user-meta">@if (session.demo()) { DNI: {{ p.dni }} · } {{ p.memberSince }}</span>
+            <p class="user-role">{{ t(p.role) }}</p>
+            <span class="user-meta">@if (session.demo()) { DNI: {{ p.dni }} · } {{ t(p.memberSince ?? '') }}</span>
           </div>
         </div>
 
@@ -23,7 +23,7 @@
         <div class="form-fields-grid">
 
           <div class="form-group">
-            <label class="form-label" for="profile-fullName">NOMBRE COMPLETO</label>
+            <label class="form-label" for="profile-fullName">{{ t('NOMBRE COMPLETO') }}</label>
             <input
               type="text"
               class="form-input"
@@ -31,7 +31,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="profile-phone">TELÉFONO MÓVIL</label>
+            <label class="form-label" for="profile-phone">{{ t('TELÉFONO MÓVIL') }}</label>
             <input
               type="text"
               class="form-input"
@@ -39,7 +39,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="profile-email">CORREO ELECTRÓNICO</label>
+            <label class="form-label" for="profile-email">{{ t('CORREO ELECTRÓNICO') }}</label>
             <input
               type="email"
               class="form-input"
@@ -47,23 +47,23 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="shift-type">TIPO DE TURNO</label>
+            <label class="form-label" for="shift-type">{{ t('TIPO DE TURNO') }}</label>
             <select id="shift-type" class="form-input" [(ngModel)]="p.shiftType">
-              <option [ngValue]="undefined" disabled>Selecciona tu turno</option>
-              <option value="day">Diurno</option>
-              <option value="night">Nocturno</option>
-              <option value="rotating">Rotativo</option>
+              <option [ngValue]="undefined" disabled>{{ t('Selecciona tu turno') }}</option>
+              <option value="day">{{ t('Diurno') }}</option>
+              <option value="night">{{ t('Nocturno') }}</option>
+              <option value="rotating">{{ t('Rotativo') }}</option>
             </select>
-            <label class="form-label" for="profile-schedule">HORARIO HABITUAL DE TURNO</label>
+            <label class="form-label" for="profile-schedule">{{ t('HORARIO HABITUAL DE TURNO') }}</label>
             <input
               type="text"
               class="form-input"
               id="profile-schedule" [(ngModel)]="p.schedule" />
-            <small>Indica inicio y fin; usa +1 día si termina después de medianoche.</small>
+            <small>{{ t('Indica inicio y fin; usa +1 día si termina después de medianoche.') }}</small>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="profile-transport">TRANSPORTE PRINCIPAL</label>
+            <label class="form-label" for="profile-transport">{{ t('TRANSPORTE PRINCIPAL') }}</label>
             <input
               type="text"
               class="form-input"
@@ -71,7 +71,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="profile-district">DISTRITO DE RESIDENCIA</label>
+            <label class="form-label" for="profile-district">{{ t('DISTRITO DE RESIDENCIA') }}</label>
             <input
               type="text"
               class="form-input"
@@ -82,29 +82,29 @@
 
         <!-- Privacy & Geolocation Settings -->
         <div class="privacy-section">
-          <h2 class="privacy-section-title">Ajustes de Privacidad y Geolocalización</h2>
+          <h2 class="privacy-section-title">{{ t('Ajustes de Privacidad y Geolocalización') }}</h2>
 
           <div class="checkbox-group">
             <mat-checkbox
               color="primary"
               [(ngModel)]="p.privacyGpsActiveOnly">
-              Compartir GPS únicamente durante check-ins activos
+              {{ t('Compartir GPS únicamente durante check-ins activos') }}
             </mat-checkbox>
 
             <mat-checkbox
               color="primary"
               [(ngModel)]="p.privacyEncryptedHistory">
-              Preferir cifrado de extremo a extremo para el historial
+              {{ t('Preferir cifrado de extremo a extremo para el historial') }}
             </mat-checkbox>
 
             <mat-checkbox
               color="primary"
               [(ngModel)]="p.privacyAnonymousRatings">
-              Calificaciones anónimas en mapa comunitario
+              {{ t('Calificaciones anónimas en mapa comunitario') }}
             </mat-checkbox>
           </div>
           @if (!session.demo()) {
-            <small>En esta prueba solo se guardan tus preferencias.</small>
+            <small>{{ t('En esta prueba solo se guardan tus preferencias.') }}</small>
           }
         </div>
 
@@ -116,11 +116,11 @@
             [disabled]="saving()"
             (click)="onSave()">
             <mat-icon class="btn-icon">save</mat-icon>
-            <span>Guardar Modificaciones</span>
+            <span>{{ t('Guardar Modificaciones') }}</span>
           </button>
         </div>
-        @if (status()) { <p role="status">{{ status() }}</p> }
-        @if (error()) { <p class="form-error" role="alert">{{ error() }}</p> }
+        @if (status()) { <p role="status">{{ t(status()) }}</p> }
+        @if (error()) { <p class="form-error" role="alert">{{ t(error()) }}</p> }
 
       </mat-card>
 
@@ -128,8 +128,8 @@
       <aside class="profile-aside">
 
         <mat-card class="aside-card">
-          <h3 class="aside-title">Sesión actual</h3>
-          <p class="aside-desc">{{ session.demo() ? 'Demostración' : p.email }}</p>
+          <h3 class="aside-title">{{ t('Sesión actual') }}</h3>
+          <p class="aside-desc">{{ session.demo() ? t('Demostración') : p.email }}</p>
         </mat-card>
       </aside>
 

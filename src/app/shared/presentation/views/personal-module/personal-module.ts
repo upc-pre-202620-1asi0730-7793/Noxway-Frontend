@@ -1,3 +1,4 @@
+import { LanguageService } from '../../../infrastructure/language.service';
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,7 +26,7 @@ const sections = {
     titleLabel: 'Nombre del lugar o zona',
     detailsLabel: 'Dirección y descripción',
     action: 'Guardar reporte',
-    note: 'Tus reportes se guardan en tu cuenta. El mapa en vivo y la verificación comunitaria están pendientes.',
+    note: 'Tus reportes se guardan en tu cuenta. La verificación comunitaria está pendiente.',
   },
   community: {
     icon: 'forum',
@@ -68,6 +69,7 @@ const sections = {
   styleUrl: './personal-module.css',
 })
 export class PersonalModule implements OnInit {
+  readonly t = inject(LanguageService).ui;
   private readonly http = inject(HttpClient);
   private readonly session = inject(SessionService);
   private readonly router = inject(Router);
@@ -140,7 +142,7 @@ export class PersonalModule implements OnInit {
           void this.router.navigateByUrl('/login');
           return;
         }
-        if (error.status === 0 || error.status === 404) {
+        if (error.status === 0 || error.status === 404 || error.status >= 500) {
           this.error.set('Comprueba que npm run server esté ejecutando la versión actual del proyecto y vuelve a cargar.');
           return;
         }

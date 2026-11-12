@@ -3,20 +3,20 @@
     <mat-card class="welcome-card">
       <div class="welcome-content">
         <span class="shift-badge">
-          {{ profile.shiftType === 'day' ? 'Turno diurno' : profile.shiftType === 'night' ? 'Turno nocturno' : 'Turno rotativo' }}
+          {{ profile.shiftType === 'day' ? t('Turno diurno') : profile.shiftType === 'night' ? t('Turno nocturno') : t('Turno rotativo') }}
           @if (profile.schedule) { · {{ profile.schedule }} }
         </span>
-        <h1 class="welcome-title">Hola, {{ profile.fullName }}</h1>
-        <p class="welcome-desc">Completa tu horario y tus preferencias en Mi Perfil.</p>
+        <h1 class="welcome-title">{{ t('Hola') }}, {{ profile.fullName }}</h1>
+        <p class="welcome-desc">{{ t('Completa tu horario y tus preferencias en Mi Perfil.') }}</p>
       </div>
-      <a mat-flat-button class="primary-btn" routerLink="/profile">Ir a Mi Perfil</a>
+      <a mat-flat-button class="primary-btn" routerLink="/profile">{{ t('Ir a Mi Perfil') }}</a>
     </mat-card>
     <mat-card class="welcome-card">
       <div class="welcome-content">
-        <h2 class="welcome-title">Mi trayecto</h2>
-        <p class="welcome-desc">Registra una salida y una llegada. Podrás consultar tu historial local.</p>
+        <h2 class="welcome-title">{{ t('Mi trayecto') }}</h2>
+        <p class="welcome-desc">{{ t('Registra una salida y una llegada. Podrás consultar tu historial local.') }}</p>
       </div>
-      <a mat-flat-button class="primary-btn" routerLink="/my-journeys">Abrir mis trayectos</a>
+      <a mat-flat-button class="primary-btn" routerLink="/my-journeys">{{ t('Abrir mis trayectos') }}</a>
     </mat-card>
   </section>
 } @else if (session.demo()) {

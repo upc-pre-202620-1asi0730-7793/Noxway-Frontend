@@ -1,3 +1,4 @@
+import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -11,6 +12,7 @@ import { SessionService } from '../../../infrastructure/session.service';
   styleUrl: './access.css',
 })
 export class Access {
+  readonly t = inject(LanguageService).ui;
   private readonly session = inject(SessionService);
   private readonly router = inject(Router);
   readonly registering = inject(ActivatedRoute).snapshot.data['registering'] === true;
@@ -39,7 +41,7 @@ export class Access {
           void this.router.navigate(['/dashboard']);
         }
       },
-      error: (error) => this.error.set(error.error?.message || 'No se pudo conectar con la API local. Comprueba que npm run server esté ejecutándose.'),
+      error: (error) => this.error.set((error.status >= 400 && error.status < 500 ? error.error?.message : undefined) || 'No se pudo conectar con la API local. Comprueba que npm run server esté ejecutándose.'),
     });
   }
 

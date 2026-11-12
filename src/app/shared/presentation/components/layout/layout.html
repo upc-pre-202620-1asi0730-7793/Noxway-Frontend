@@ -90,7 +90,7 @@
 
         <div class="user-info">
           <strong>{{ session.profile()?.fullName ?? 'Jorge Luis Huamán' }}</strong>
-          <span class="user-badge">{{ session.profile()?.role ?? languageService.translate('sidebar.workerRole') }}</span>
+          <span class="user-badge">{{ session.profile() ? languageService.ui(session.profile()!.role) : languageService.translate('sidebar.workerRole') }}</span>
         </div>
       </div>
 
@@ -182,7 +182,7 @@
         <!-- Worker Network Indicator in Topbar -->
         <div class="network-status">
           <span class="status-dot"></span>
-          <span>{{ session.demo() ? 'Demostración · Datos de ejemplo' : 'Prueba local' }}</span>
+          <span>{{ session.demo() ? languageService.ui('Demostración · Datos de ejemplo') : languageService.ui('Prueba local') }}</span>
         </div>
 
         <div class="topbar-actions">

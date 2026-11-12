@@ -67,3 +67,6 @@ button:disabled { opacity: .6; cursor: default; }
 @media (max-width: 760px) {
   .module-grid { grid-template-columns: 1fr; }
 }
+
+.map-card iframe { display: block; width: 100%; height: clamp(270px, 40vh, 470px); border: 0; border-radius: 8px; background: #182641; }
+.map-card a { display: inline-block; margin-top: 10px; color: #93c5fd; }

@@ -1,44 +1,44 @@
 <main class="access">
   <section class="panel">
     <img src="LogoNovctiva.png" alt="Noxway" width="64" height="64" />
-    <h1>{{ registering ? 'Crea tu cuenta de Noxway' : 'Inicia sesión en Noxway' }}</h1>
-    <p>Prueba local para entrevistas. Usa una contraseña exclusiva para esta prueba.</p>
+    <h1>{{ registering ? t('Crea tu cuenta de Noxway') : t('Inicia sesión en Noxway') }}</h1>
+    <p>{{ t('Prueba local para entrevistas. Usa una contraseña exclusiva para esta prueba.') }}</p>
 
     <form #form="ngForm" (ngSubmit)="submit(form)">
       @if (registering) {
-        <label>Nombre completo
+        <label>{{ t('Nombre completo') }}
           <input name="fullName" [(ngModel)]="fullName" required maxlength="150" autocomplete="name" />
         </label>
       }
-      <label>Correo electrónico
+      <label>{{ t('Correo electrónico') }}
         <input name="email" type="email" [(ngModel)]="email" required email maxlength="254" autocomplete="email" />
       </label>
       @if (registering) {
-        <label>Tipo de turno
+        <label>{{ t('Tipo de turno') }}
           <select name="shiftType" [(ngModel)]="shiftType" required>
-            <option value="" disabled>Selecciona tu turno</option>
-            <option value="day">Diurno</option>
-            <option value="night">Nocturno</option>
-            <option value="rotating">Rotativo</option>
+            <option value="" disabled>{{ t('Selecciona tu turno') }}</option>
+            <option value="day">{{ t('Diurno') }}</option>
+            <option value="night">{{ t('Nocturno') }}</option>
+            <option value="rotating">{{ t('Rotativo') }}</option>
           </select>
         </label>
       }
-      <label>Contraseña
+      <label>{{ t('Contraseña') }}
         <input name="password" type="password" [(ngModel)]="password" required
           [minlength]="registering ? 8 : 1" maxlength="128"
           [attr.autocomplete]="registering ? 'new-password' : 'current-password'" />
       </label>
-      @if (registering) { <small>Mínimo 8 caracteres.</small> }
-      @if (registered) { <p role="status">Cuenta creada. Inicia sesión con tus datos.</p> }
-      @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+      @if (registering) { <small>{{ t('Mínimo 8 caracteres.') }}</small> }
+      @if (registered) { <p role="status">{{ t('Cuenta creada. Inicia sesión con tus datos.') }}</p> }
+      @if (error()) { <p class="error" role="alert">{{ t(error()) }}</p> }
       <button type="submit" [disabled]="form.invalid || busy()">
-        {{ busy() ? 'Procesando…' : registering ? 'Crear cuenta' : 'Iniciar sesión' }}
+        {{ busy() ? t('Procesando…') : registering ? t('Crear cuenta') : t('Iniciar sesión') }}
       </button>
     </form>
 
-    <a [routerLink]="registering ? '/login' : '/register'">{{ registering ? 'Ya tengo cuenta' : 'Crear una cuenta' }}</a>
+    <a [routerLink]="registering ? '/login' : '/register'">{{ registering ? t('Ya tengo cuenta') : t('Crear una cuenta') }}</a>
     @if (!registering) {
-      <button class="demo" type="button" [disabled]="busy()" (click)="enterDemo()">Abrir demostración con datos de ejemplo</button>
+      <button class="demo" type="button" [disabled]="busy()" (click)="enterDemo()">{{ t('Abrir demostración con datos de ejemplo') }}</button>
     }
   </section>
 </main>

@@ -1,3 +1,4 @@
+import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -21,6 +22,7 @@ interface LocalJourney {
   styleUrls: ['../journey/journey.css', './local-journeys.css'],
 })
 export class LocalJourneys implements OnInit {
+  readonly t = inject(LanguageService).ui;
   private readonly http = inject(HttpClient);
   private readonly session = inject(SessionService);
   private readonly router = inject(Router);
