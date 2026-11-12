@@ -203,6 +203,10 @@ server.post('/me/records/:section', (req, res) => {
     const district = clean(req.body?.district, 80);
     if (district) record.district = district;
   }
+  if (section === 'contacts') {
+    const relationship = clean(req.body?.relationship, 80);
+    if (relationship) record.relationship = relationship;
+  }
   account.assign({ records: { ...records, [section]: [record, ...(records[section] ?? [])] } }).write();
   return res.status(201).json(record);
 });

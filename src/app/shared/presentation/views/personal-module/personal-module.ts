@@ -16,6 +16,7 @@ interface PersonalRecord {
   details: string;
   location?: ReportCoordinates;
   district?: string;
+  relationship?: string;
 }
 
 const sections = {
@@ -45,7 +46,7 @@ const sections = {
     icon: 'group',
     listTitle: 'Mi red de confianza',
     formTitle: 'Agregar contacto',
-    title: 'Contactos de Confianza',
+    title: 'Red de Contactos de Confianza',
     empty: 'Aún no has agregado contactos de confianza.',
     titleLabel: 'Nombre del contacto',
     detailsLabel: 'Teléfono o correo electrónico',
@@ -64,7 +65,8 @@ export class PersonalModule implements OnInit {
   private readonly http = inject(HttpClient);
   readonly session = inject(SessionService);
   private readonly router = inject(Router);
-  readonly section = inject(ActivatedRoute).snapshot.data['section'] as keyof typeof sections | 'benefits';
+  private readonly route = inject(ActivatedRoute);
+  readonly section = this.route.snapshot.data['section'] as keyof typeof sections | 'benefits';
   private readonly endpoint = `${localApi}/me/records/${this.section}`;
 
   readonly module = this.section === 'benefits' ? null : sections[this.section];
@@ -98,17 +100,24 @@ export class PersonalModule implements OnInit {
   title = '';
   category = '';
   district = '';
+  relationship = '';
   start = '';
   end = '';
   details = '';
 
   ngOnInit(): void {
-    if (this.module) this.load();
+    const notice = this.route.snapshot.queryParamMap.get('notice');
+    if (this.module) this.load(this.section === 'community' ? notice : null);
   }
 
-  load(): void {
-    this.run(this.http.get<PersonalRecord[]>(this.endpoint, this.session.requestOptions()),
-      (records) => this.records.set(records));
+  load(notice: string | null = null): void {
+    this.run(this.http.get<PersonalRecord[]>(this.endpoint, this.session.requestOptions()), (records) => {
+      this.records.set(records);
+      if (notice === 'place' || notice === 'hazard') {
+        this.category = notice === 'place' ? 'Reporte de local' : 'Aviso de seguridad';
+        this.openComposer();
+      }
+    });
   }
 
   save(form: NgForm): void {
@@ -134,6 +143,7 @@ export class PersonalModule implements OnInit {
 
     this.run(this.http.post<PersonalRecord>(this.endpoint, {
       title, details, ...(location && { location, district: this.district }),
+      ...(this.section === 'contacts' && { relationship: this.relationship }),
     }, this.session.requestOptions()), (record) => {
       this.records.update((records) => [record, ...(records ?? [])]);
       form.resetForm();
@@ -152,6 +162,13 @@ export class PersonalModule implements OnInit {
   closeComposer(): void {
     this.composer()?.nativeElement.close();
     this.composing.set(false);
+  }
+
+  contactUrl(details: string): string | null {
+    const value = details.trim();
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return `mailto:${encodeURIComponent(value)}`;
+    if (/^\+?[\d ()-]+$/.test(value) && /\d/.test(value)) return `tel:${value.replace(/[^+\d]/g, '')}`;
+    return null;
   }
 
   reportMapUrl({ lat, lon }: ReportCoordinates): string {

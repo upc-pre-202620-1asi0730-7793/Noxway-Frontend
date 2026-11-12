@@ -109,3 +109,11 @@ button:disabled { opacity: .6; cursor: default; }
   .module-banner { flex-wrap: wrap; }
   .rest-stats, .module-grid.contact-cards { grid-template-columns: 1fr; }
 }
+
+.contact-card { border-color: #36546b; display: grid; gap: 14px; }
+.contact-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.contact-identity p { margin-top: 3px; color: #aebed2; }
+.contact-identity .record-icon { border-radius: 50%; background: #143b40; color: #6ee7b7; }
+.contact-card .record-details { margin: 0; }
+.contact-state { border: 1px solid #2e4059; border-radius: 6px; padding: 12px; color: #b7c7dc; background: #0c1427; }
+.contact-action { justify-self: start; border: 1px solid #415779; border-radius: 6px; padding: 8px 16px; color: #bfdbfe; text-decoration: none; }

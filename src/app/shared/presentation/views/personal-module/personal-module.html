@@ -93,9 +93,18 @@
     @if (section === 'contacts' && records()?.length) {
       @for (record of records() ?? []; track record.id) {
         <section class="module-card contact-card">
-          <div class="contact-identity"><span class="record-icon">{{ record.title.charAt(0) }}</span><h2>{{ record.title }}</h2></div>
-          <p class="record-details">{{ record.details }}</p>
-          <p class="membership-status">{{ t('Guardado en tu cuenta') }}</p>
+          <div class="contact-card-header">
+            <div class="contact-identity">
+              <span class="record-icon">{{ record.title.charAt(0) }}</span>
+              <div><h2>{{ record.title }}</h2>@if (record.relationship) { <p>{{ record.relationship }}</p> }</div>
+            </div>
+            <span class="membership-status">{{ t('Guardado en tu cuenta') }}</span>
+          </div>
+          <p class="record-details"><strong>{{ t('Teléfono o correo electrónico') }}</strong><br />{{ record.details }}</p>
+          <div class="contact-state">{{ t('El contacto aún no está vinculado a otra cuenta.') }}</div>
+          @if (contactUrl(record.details); as url) {
+            <a class="contact-action" [href]="url">{{ t('Contactar') }}</a>
+          }
         </section>
       }
     } @else {
@@ -169,6 +178,7 @@
             <label>{{ t('Categoría') }}
               <select name="category" [(ngModel)]="category" required>
                 <option value="" disabled>{{ t('Selecciona una categoría') }}</option>
+                <option value="Reporte de local">{{ t('Reporte de local') }}</option>
                 <option value="Aviso de seguridad">{{ t('Aviso de seguridad') }}</option>
                 <option value="Recomendación">{{ t('Recomendación') }}</option>
                 <option value="Consulta">{{ t('Consulta') }}</option>
@@ -176,6 +186,9 @@
             </label>
           }
           <label>{{ t(page.titleLabel) }}<input name="title" [(ngModel)]="title" required maxlength="150" /></label>
+          @if (section === 'contacts') {
+            <label>{{ t('Relación (opcional)') }}<input name="relationship" [(ngModel)]="relationship" maxlength="80" /></label>
+          }
           <label>{{ t(page.detailsLabel) }}<textarea name="details" [(ngModel)]="details" required maxlength="450" rows="3"></textarea></label>
         }
         @if (section === 'community') {
