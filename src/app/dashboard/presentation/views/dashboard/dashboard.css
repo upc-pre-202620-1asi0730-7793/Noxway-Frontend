@@ -490,3 +490,13 @@
   color: #94a3b8;
   line-height: 1.4;
 }
+
+.dashboard-account-aside { display: grid; gap: 16px; align-content: start; }
+.welcome-card, .stat-card, .route-card { background: #1d2738 !important; }
+.route-path-box { color: #cbd5e1; }
+.dashboard-account-aside .secondary-btn { width: 100%; }
+@media (max-width: 760px) {
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dashboard-body { grid-template-columns: 1fr; }
+  .welcome-card, .route-actions-row { flex-wrap: wrap; }
+}

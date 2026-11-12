@@ -9,7 +9,7 @@ export interface UserProfile extends BaseEntity {
   /** Occupational position and workplace company */
   role: string;
   /** National identity card number (DNI) */
-  dni: string;
+  dni?: string;
   /** Membership tenure string */
   memberSince: string;
   /** Avatar initials or visual token */
@@ -33,7 +33,7 @@ export interface UserProfile extends BaseEntity {
   /** Privacy flag: Submit road hazard ratings and comments anonymously */
   privacyAnonymousRatings: boolean;
   /** Last password update timestamp text */
-  passwordUpdated: string;
+  passwordUpdated?: string;
   /** Count and location summary of active sessions */
-  activeSessions: string;
+  activeSessions?: string;
 }

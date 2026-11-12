@@ -1,41 +1,51 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { UserProfileService } from '../../../../iam/infrastructure/user-profile.service';
-import { UserProfile } from '../../../../iam/domain/model/user-profile.entity';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatDividerModule } from '@angular/material/divider';
-import { DashboardData, DashboardService } from '../../../infrastructure/dashboard.service';
+import { LanguageService } from '../../../../shared/infrastructure/language.service';
+import { localApi, SessionService } from '../../../../iam/infrastructure/session.service';
+
+interface DashboardSummary {
+  completedTrips: number;
+  activeTrip: { origin: string; destination: string } | null;
+  contactCount: number;
+  lastRest: string | null;
+  noticeCount: number;
+}
 
 @Component({
   selector: 'app-dashboard',
-  imports: [
-    RouterLink,
-    MatButtonModule,
-    MatIconModule,
-    MatCardModule,
-    MatChipsModule,
-    MatDividerModule,
-  ],
+  imports: [RouterLink, MatButtonModule, MatIconModule, MatCardModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
-  private readonly dashboardService = inject(DashboardService);
-
-  readonly workerProfile = signal<UserProfile | null>(null);
-  readonly profileService = inject(UserProfileService);
-
-  readonly dashboardData = signal<DashboardData | null>(null);
+  readonly t = inject(LanguageService).ui;
+  readonly session = inject(SessionService);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  readonly summary = signal<DashboardSummary | null>(null);
+  readonly failed = signal(false);
 
   ngOnInit(): void {
-    this.profileService.getProfile().subscribe(p => this.workerProfile.set(p));
-    this.dashboardService.getDashboardData().subscribe((data) => {
-      if (data && data.length > 0) {
-        this.dashboardData.set(data[0]);
-      }
-    });
+    this.load();
+  }
+
+  load(): void {
+    this.failed.set(false);
+    this.http.get<DashboardSummary>(`${localApi}/me/dashboard`, this.session.requestOptions())
+      .subscribe({
+        next: (summary) => this.summary.set(summary),
+        error: (error) => {
+          if (error.status === 401) {
+            this.session.logout();
+            void this.router.navigateByUrl('/login');
+          } else {
+            this.failed.set(true);
+          }
+        },
+      });
   }
 }

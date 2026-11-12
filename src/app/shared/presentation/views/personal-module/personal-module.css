@@ -1,0 +1,157 @@
+:host { display: grid; gap: 20px; }
+.module-hero, .module-card {
+  padding: 24px;
+  border: 1px solid #203353;
+  border-radius: 12px;
+  background: #10192b;
+}
+.module-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(115deg, #13233f, #10192b 70%);
+}
+.module-icon, .record-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #182f55;
+  color: #93c5fd;
+}
+.record-icon { width: 36px; height: 36px; }
+h1, h2, p { margin: 0; }
+h1 { font-size: 24px; }
+h2 { font-size: 18px; margin-bottom: 16px; }
+p { color: #cbd5e1; line-height: 1.5; }
+.module-hero p, .module-card > p { margin-top: 8px; }
+.module-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 32px 16px;
+  background: #0b1323;
+  border: 1px dashed #334766;
+  border-radius: 8px;
+  text-align: center;
+  color: #93c5fd;
+}
+article { display: flex; gap: 12px; padding: 14px 0; border-top: 1px solid #203353; }
+.record-details { margin-top: 6px; white-space: pre-wrap; overflow-wrap: anywhere; }
+article > div { min-width: 0; overflow-wrap: anywhere; }
+form, label { display: grid; gap: 8px; min-width: 0; }
+form { gap: 16px; }
+input, textarea, select, button {
+  font: inherit;
+  color: #f8fafc;
+  background: #0b1323;
+  color-scheme: dark;
+  border: 1px solid #4b6082;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+textarea { resize: vertical; }
+button { justify-self: start; background: #1d4ed8; cursor: pointer; }
+button:disabled { opacity: .6; cursor: default; }
+.module-card > button { margin-top: 12px; }
+.error, [role='alert'] { color: #fda4af; }
+.membership-status { display: inline-block; padding: 5px 10px; border-radius: 16px; color: #bfdbfe; background: #182f55; }
+.contacts-layout article { background: #0b1323; border: 1px solid #203353; border-radius: 8px; padding: 14px; }
+.contacts-layout article + article { margin-top: 10px; }
+@media (max-width: 760px) {
+  .module-grid { grid-template-columns: 1fr; }
+}
+
+.report-location { min-width: 0; margin: 0; padding: 10px; border: 1px solid #415779; border-radius: 8px; }
+.report-location p { margin: 0 0 10px; }
+.report-map-link { display: inline-block; margin-top: 6px; color: #93c5fd; }
+
+.account-community { gap: 16px; }
+.account-community .community-top-bar { padding: 10px 16px; border: 1px solid #263449; border-radius: 10px; background: #101728; gap: 12px; flex-wrap: wrap; }
+.account-community .district-filters { flex-wrap: wrap; gap: 8px; }
+.account-community .community-main-grid { grid-template-columns: minmax(0, 2.25fr) minmax(220px, 1fr); gap: 18px; }
+.account-community .post-card, .account-community .aside-card { background: #1d2738 !important; border-color: #2a374b !important; }
+.account-community .post-card { margin: 0; }
+.account-community .post-card.danger-border { border-color: #ad4049 !important; }
+.account-community .author-avatar { display: grid; place-items: center; flex-shrink: 0; }
+.notice-dialog { box-sizing: border-box; width: min(580px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow: auto; color: #f8fafc; background: #10192b; border: 1px solid #415779; border-radius: 12px; padding: 20px; }
+.notice-dialog::backdrop { background: rgb(4 9 20 / 78%); }
+.notice-dialog header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.notice-dialog header h2 { margin: 0; }
+.notice-dialog > p { margin: 8px 0 16px; }
+@media (max-width: 760px) {
+  .account-community .community-main-grid { grid-template-columns: 1fr; }
+}
+
+.module-banner, .contact-card, .module-grid > .module-card { background: #1d2738; }
+.module-banner > div { flex: 1; }
+.module-banner.wellness-banner { background: #1e1b49; border-color: #5149a5; }
+.membership-banner { background: #203d81; border-color: #3b82f6; }
+.membership-banner h1 { margin-top: 8px; }
+.referral-card { border-color: #315999; background: #1d2738; }
+.rest-stats { display: grid; gap: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rest-stats .module-card { background: #1d2738; }
+.rest-stats h2 { color: #cbd5e1; font-size: 13px; margin-bottom: 8px; }
+.rest-stats strong { font-size: 20px; color: #93c5fd; }
+.rest-chart { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(70px, 1fr); gap: 12px; margin: 16px 0; padding: 16px; overflow-x: auto; border: 1px solid #334155; border-radius: 8px; background: #0b1323; }
+.rest-column { display: grid; justify-items: center; gap: 8px; color: #cbd5e1; }
+.rest-bar-track { display: flex; align-items: flex-end; width: 34px; height: 115px; background: #162641; border-radius: 4px; }
+.rest-bar { display: block; width: 100%; background: #10b981; border-radius: 4px; }
+.sleep-guide p { background: #0b1323; border-radius: 8px; padding: 12px; }
+.module-grid.contact-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.contact-identity { display: flex; align-items: center; gap: 12px; }
+.contact-identity h2 { margin: 0; }
+.notice-dialog form { margin-top: 14px; }
+@media (max-width: 760px) {
+  .module-banner { flex-wrap: wrap; }
+  .rest-stats, .module-grid.contact-cards { grid-template-columns: 1fr; }
+}
+
+.contact-card { border-color: #36546b; display: grid; gap: 14px; }
+.contact-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.contact-identity p { margin-top: 3px; color: #aebed2; }
+.contact-identity .record-icon { border-radius: 50%; background: #143b40; color: #6ee7b7; }
+.contact-card .record-details { margin: 0; }
+.contact-state { border: 1px solid #2e4059; border-radius: 6px; padding: 12px; color: #b7c7dc; background: #0c1427; }
+.contact-action { justify-self: start; border: 1px solid #415779; border-radius: 6px; padding: 8px 16px; color: #bfdbfe; text-decoration: none; }
+
+.account-community .post-card { padding: 20px !important; gap: 10px; }
+.account-community .aside-card { min-height: 180px; gap: 12px; }
+.account-community .post-badge { background: #193b48; color: #a5e6ec; }
+.account-community .post-badge.danger-badge { background: #442a38; color: #fda4af; }
+.notice-map-action { align-self: flex-start; margin-top: 4px; border: 1px solid #415779; border-radius: 6px; padding: 6px 10px; text-decoration: none; }
+.contribution-row { display: flex; justify-content: space-between; gap: 10px; color: #cbd5e1; }
+.contribution-row strong { color: #fbbf24; }
+.wellness-tag { display: inline-block; padding: 4px 9px; margin-bottom: 6px; border-radius: 12px; background: #302c67; color: #d7d4ff; font-size: 11px; }
+.rest-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.rest-stats .module-card { padding: 16px; }
+.rest-stats .rest-highlight strong { color: #fbbf24; }
+.rest-stats .rest-count strong { color: #34d399; }
+.wellness-grid { grid-template-columns: minmax(0, 2.25fr) minmax(220px, 1fr); align-items: stretch; gap: 16px; }
+.wellness-grid .sleep-guide { border-color: #5149a5; }
+.sleep-guide section { margin-top: 12px; padding: 12px; border-radius: 8px; background: #0b1323; }
+.sleep-guide h3, .recent-rest-heading { margin: 0; font-size: 14px; }
+.sleep-guide section p { padding: 0; margin-top: 4px; }
+.rest-entry { background: #0b1323; border: 1px solid #2a374b; border-radius: 8px; margin-top: 10px; padding: 12px; }
+.benefits-section h2 { margin-bottom: 12px; }
+.benefits-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.benefit-category { display: grid; gap: 14px; background: #1d2738; }
+.benefit-heading { display: flex; align-items: center; gap: 12px; }
+.benefit-heading h3 { margin: 0; font-size: 16px; }
+.benefit-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 8px; }
+.benefit-icon.blue { background: #19395b; color: #93c5fd; }
+.benefit-icon.green { background: #143f3c; color: #6ee7b7; }
+.benefit-icon.red { background: #4a2d3a; color: #fda4af; }
+.benefit-icon.violet { background: #39325a; color: #c4b5fd; }
+.referral-card { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; }
+.referral-card h2 { margin: 8px 0 6px; }
+.referral-code { display: grid; justify-items: center; min-width: 150px; gap: 5px; padding: 14px; border: 1px dashed #4177bb; border-radius: 8px; background: #0b1323; color: #bfdbfe; }
+@media (max-width: 900px) {
+  .rest-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .wellness-grid, .benefits-grid { grid-template-columns: 1fr; }
+}

@@ -2,15 +2,44 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.8.
 
-## Development server
+## Prueba local de Noxway
 
-To start a local development server, run:
+Desde la carpeta que contiene `package.json`, con Node.js 24 instalado:
 
-```bash
-ng serve
+```powershell
+npm ci
+npm run server
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Deja esa terminal abierta. En otra terminal, en la misma carpeta:
+
+```powershell
+npm start
+```
+
+Abre [http://localhost:4200](http://localhost:4200). Pulsa **Crear una cuenta** y
+registra un nombre, correo de prueba, tipo de turno y una contraseña exclusiva para
+la entrevista. Después inicia sesión. En **Mi Perfil** puedes editar y guardar tus
+datos y preferencias. En **Mi Trayecto** puedes registrar una salida, confirmar la
+llegada y ver tu historial. Pulsa **Salir** entre entrevistas.
+
+El servidor temporal escucha en el puerto 3000. Guarda las cuentas, los trayectos y los registros personales
+en `server/accounts.local.json`, que se crea al arrancar y se excluye de Git.
+Al reiniciar la API, los datos se conservan y es necesario iniciar sesión de nuevo.
+
+Las cuentas registradas empiezan con listas vacías. El dashboard resume los
+trayectos, los descansos, los contactos y los avisos de cada cuenta.
+Los planes empiezan sin suscripción activa.
+
+La prueba local guarda las preferencias de privacidad. La integración con
+Spring Boot y MySQL, la publicación comunitaria, los envíos
+de invitaciones, el cifrado del historial y la contratación de planes están
+pendientes.
+
+Servicios Cercanos lee los puntos de interés de OpenStreetMap mediante OpenFreeMap y requiere conexión
+a Internet. Puedes filtrar farmacias, supermercados y grifos en la zona visible.
+Los avisos se crean en Comunidad, que también muestra los reportes privados
+guardados antes desde Servicios Cercanos.
 
 ## Code scaffolding
 

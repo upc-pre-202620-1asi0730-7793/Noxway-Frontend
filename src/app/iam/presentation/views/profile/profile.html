@@ -14,8 +14,8 @@
 
           <div class="user-titles">
             <h1 class="user-fullname">{{ p.fullName }}</h1>
-            <p class="user-role">{{ p.role }}</p>
-            <span class="user-meta">DNI: {{ p.dni }} · {{ p.memberSince }}</span>
+            <p class="user-role">{{ t(p.role) }}</p>
+            <span class="user-meta">{{ t(p.memberSince ?? '') }}</span>
           </div>
         </div>
 
@@ -23,86 +23,89 @@
         <div class="form-fields-grid">
 
           <div class="form-group">
-            <label class="form-label">NOMBRE COMPLETO</label>
+            <label class="form-label" for="profile-fullName">{{ t('NOMBRE COMPLETO') }}</label>
             <input
               type="text"
               class="form-input"
-              [(ngModel)]="p.fullName" />
+              id="profile-fullName" [(ngModel)]="p.fullName" />
           </div>
 
           <div class="form-group">
-            <label class="form-label">TELÉFONO MÓVIL</label>
+            <label class="form-label" for="profile-phone">{{ t('TELÉFONO MÓVIL') }}</label>
             <input
               type="text"
               class="form-input"
-              [(ngModel)]="p.phone" />
+              id="profile-phone" [(ngModel)]="p.phone" />
           </div>
 
           <div class="form-group">
-            <label class="form-label">CORREO ELECTRÓNICO</label>
+            <label class="form-label" for="profile-email">{{ t('CORREO ELECTRÓNICO') }}</label>
             <input
               type="email"
               class="form-input"
-              [(ngModel)]="p.email" />
+              id="profile-email" [(ngModel)]="p.email" readonly />
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="shift-type">TIPO DE TURNO</label>
+            <label class="form-label" for="shift-type">{{ t('TIPO DE TURNO') }}</label>
             <select id="shift-type" class="form-input" [(ngModel)]="p.shiftType">
-              <option [ngValue]="undefined" disabled>Selecciona tu turno</option>
-              <option value="day">Diurno</option>
-              <option value="night">Nocturno</option>
-              <option value="rotating">Rotativo</option>
+              <option [ngValue]="undefined" disabled>{{ t('Selecciona tu turno') }}</option>
+              <option value="day">{{ t('Diurno') }}</option>
+              <option value="night">{{ t('Nocturno') }}</option>
+              <option value="rotating">{{ t('Rotativo') }}</option>
             </select>
-            <label class="form-label">HORARIO HABITUAL DE TURNO</label>
+            <label class="form-label" for="profile-schedule">{{ t('HORARIO HABITUAL DE TURNO') }}</label>
             <input
               type="text"
               class="form-input"
-              [(ngModel)]="p.schedule" />
-            <small>Indica inicio y fin; usa +1 día si termina después de medianoche.</small>
+              id="profile-schedule" [(ngModel)]="p.schedule" />
+            <small>{{ t('Indica inicio y fin; usa +1 día si termina después de medianoche.') }}</small>
           </div>
 
           <div class="form-group">
-            <label class="form-label">TRANSPORTE PRINCIPAL</label>
+            <label class="form-label" for="profile-transport">{{ t('TRANSPORTE PRINCIPAL') }}</label>
             <input
               type="text"
               class="form-input"
-              [(ngModel)]="p.transport" />
+              id="profile-transport" [(ngModel)]="p.transport" />
           </div>
 
           <div class="form-group">
-            <label class="form-label">DISTRITO DE RESIDENCIA</label>
+            <label class="form-label" for="profile-district">{{ t('DISTRITO DE RESIDENCIA') }}</label>
             <input
               type="text"
               class="form-input"
-              [(ngModel)]="p.district" />
+              id="profile-district" [(ngModel)]="p.district" />
           </div>
 
         </div>
 
         <!-- Privacy & Geolocation Settings -->
         <div class="privacy-section">
-          <h2 class="privacy-section-title">Ajustes de Privacidad y Geolocalización</h2>
+          <h2 class="privacy-section-title">{{ t('Ajustes de Privacidad y Geolocalización') }}</h2>
 
           <div class="checkbox-group">
             <mat-checkbox
               color="primary"
               [(ngModel)]="p.privacyGpsActiveOnly">
-              Compartir GPS únicamente durante check-ins activos
+              {{ t('Compartir GPS únicamente durante check-ins activos') }}
             </mat-checkbox>
 
             <mat-checkbox
               color="primary"
               [(ngModel)]="p.privacyEncryptedHistory">
-              Historial de rutas cifrado de extremo a extremo
+              {{ t('Preferir cifrado de extremo a extremo para el historial') }}
             </mat-checkbox>
 
             <mat-checkbox
               color="primary"
               [(ngModel)]="p.privacyAnonymousRatings">
-              Calificaciones anónimas en mapa comunitario
+              {{ t('Calificaciones anónimas en mapa comunitario') }}
             </mat-checkbox>
           </div>
+          @if (!session.demo()) {
+            <small>{{ t('En esta prueba solo se guardan tus preferencias.') }}</small>
+          }
         </div>
 
         <!-- Save Button -->
@@ -110,41 +113,25 @@
           <button
             mat-flat-button
             class="save-btn"
+            [disabled]="saving()"
             (click)="onSave()">
             <mat-icon class="btn-icon">save</mat-icon>
-            <span>Guardar Modificaciones</span>
+            <span>{{ t('Guardar Modificaciones') }}</span>
           </button>
         </div>
+        @if (status()) { <p role="status">{{ t(status()) }}</p> }
+        @if (error()) { <p class="form-error" role="alert">{{ t(error()) }}</p> }
 
       </mat-card>
 
       <!-- Right Column: Security & Sessions -->
       <aside class="profile-aside">
 
-        <!-- Account Security Card -->
         <mat-card class="aside-card">
-          <h3 class="aside-title">Seguridad de Cuenta</h3>
-          <p class="aside-desc">{{ p.passwordUpdated }}</p>
-
-          <button
-            mat-stroked-button
-            class="change-password-btn"
-            (click)="onChangePassword()">
-            <mat-icon class="btn-icon">lock_reset</mat-icon>
-            <span>Cambiar Contraseña</span>
-          </button>
+          <h3 class="aside-title">{{ t('Seguridad de cuenta') }}</h3>
+          <div class="session-section">{{ t('Sesión actual') }}</div>
+          <p class="aside-desc">{{ p.email }}</p>
         </mat-card>
-
-        <!-- Active Sessions Card -->
-        <mat-card class="aside-card">
-          <h3 class="aside-title">Sesiones Activas</h3>
-
-          <div class="session-item">
-            <span class="session-dot"></span>
-            <span class="session-label">{{ p.activeSessions }}</span>
-          </div>
-        </mat-card>
-
       </aside>
 
     </div>

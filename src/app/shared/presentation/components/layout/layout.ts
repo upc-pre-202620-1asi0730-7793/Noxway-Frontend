@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { filter } from 'rxjs';
 import { LanguageService } from '../../../infrastructure/language.service';
+import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { LanguageSwitcher } from '../language-switcher/language-switcher';
 
 /**
@@ -36,9 +37,11 @@ export interface NavOption {
 })
 export class Layout implements OnInit, OnDestroy {
   private readonly router = inject(Router);
+  readonly session = inject(SessionService);
   public readonly languageService = inject(LanguageService);
 
   private readonly currentUrlSignal = signal<string>('/dashboard');
+  readonly wideContent = computed(() => ['/my-journeys', '/map', '/community', '/wellness', '/benefits'].includes(this.currentUrlSignal().split('?')[0]));
   readonly currentTime = signal<string>('02:45:18 AM');
   readonly companionTime = signal<string>('02:45 AM');
 
@@ -94,9 +97,12 @@ export class Layout implements OnInit, OnDestroy {
   readonly workerOptions = computed(() => {
     // Trigger reactivity on current language signal
     this.languageService.currentLang();
-    return this.workerNavDefinitions.map((opt) => ({
-      ...opt,
-      label: this.languageService.translate(opt.labelKey),
+    const demo = this.session.demo();
+    return this.workerNavDefinitions.map((option) => ({
+      ...option,
+      link: !demo && option.link === '/journey' ? '/my-journeys' : option.link,
+      badge: demo ? option.badge : undefined,
+      label: this.languageService.translate(option.labelKey),
     }));
   });
 
@@ -146,7 +152,7 @@ export class Layout implements OnInit, OnDestroy {
     }
 
     // Worker Portal Routes
-    if (url.includes('/journey')) {
+    if (url.includes('/journey') || url.includes('/my-journeys')) {
       return this.languageService.translate('title.journey');
     }
     if (url.includes('/map')) {
@@ -216,8 +222,8 @@ export class Layout implements OnInit, OnDestroy {
   onSosClick(): void {
     const msg =
       this.languageService.currentLang() === 'es'
-        ? 'ALERTA SOS ACTIVADA: Se ha notificado a tu red de confianza y a Serenazgo de turno.'
-        : 'SOS ALERT TRIGGERED: Your trusted network and on-duty Serenazgo have been notified.';
+        ? 'Simulación de alerta SOS.'
+        : 'SOS alert simulation.';
     alert(msg);
   }
 
@@ -227,14 +233,19 @@ export class Layout implements OnInit, OnDestroy {
   onCallJorgeClick(): void {
     const msg =
       this.languageService.currentLang() === 'es'
-        ? 'LLAMANDO A JORGE LUIS HUAMÁN (+51 987 654 321) vía línea segura.'
-        : 'CALLING JORGE LUIS HUAMÁN (+51 987 654 321) via secure line.';
+        ? 'Simulación de llamada al trabajador.'
+        : 'Worker call simulation.';
     alert(msg);
   }
 
   /**
    * Reloads the application view.
    */
+  logout(): void {
+    this.session.logout();
+    void this.router.navigateByUrl('/login');
+  }
+
   onRefreshClick(): void {
     window.location.reload();
   }

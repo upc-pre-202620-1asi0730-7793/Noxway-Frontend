@@ -1,0 +1,233 @@
+@if (section === 'community') {
+  <section class="community-container account-community">
+    <div class="community-top-bar">
+      <nav class="district-filters" [attr.aria-label]="t('Filtrar por distrito')">
+        <button type="button" class="filter-pill" [class.active]="!selectedDistrict()"
+          [attr.aria-pressed]="!selectedDistrict()" (click)="selectedDistrict.set('')">{{ t('Todos los Distritos') }}</button>
+        @for (district of districts(); track district) {
+          <button type="button" class="filter-pill" [class.active]="selectedDistrict() === district"
+            [attr.aria-pressed]="selectedDistrict() === district" (click)="selectedDistrict.set(district)">{{ district }}</button>
+        }
+      </nav>
+      <button type="button" class="publish-btn" [disabled]="!records() || busy()" (click)="openComposer()">
+        <mat-icon class="btn-icon">add</mat-icon>{{ t('Publicar aviso') }}
+      </button>
+    </div>
+
+    <div class="community-main-grid">
+      <section class="feed-column" [attr.aria-label]="t('Mis avisos')">
+        @if (records()) {
+          @for (record of visibleNotices(); track record.id) {
+            <article class="post-card" [class.danger-border]="record.details.startsWith('Aviso de seguridad · ')">
+              <div class="post-header">
+                <span class="author-avatar">{{ session.profile()?.fullName?.charAt(0) }}</span>
+                <div class="author-info">
+                  <strong class="author-name">{{ session.profile()?.fullName }}</strong>
+                  @if (record.district) { <span class="post-meta">{{ record.district }}</span> }
+                </div>
+                @if (noticeCategory(record.details); as category) {
+                  <span class="post-badge" [class.danger-badge]="category === 'Aviso de seguridad'">{{ t(category) }}</span>
+                }
+              </div>
+              <h2 class="post-title">{{ record.title }}</h2>
+              <p class="post-content record-details">{{ noticeDescription(record.details) }}</p>
+              @if (record.location; as point) {
+                <a class="report-map-link notice-map-action" [href]="reportMapUrl(point)" target="_blank" rel="noopener noreferrer">
+                  {{ t('Ver ubicación del aviso') }}
+                </a>
+              }
+            </article>
+          } @empty {
+            <div class="post-card">
+              <h2 class="post-title">{{ t('Mis avisos') }}</h2>
+              <p>{{ t(selectedDistrict() ? 'Aún no hay avisos en este distrito.' : 'Aún no has creado ningún aviso.') }}</p>
+            </div>
+          }
+        } @else if (busy()) {
+          <p role="status">{{ t('Cargando tus datos…') }}</p>
+        } @else {
+          <p role="alert">{{ t(error()) }}</p>
+          <button type="button" (click)="load()">{{ t('Volver a cargar') }}</button>
+        }
+      </section>
+      <aside class="community-aside">
+        <section class="aside-card">
+          <h2 class="aside-heading">{{ t('Código de la Comunidad') }}</h2>
+          <div class="code-item"><mat-icon class="code-mat-icon blue-icon">verified</mat-icon><p>{{ t('Describe el hecho con precisión.') }}</p></div>
+          <div class="code-item"><mat-icon class="code-mat-icon amber-icon">lock</mat-icon><p>{{ t('Evita incluir datos privados.') }}</p></div>
+          <div class="code-item"><mat-icon class="code-mat-icon green-icon">location_on</mat-icon><p>{{ t('Verifica el punto antes de guardar.') }}</p></div>
+        </section>
+        <section class="aside-card">
+          <h2 class="aside-heading">{{ t('Mis aportes') }}</h2>
+          @if (records()) {
+            <div class="contribution-row"><span>{{ t('Avisos guardados en esta cuenta') }}</span><strong>{{ records()?.length }}</strong></div>
+            <div class="contribution-row"><span>{{ t('Avisos con ubicación') }}</span><strong>{{ locatedNoticeCount() }}</strong></div>
+          }
+        </section>
+      </aside>
+    </div>
+
+    <dialog #composer class="notice-dialog" aria-labelledby="notice-dialog-title" (close)="composing.set(false)">
+      <header>
+        <h2 id="notice-dialog-title">{{ t('Crear aviso') }}</h2>
+        <button type="button" (click)="closeComposer()">{{ t('Cerrar') }}</button>
+      </header>
+      <p>{{ t('El aviso se guardará en tu cuenta local.') }}</p>
+      @if (composing() && module; as page) {
+        <ng-container [ngTemplateOutlet]="entryForm" [ngTemplateOutletContext]="{ $implicit: page }" />
+      }
+    </dialog>
+  </section>
+} @else if (module; as page) {
+  <header class="module-hero module-banner" [class.wellness-banner]="section === 'wellness'">
+    <span class="module-icon"><mat-icon>{{ page.icon }}</mat-icon></span>
+    <div>
+      @if (section === 'wellness') { <span class="wellness-tag">{{ t('Salud del sueño en cada turno') }}</span> }
+      <h1>{{ t(page.title) }}</h1><p>{{ t(page.note) }}</p>
+    </div>
+    <button type="button" class="publish-btn" [disabled]="!records() || busy()" (click)="openComposer()">
+      <mat-icon class="btn-icon">add</mat-icon>{{ t(page.formTitle) }}
+    </button>
+  </header>
+
+  @if (section === 'wellness' && records()) {
+    <div class="rest-stats">
+      <section class="module-card"><h2>{{ t('Último descanso') }}</h2><strong>{{ restChart().at(-1)?.label ?? '—' }}</strong></section>
+      <section class="module-card"><h2>{{ t('Promedio de tus últimos registros') }}</h2><strong>{{ averageRest() }}</strong></section>
+      <section class="module-card rest-highlight"><h2>{{ t('Descanso más largo de los últimos registros') }}</h2><strong>{{ longestRest() }}</strong></section>
+      <section class="module-card rest-count"><h2>{{ t('Descansos registrados') }}</h2><strong>{{ records()?.length }}</strong></section>
+    </div>
+  }
+
+  <div class="module-grid" [class.wellness-grid]="section === 'wellness'" [class.contact-cards]="section === 'contacts' && records()?.length">
+    @if (section === 'contacts' && records()?.length) {
+      @for (record of records() ?? []; track record.id) {
+        <section class="module-card contact-card">
+          <div class="contact-card-header">
+            <div class="contact-identity">
+              <span class="record-icon">{{ record.title.charAt(0) }}</span>
+              <div><h2>{{ record.title }}</h2>@if (record.relationship) { <p>{{ record.relationship }}</p> }</div>
+            </div>
+            <span class="membership-status">{{ t('Guardado en tu cuenta') }}</span>
+          </div>
+          <p class="record-details"><strong>{{ t('Teléfono o correo electrónico') }}</strong><br />{{ record.details }}</p>
+          <div class="contact-state">{{ t('El contacto aún no está vinculado a otra cuenta.') }}</div>
+          @if (contactUrl(record.details); as url) {
+            <a class="contact-action" [href]="url">{{ t('Contactar') }}</a>
+          }
+        </section>
+      }
+    } @else {
+      <section class="module-card">
+        <h2>{{ t(page.listTitle) }}</h2>
+        @if (records()) {
+          @if (section === 'wellness' && restChart().length) {
+            <div class="rest-chart" [attr.aria-label]="t('Duración de los últimos descansos')">
+              @for (entry of restChart(); track entry.id) {
+                <div class="rest-column">
+                  <small>{{ entry.label }}</small>
+                  <div class="rest-bar-track" aria-hidden="true">
+                    <span class="rest-bar" [style.height.%]="entry.minutes / chartMaximum() * 100"></span>
+                  </div>
+                  <small>{{ entry.title }}</small>
+                </div>
+              }
+            </div>
+          }
+          @if (section === 'wellness' && records()?.length) {
+            <h3 class="recent-rest-heading">{{ t('Registros de descanso recientes') }}</h3>
+          }
+          @for (record of records() ?? []; track record.id) {
+            <article [class.rest-entry]="section === 'wellness'"><span class="record-icon"><mat-icon>{{ page.icon }}</mat-icon></span><div><strong>{{ record.title }}</strong><p class="record-details">{{ record.details }}</p></div></article>
+          } @empty {
+            <div class="empty-state"><mat-icon>{{ page.icon }}</mat-icon><p>{{ t(page.empty) }}</p></div>
+          }
+        } @else if (busy()) {
+          <p role="status">{{ t('Cargando tus datos…') }}</p>
+        } @else {
+          <p role="alert">{{ t(error()) }}</p>
+          <button type="button" (click)="load()">{{ t('Volver a cargar') }}</button>
+        }
+      </section>
+      @if (section === 'wellness') {
+        <aside class="module-card sleep-guide">
+          <h2>{{ t('Sugerencias del Sueño') }}</h2>
+          <section><h3>{{ t('Horario de descanso') }}</h3><p>{{ t('Mantén un horario de descanso regular según tu turno.') }}</p></section>
+          <section><h3>{{ t('Luz y ruido') }}</h3><p>{{ t('Busca un ambiente oscuro y tranquilo para descansar.') }}</p></section>
+          <section><h3>{{ t('Cafeína') }}</h3><p>{{ t('Evita la cafeína cerca de tu hora de descanso.') }}</p></section>
+        </aside>
+      }
+    }
+  </div>
+
+  <dialog #composer class="notice-dialog" aria-labelledby="record-dialog-title" (close)="composing.set(false)">
+    <header><h2 id="record-dialog-title">{{ t(page.formTitle) }}</h2><button type="button" (click)="closeComposer()">{{ t('Cerrar') }}</button></header>
+    @if (composing()) {
+      <ng-container [ngTemplateOutlet]="entryForm" [ngTemplateOutletContext]="{ $implicit: page }" />
+    }
+  </dialog>
+} @else {
+  <header class="module-hero membership-banner">
+    <span class="module-icon"><mat-icon>workspace_premium</mat-icon></span>
+    <div><span class="membership-status">{{ t('Sin plan activo') }}</span><h1>{{ t('Mi membresía') }}</h1><p>{{ t('La contratación estará disponible cuando se conecte el servicio de suscripciones.') }}</p></div>
+  </header>
+  <section class="benefits-section">
+    <h2>{{ t('Convenios colectivos') }}</h2>
+    <div class="benefits-grid">
+      @for (category of benefitCategories; track category.icon) {
+        <article class="module-card benefit-category">
+          <div class="benefit-heading">
+            <span class="record-icon" [class]="'benefit-icon ' + category.color"><mat-icon>{{ category.icon }}</mat-icon></span>
+            <h3>{{ t(category.label) }}</h3>
+          </div>
+          <p>{{ t('Sin convenios disponibles para tu cuenta.') }}</p>
+        </article>
+      }
+    </div>
+  </section>
+  <section class="module-card referral-card">
+    <div>
+      <span class="membership-status">{{ t('Programa de referidos') }}</span>
+      <h2>{{ t('Invita a un compañero de turno') }}</h2>
+      <p>{{ t('Tu cuenta todavía no tiene un código de referido.') }}</p>
+    </div>
+    <div class="referral-code"><span>{{ t('Tu código') }}</span><strong>—</strong></div>
+  </section>
+}
+
+<ng-template #entryForm let-page>
+      <form #form="ngForm" (ngSubmit)="save(form)">
+        @if (section === 'wellness') {
+          <label>{{ t('Inicio del descanso') }}<input type="datetime-local" name="start" [(ngModel)]="start" required /></label>
+          <label>{{ t('Fin del descanso') }}<input type="datetime-local" name="end" [(ngModel)]="end" required /></label>
+          <label>{{ t('Notas (opcional)') }}<textarea name="details" [(ngModel)]="details" maxlength="450" rows="3"></textarea></label>
+        } @else {
+          @if (section === 'community') {
+            <label>{{ t('Categoría') }}
+              <select name="category" [(ngModel)]="category" required>
+                <option value="" disabled>{{ t('Selecciona una categoría') }}</option>
+                <option value="Reporte de local">{{ t('Reporte de local') }}</option>
+                <option value="Aviso de seguridad">{{ t('Aviso de seguridad') }}</option>
+                <option value="Recomendación">{{ t('Recomendación') }}</option>
+                <option value="Consulta">{{ t('Consulta') }}</option>
+              </select>
+            </label>
+          }
+          <label>{{ t(page.titleLabel) }}<input name="title" [(ngModel)]="title" required maxlength="150" /></label>
+          @if (section === 'contacts') {
+            <label>{{ t('Relación (opcional)') }}<input name="relationship" [(ngModel)]="relationship" maxlength="80" /></label>
+          }
+          <label>{{ t(page.detailsLabel) }}<textarea name="details" [(ngModel)]="details" required maxlength="450" rows="3"></textarea></label>
+        }
+        @if (section === 'community') {
+          <label>{{ t('Distrito (opcional)') }}<input name="district" [(ngModel)]="district" maxlength="80" /></label>
+          <fieldset class="report-location">
+            <legend>{{ t('Lugar del aviso') }}</legend>
+            <p>{{ t('Haz clic en el mapa para marcar dónde ocurrió.') }}</p>
+            <app-report-location [(location)]="location" />
+          </fieldset>
+        }
+        <button type="submit" [disabled]="form.invalid || busy() || !records() || (section === 'community' && !location())">{{ t(page.action) }}</button>
+      </form>
+      @if (records() && error()) { <p class="error" role="alert">{{ t(error()) }}</p> }
+</ng-template>

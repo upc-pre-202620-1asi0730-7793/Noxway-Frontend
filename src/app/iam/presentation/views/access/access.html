@@ -1,0 +1,45 @@
+<main class="access">
+  <section class="panel" [class.register-panel]="registering">
+    <img src="LogoNovctiva.png" alt="Noxway" width="64" height="64" />
+    <h1>{{ registering ? t('Crea tu cuenta de Noxway') : t('Inicia sesión en Noxway') }}</h1>
+    <p class="access-intro">{{ t('Tu red de seguridad de día y de noche') }}</p>
+    <div class="account-type">{{ t('Trabajador') }}</div>
+
+    <form #form="ngForm" (ngSubmit)="submit(form)">
+      @if (registering) {
+        <label>{{ t('Nombre completo') }}
+          <input name="fullName" [(ngModel)]="fullName" required maxlength="150" autocomplete="name" />
+        </label>
+      }
+      <label>{{ t('Correo electrónico') }}
+        <input name="email" type="email" [(ngModel)]="email" required email maxlength="254" autocomplete="email" />
+      </label>
+      @if (registering) {
+        <label>{{ t('Teléfono móvil (opcional)') }}
+          <input name="phone" type="tel" [(ngModel)]="phone" maxlength="32" autocomplete="tel" />
+        </label>
+        <label>{{ t('Tipo de turno') }}
+          <select name="shiftType" [(ngModel)]="shiftType" required>
+            <option value="" disabled>{{ t('Selecciona tu turno') }}</option>
+            <option value="day">{{ t('Diurno') }}</option>
+            <option value="night">{{ t('Nocturno') }}</option>
+            <option value="rotating">{{ t('Rotativo') }}</option>
+          </select>
+        </label>
+      }
+      <label>{{ t('Contraseña') }}
+        <input name="password" type="password" [(ngModel)]="password" required
+          [minlength]="registering ? 8 : 1" maxlength="128"
+          [attr.autocomplete]="registering ? 'new-password' : 'current-password'" />
+      </label>
+      @if (registering) { <small>{{ t('Mínimo 8 caracteres.') }}</small> }
+      @if (registered) { <p role="status">{{ t('Cuenta creada. Inicia sesión con tus datos.') }}</p> }
+      @if (error()) { <p class="error" role="alert">{{ t(error()) }}</p> }
+      <button type="submit" [disabled]="form.invalid || busy()">
+        {{ busy() ? t('Procesando…') : registering ? t('Crear cuenta') : t('Iniciar sesión') }}
+      </button>
+    </form>
+
+    <a [routerLink]="registering ? '/login' : '/register'">{{ registering ? t('Ya tengo cuenta') : t('Crear una cuenta') }}</a>
+  </section>
+</main>

@@ -1,1 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Follow the outline of the day-and-night shield, preserving its white interior. */
+img[src="LogoNovctiva.png"] {
+  clip-path: polygon(
+    49.8% 3%, 92.5% 16.3%, 92.5% 47%, 92% 53%, 91% 59%,
+    89% 65%, 86% 71%, 82% 77%, 76% 83%, 69% 89%, 60% 94%,
+    49.8% 98.4%, 40% 94%, 31% 89%, 24% 83%, 18% 77%,
+    14% 71%, 11% 65%, 9% 59%, 8% 53%, 7.2% 47%, 7.2% 16.3%
+  );
+}
+
+app-nearby-services .leaflet-tile-pane { filter: invert(.93) hue-rotate(180deg) saturate(.6) brightness(.86); }
