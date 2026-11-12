@@ -1,41 +1,67 @@
-<section class="panel">
-  <h1>Mi trayecto</h1>
-  <p>Registro local de salidas y llegadas. GPS y avisos externos están desactivados en esta prueba.</p>
+<section class="journey-container">
+  <section class="active-commute-card">
+    <header class="commute-status-header">
+      <div>
+        <h1>Mi trayecto</h1>
+        <p>Registra tu salida y confirma tu llegada.</p>
+      </div>
+      @if (journeys()) {
+        <span class="status-pill">{{ active() ? 'Trayecto en curso' : 'Sin trayecto activo' }}</span>
+      }
+    </header>
 
-  @if (active(); as journey) {
-    <h2>Trayecto activo</h2>
-    <p>{{ journey.origin }} → {{ journey.destination }}</p>
-    <p>Salida {{ journey.startedAt | date:'short' }}</p>
-    <button type="button" [disabled]="busy()" (click)="finish(journey)">Confirmar llegada</button>
-  } @else if (journeys()) {
-    <form #form="ngForm" (ngSubmit)="start(form)">
-      <label>Origen
-        <input name="origin" [(ngModel)]="origin" required maxlength="150" />
-      </label>
-      <label>Destino
-        <input name="destination" [(ngModel)]="destination" required maxlength="150" />
-      </label>
-      <button type="submit" [disabled]="form.invalid || busy()">Iniciar trayecto</button>
-    </form>
-  } @else if (busy()) {
-    <p role="status">Cargando tus trayectos…</p>
-  } @else {
-    <button type="button" (click)="load()">Volver a cargar</button>
-  }
-
-  @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
-</section>
-
-@if (journeys()) {
-  <section class="panel">
-    <h2>Historial de trayectos</h2>
-    @for (journey of history(); track journey.id) {
-      <article>
-        <strong>{{ journey.origin }} → {{ journey.destination }}</strong>
-        <p>Salida {{ journey.startedAt | date:'short' }} · Llegada {{ journey.finishedAt | date:'short' }}</p>
-      </article>
-    } @empty {
-      <p>Aún no has finalizado ningún trayecto.</p>
+    @if (active(); as journey) {
+      <div class="checkpoints-row">
+        <div class="checkpoint-item">
+          <span class="journey-step"><mat-icon>trip_origin</mat-icon></span>
+          <div><strong>Salida registrada</strong><p>{{ journey.startedAt | date:'dd/MM/yyyy HH:mm' }}</p></div>
+        </div>
+        <div class="checkpoint-item">
+          <span class="journey-step pending"><mat-icon>flag</mat-icon></span>
+          <div><strong>Llegada</strong><p>Pendiente de confirmación</p></div>
+        </div>
+      </div>
+      <div class="metrics-grid local-metrics">
+        <div class="metric-box"><span class="metric-label">Origen</span><strong>{{ journey.origin }}</strong></div>
+        <div class="metric-box"><span class="metric-label">Destino</span><strong>{{ journey.destination }}</strong></div>
+      </div>
+      <div class="commute-actions-row">
+        <button class="confirm-arrival-btn" type="button" [disabled]="busy()" (click)="finish(journey)">Confirmar llegada</button>
+      </div>
+    } @else if (journeys()) {
+      <form #form="ngForm" (ngSubmit)="start(form)">
+        <div class="local-fields">
+          <label>Origen<input name="origin" [(ngModel)]="origin" required maxlength="150" /></label>
+          <label>Destino<input name="destination" [(ngModel)]="destination" required maxlength="150" /></label>
+        </div>
+        <button type="submit" [disabled]="form.invalid || busy()">Iniciar trayecto</button>
+      </form>
+    } @else if (busy()) {
+      <p role="status">Cargando tus trayectos…</p>
+    } @else {
+      <button type="button" (click)="load()">Volver a cargar</button>
     }
+
+    @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
   </section>
-}
+
+  @if (journeys()) {
+    <div class="journey-details-grid">
+      <section class="panel-card">
+        <h2 class="panel-title">Historial de trayectos</h2>
+        @for (journey of history(); track journey.id) {
+          <article>
+            <strong>{{ journey.origin }} → {{ journey.destination }}</strong>
+            <p>Salida {{ journey.startedAt | date:'dd/MM/yyyy HH:mm' }} · Llegada {{ journey.finishedAt | date:'dd/MM/yyyy HH:mm' }}</p>
+          </article>
+        } @empty {
+          <p>Cuando confirmes tu primera llegada, el trayecto aparecerá aquí.</p>
+        }
+      </section>
+      <section class="panel-card">
+        <h2 class="panel-title">Seguimiento del trayecto</h2>
+        <p>El seguimiento de esta cuenta registra la salida y la llegada manualmente. El GPS y los avisos externos están pendientes.</p>
+      </section>
+    </div>
+  }
+</section>

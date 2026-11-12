@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { finalize, Observable } from 'rxjs';
@@ -15,9 +16,9 @@ interface LocalJourney {
 }
 
 @Component({
-  imports: [DatePipe, FormsModule],
+  imports: [DatePipe, FormsModule, MatIconModule],
   templateUrl: './local-journeys.html',
-  styleUrl: './local-journeys.css',
+  styleUrls: ['../journey/journey.css', './local-journeys.css'],
 })
 export class LocalJourneys implements OnInit {
   private readonly http = inject(HttpClient);

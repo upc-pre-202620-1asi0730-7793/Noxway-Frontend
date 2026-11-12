@@ -28,3 +28,17 @@ button {
 button:disabled { opacity: .65; cursor: default; }
 article { padding-top: 12px; border-top: 1px solid #253552; }
 .error { color: #fda4af; }
+
+.commute-status-header { align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.local-fields, .local-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+form { max-width: none; }
+label { min-width: 0; }
+.metric-box { overflow-wrap: anywhere; }
+.checkpoints-row { justify-content: flex-start; gap: 28px; flex-wrap: wrap; }
+.checkpoint-item { display: flex; flex-direction: row; gap: 10px; text-align: left; }
+.checkpoint-item p { margin: 4px 0 0; }
+.journey-step { display: grid; place-items: center; border-radius: 50%; width: 38px; height: 38px; color: #34d399; background: #103133; }
+.journey-step.pending { color: #93c5fd; background: #162641; }
+@media (max-width: 600px) {
+  .local-fields, .local-metrics, .journey-details-grid { grid-template-columns: 1fr; }
+}
