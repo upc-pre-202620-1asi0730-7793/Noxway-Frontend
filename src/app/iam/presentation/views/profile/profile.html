@@ -15,7 +15,7 @@
           <div class="user-titles">
             <h1 class="user-fullname">{{ p.fullName }}</h1>
             <p class="user-role">{{ p.role }}</p>
-            <span class="user-meta">DNI: {{ p.dni }} · {{ p.memberSince }}</span>
+            <span class="user-meta">@if (session.demo()) { DNI: {{ p.dni }} · } {{ p.memberSince }}</span>
           </div>
         </div>
 
@@ -23,27 +23,27 @@
         <div class="form-fields-grid">
 
           <div class="form-group">
-            <label class="form-label">NOMBRE COMPLETO</label>
+            <label class="form-label" for="profile-fullName">NOMBRE COMPLETO</label>
             <input
               type="text"
               class="form-input"
-              [(ngModel)]="p.fullName" />
+              id="profile-fullName" [(ngModel)]="p.fullName" />
           </div>
 
           <div class="form-group">
-            <label class="form-label">TELÉFONO MÓVIL</label>
+            <label class="form-label" for="profile-phone">TELÉFONO MÓVIL</label>
             <input
               type="text"
               class="form-input"
-              [(ngModel)]="p.phone" />
+              id="profile-phone" [(ngModel)]="p.phone" />
           </div>
 
           <div class="form-group">
-            <label class="form-label">CORREO ELECTRÓNICO</label>
+            <label class="form-label" for="profile-email">CORREO ELECTRÓNICO</label>
             <input
               type="email"
               class="form-input"
-              [(ngModel)]="p.email" />
+              id="profile-email" [(ngModel)]="p.email" [readOnly]="!session.demo()" />
           </div>
 
           <div class="form-group">
@@ -54,28 +54,28 @@
               <option value="night">Nocturno</option>
               <option value="rotating">Rotativo</option>
             </select>
-            <label class="form-label">HORARIO HABITUAL DE TURNO</label>
+            <label class="form-label" for="profile-schedule">HORARIO HABITUAL DE TURNO</label>
             <input
               type="text"
               class="form-input"
-              [(ngModel)]="p.schedule" />
+              id="profile-schedule" [(ngModel)]="p.schedule" />
             <small>Indica inicio y fin; usa +1 día si termina después de medianoche.</small>
           </div>
 
           <div class="form-group">
-            <label class="form-label">TRANSPORTE PRINCIPAL</label>
+            <label class="form-label" for="profile-transport">TRANSPORTE PRINCIPAL</label>
             <input
               type="text"
               class="form-input"
-              [(ngModel)]="p.transport" />
+              id="profile-transport" [(ngModel)]="p.transport" />
           </div>
 
           <div class="form-group">
-            <label class="form-label">DISTRITO DE RESIDENCIA</label>
+            <label class="form-label" for="profile-district">DISTRITO DE RESIDENCIA</label>
             <input
               type="text"
               class="form-input"
-              [(ngModel)]="p.district" />
+              id="profile-district" [(ngModel)]="p.district" />
           </div>
 
         </div>
@@ -94,7 +94,7 @@
             <mat-checkbox
               color="primary"
               [(ngModel)]="p.privacyEncryptedHistory">
-              Historial de rutas cifrado de extremo a extremo
+              Preferir cifrado de extremo a extremo para el historial
             </mat-checkbox>
 
             <mat-checkbox
@@ -103,6 +103,9 @@
               Calificaciones anónimas en mapa comunitario
             </mat-checkbox>
           </div>
+          @if (!session.demo()) {
+            <small>En esta prueba solo se guardan tus preferencias.</small>
+          }
         </div>
 
         <!-- Save Button -->
@@ -110,41 +113,24 @@
           <button
             mat-flat-button
             class="save-btn"
+            [disabled]="saving()"
             (click)="onSave()">
             <mat-icon class="btn-icon">save</mat-icon>
             <span>Guardar Modificaciones</span>
           </button>
         </div>
+        @if (status()) { <p role="status">{{ status() }}</p> }
+        @if (error()) { <p class="form-error" role="alert">{{ error() }}</p> }
 
       </mat-card>
 
       <!-- Right Column: Security & Sessions -->
       <aside class="profile-aside">
 
-        <!-- Account Security Card -->
         <mat-card class="aside-card">
-          <h3 class="aside-title">Seguridad de Cuenta</h3>
-          <p class="aside-desc">{{ p.passwordUpdated }}</p>
-
-          <button
-            mat-stroked-button
-            class="change-password-btn"
-            (click)="onChangePassword()">
-            <mat-icon class="btn-icon">lock_reset</mat-icon>
-            <span>Cambiar Contraseña</span>
-          </button>
+          <h3 class="aside-title">Sesión actual</h3>
+          <p class="aside-desc">{{ session.demo() ? 'Demostración' : p.email }}</p>
         </mat-card>
-
-        <!-- Active Sessions Card -->
-        <mat-card class="aside-card">
-          <h3 class="aside-title">Sesiones Activas</h3>
-
-          <div class="session-item">
-            <span class="session-dot"></span>
-            <span class="session-label">{{ p.activeSessions }}</span>
-          </div>
-        </mat-card>
-
       </aside>
 
     </div>
