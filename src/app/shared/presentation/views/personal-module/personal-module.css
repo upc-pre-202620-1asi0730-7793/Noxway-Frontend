@@ -1,14 +1,69 @@
-textarea {
+:host { display: grid; gap: 20px; }
+.module-hero, .module-card {
+  padding: 24px;
+  border: 1px solid #203353;
+  border-radius: 12px;
+  background: #10192b;
+}
+.module-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(115deg, #13233f, #10192b 70%);
+}
+.module-icon, .record-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #182f55;
+  color: #93c5fd;
+}
+.record-icon { width: 36px; height: 36px; }
+h1, h2, p { margin: 0; }
+h1 { font-size: 24px; }
+h2 { font-size: 18px; margin-bottom: 16px; }
+p { color: #cbd5e1; line-height: 1.5; }
+.module-hero p, .module-card > p { margin-top: 8px; }
+.module-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 32px 16px;
+  background: #0b1323;
+  border: 1px dashed #334766;
+  border-radius: 8px;
+  text-align: center;
+  color: #93c5fd;
+}
+article { display: flex; gap: 12px; padding: 14px 0; border-top: 1px solid #203353; }
+.record-details { margin-top: 6px; white-space: pre-wrap; overflow-wrap: anywhere; }
+article > div { min-width: 0; overflow-wrap: anywhere; }
+form, label { display: grid; gap: 8px; min-width: 0; }
+form { gap: 16px; }
+input, textarea, select, button {
   font: inherit;
   color: #f8fafc;
   background: #0b1323;
+  color-scheme: dark;
   border: 1px solid #4b6082;
   border-radius: 8px;
   padding: 10px 12px;
-  resize: vertical;
 }
-
-.record-details {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+textarea { resize: vertical; }
+button { justify-self: start; background: #1d4ed8; cursor: pointer; }
+button:disabled { opacity: .6; cursor: default; }
+.module-card > button { margin-top: 12px; }
+.error, [role='alert'] { color: #fda4af; }
+.membership-status { display: inline-block; padding: 5px 10px; border-radius: 16px; color: #bfdbfe; background: #182f55; }
+.service-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.service-filters button { background: #111c30; }
+.service-filters button[aria-pressed='true'] { background: #1d4ed8; border-color: #60a5fa; }
+.contacts-layout article { background: #0b1323; border: 1px solid #203353; border-radius: 8px; padding: 14px; }
+.contacts-layout article + article { margin-top: 10px; }
+@media (max-width: 760px) {
+  .module-grid { grid-template-columns: 1fr; }
 }

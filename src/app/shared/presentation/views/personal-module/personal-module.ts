@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { restPeriod } from '../../../../wellness/domain/model/rest-period';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize, Observable } from 'rxjs';
@@ -11,8 +13,13 @@ interface PersonalRecord {
   details: string;
 }
 
+const serviceTypes = ['Farmacia', 'Grifo', 'Zona de riesgo', 'Otro servicio'];
+
 const sections = {
   services: {
+    icon: 'place',
+    listTitle: 'Mis reportes',
+    formTitle: 'Reportar lugar o peligro',
     title: 'Servicios Cercanos y Zonas de Riesgo',
     empty: 'Aún no has registrado servicios ni zonas de riesgo.',
     titleLabel: 'Nombre del lugar o zona',
@@ -21,6 +28,9 @@ const sections = {
     note: 'Tus reportes se guardan en tu cuenta. El mapa en vivo y la verificación comunitaria están pendientes.',
   },
   community: {
+    icon: 'forum',
+    listTitle: 'Mis avisos',
+    formTitle: 'Crear aviso',
     title: 'Comunidad',
     empty: 'Aún no has creado ningún aviso.',
     titleLabel: 'Título del aviso',
@@ -29,6 +39,9 @@ const sections = {
     note: 'Puedes guardar avisos en tu cuenta local. La publicación a otros usuarios está pendiente.',
   },
   wellness: {
+    icon: 'bedtime',
+    listTitle: 'Historial de descanso',
+    formTitle: 'Registrar descanso',
     title: 'Bienestar & Sueño',
     empty: 'Aún no has registrado descansos.',
     titleLabel: 'Fecha del descanso',
@@ -37,6 +50,9 @@ const sections = {
     note: 'Registra tu horario de descanso para llevar tu propio historial.',
   },
   contacts: {
+    icon: 'group',
+    listTitle: 'Mi red de confianza',
+    formTitle: 'Agregar contacto',
     title: 'Contactos de Confianza',
     empty: 'Aún no has agregado contactos de confianza.',
     titleLabel: 'Nombre del contacto',
@@ -47,23 +63,33 @@ const sections = {
 };
 
 @Component({
-  imports: [FormsModule],
+  imports: [FormsModule, MatIconModule],
   templateUrl: './personal-module.html',
-  styleUrls: ['../../../../commute/presentation/views/local-journeys/local-journeys.css', './personal-module.css'],
+  styleUrl: './personal-module.css',
 })
 export class PersonalModule implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly session = inject(SessionService);
   private readonly router = inject(Router);
-  private readonly section = inject(ActivatedRoute).snapshot.data['section'] as keyof typeof sections | 'benefits';
+  readonly section = inject(ActivatedRoute).snapshot.data['section'] as keyof typeof sections | 'benefits';
   private readonly endpoint = `${localApi}/me/records/${this.section}`;
 
   readonly module = this.section === 'benefits' ? null : sections[this.section];
   readonly records = signal<PersonalRecord[] | null>(null);
+  readonly serviceTypes = serviceTypes;
+  readonly serviceFilter = signal('');
+  readonly visibleRecords = computed(() => {
+    const entries = this.records() ?? [];
+    const filter = this.serviceFilter();
+    return filter ? entries.filter((record) => record.details.startsWith(filter + ' · ')) : entries;
+  });
   readonly busy = signal(false);
   readonly error = signal('');
 
   title = '';
+  category = '';
+  start = '';
+  end = '';
   details = '';
 
   ngOnInit(): void {
@@ -76,10 +102,27 @@ export class PersonalModule implements OnInit {
   }
 
   save(form: NgForm): void {
-    if (this.busy() || form.invalid || !this.title.trim() || !this.details.trim()) return;
+    if (this.busy() || form.invalid) return;
+    let title = this.title.trim();
+    let details = this.details.trim();
+
+    if (this.section === 'wellness') {
+      const rest = restPeriod(this.start, this.end);
+      if (!rest) {
+        this.error.set('El fin debe ser posterior al inicio y el descanso no puede superar 24 horas.');
+        return;
+      }
+      title = `${this.start.replace('T', ' ')} → ${this.end.replace('T', ' ')}`;
+      const duration = `${Math.floor(rest.minutes / 60)} h ${rest.minutes % 60} min`;
+      details = details ? `${duration} · ${details}` : duration;
+    } else if (this.category) {
+      details = `${this.category} · ${details}`;
+    }
+
+    if (!title || !details) return;
 
     this.run(this.http.post<PersonalRecord>(this.endpoint, {
-      title: this.title, details: this.details,
+      title, details,
     }, this.session.requestOptions()), (record) => {
       this.records.update((records) => [record, ...(records ?? [])]);
       form.resetForm();
@@ -97,9 +140,11 @@ export class PersonalModule implements OnInit {
           void this.router.navigateByUrl('/login');
           return;
         }
-        this.error.set(error.status === 0
-          ? 'Inicia la API local con npm run server y vuelve a intentarlo.'
-          : error.error?.message || 'No se pudo completar la operación.');
+        if (error.status === 0 || error.status === 404) {
+          this.error.set('Comprueba que npm run server esté ejecutando la versión actual del proyecto y vuelve a cargar.');
+          return;
+        }
+        this.error.set(error.error?.message || 'La API local no pudo guardar o cargar los datos.');
       },
     });
   }
