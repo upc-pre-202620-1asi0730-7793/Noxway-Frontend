@@ -20,6 +20,13 @@
     </section>
     <section class="panel results">
       <h2>{{ t(selected().label) }}</h2>
+      @if (selectedPlace(); as place) {
+        <div class="place-detail">
+          <h3>{{ placeName(place) }}</h3>
+          <p>{{ (place.distance / 1000).toFixed(1) }} km · {{ t('Distancia en línea recta') }}</p>
+          <a [href]="placeUrl(place)" target="_blank" rel="noopener noreferrer">{{ t('Abrir en OpenStreetMap') }}</a>
+        </div>
+      }
       @if (loading()) {
         <p role="status">{{ t('Buscando establecimientos…') }}</p>
       } @else if (error()) {

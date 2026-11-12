@@ -73,60 +73,89 @@
     </dialog>
   </section>
 } @else if (module; as page) {
-  <header class="module-hero">
+  <header class="module-hero module-banner" [class.wellness-banner]="section === 'wellness'">
     <span class="module-icon"><mat-icon>{{ page.icon }}</mat-icon></span>
     <div><h1>{{ t(page.title) }}</h1><p>{{ t(page.note) }}</p></div>
+    <button type="button" class="publish-btn" [disabled]="!records() || busy()" (click)="openComposer()">
+      <mat-icon class="btn-icon">add</mat-icon>{{ t(page.formTitle) }}
+    </button>
   </header>
 
-  <div class="module-grid" [class.contacts-layout]="section === 'contacts'">
-    <section class="module-card">
-      <h2>{{ t(page.listTitle) }}</h2>
-      @if (records()) {
-        @for (record of records() ?? []; track record.id) {
-          <article>
-            <span class="record-icon"><mat-icon>{{ page.icon }}</mat-icon></span>
-            <div>
-              <strong>{{ record.title }}</strong>
-              <p class="record-details">{{ record.details }}</p>
-              @if (record.location; as point) {
-                <a class="report-map-link" [href]="reportMapUrl(point)" target="_blank" rel="noopener noreferrer">
-                  {{ t('Ver ubicación del aviso') }}
-                </a>
+  @if (section === 'wellness' && records()) {
+    <div class="rest-stats">
+      <section class="module-card"><h2>{{ t('Último descanso') }}</h2><strong>{{ restChart().at(-1)?.label ?? '—' }}</strong></section>
+      <section class="module-card"><h2>{{ t('Promedio de tus últimos registros') }}</h2><strong>{{ averageRest() }}</strong></section>
+      <section class="module-card"><h2>{{ t('Descansos registrados') }}</h2><strong>{{ records()?.length }}</strong></section>
+    </div>
+  }
+
+  <div class="module-grid" [class.contact-cards]="section === 'contacts' && records()?.length">
+    @if (section === 'contacts' && records()?.length) {
+      @for (record of records() ?? []; track record.id) {
+        <section class="module-card contact-card">
+          <div class="contact-identity"><span class="record-icon">{{ record.title.charAt(0) }}</span><h2>{{ record.title }}</h2></div>
+          <p class="record-details">{{ record.details }}</p>
+          <p class="membership-status">{{ t('Guardado en tu cuenta') }}</p>
+        </section>
+      }
+    } @else {
+      <section class="module-card">
+        <h2>{{ t(page.listTitle) }}</h2>
+        @if (records()) {
+          @if (section === 'wellness' && restChart().length) {
+            <div class="rest-chart" [attr.aria-label]="t('Duración de los últimos descansos')">
+              @for (entry of restChart(); track entry.id) {
+                <div class="rest-column">
+                  <small>{{ entry.label }}</small>
+                  <div class="rest-bar-track" aria-hidden="true">
+                    <span class="rest-bar" [style.height.%]="entry.minutes / chartMaximum() * 100"></span>
+                  </div>
+                  <small>{{ entry.title }}</small>
+                </div>
               }
             </div>
-          </article>
-        } @empty {
-          <div class="empty-state"><mat-icon>{{ page.icon }}</mat-icon><p>{{ t(page.empty) }}</p></div>
+          }
+          @for (record of records() ?? []; track record.id) {
+            <article><span class="record-icon"><mat-icon>{{ page.icon }}</mat-icon></span><div><strong>{{ record.title }}</strong><p class="record-details">{{ record.details }}</p></div></article>
+          } @empty {
+            <div class="empty-state"><mat-icon>{{ page.icon }}</mat-icon><p>{{ t(page.empty) }}</p></div>
+          }
+        } @else if (busy()) {
+          <p role="status">{{ t('Cargando tus datos…') }}</p>
+        } @else {
+          <p role="alert">{{ t(error()) }}</p>
+          <button type="button" (click)="load()">{{ t('Volver a cargar') }}</button>
         }
-      } @else if (busy()) {
-        <p role="status">{{ t('Cargando tus datos…') }}</p>
-      } @else {
-        <p role="alert">{{ t(error()) }}</p>
-        <button type="button" (click)="load()">{{ t('Volver a cargar') }}</button>
+      </section>
+      @if (section === 'wellness') {
+        <aside class="module-card sleep-guide">
+          <h2>{{ t('Sugerencias del Sueño') }}</h2>
+          <p>{{ t('Mantén un horario de descanso regular según tu turno.') }}</p>
+          <p>{{ t('Busca un ambiente oscuro y tranquilo para descansar.') }}</p>
+        </aside>
       }
-    </section>
+    }
+  </div>
 
-    <section class="module-card">
-      <h2>{{ t(page.formTitle) }}</h2>
+  <dialog #composer class="notice-dialog" aria-labelledby="record-dialog-title" (close)="composing.set(false)">
+    <header><h2 id="record-dialog-title">{{ t(page.formTitle) }}</h2><button type="button" (click)="closeComposer()">{{ t('Cerrar') }}</button></header>
+    @if (composing()) {
       <ng-container [ngTemplateOutlet]="entryForm" [ngTemplateOutletContext]="{ $implicit: page }" />
-    </section>
-  </div>
+    }
+  </dialog>
 } @else {
-  <header class="module-hero">
+  <header class="module-hero membership-banner">
     <span class="module-icon"><mat-icon>workspace_premium</mat-icon></span>
-    <div><h1>{{ t('Beneficios & Planes') }}</h1><p>{{ t('Consulta tu membresía y tus convenios.') }}</p></div>
+    <div><span class="membership-status">{{ t('Sin plan activo') }}</span><h1>{{ t('Mi membresía') }}</h1><p>{{ t('La contratación estará disponible cuando se conecte el servicio de suscripciones.') }}</p></div>
   </header>
-  <div class="module-grid">
-    <section class="module-card">
-      <h2>{{ t('Mi membresía') }}</h2>
-      <p class="membership-status">{{ t('Sin plan activo') }}</p>
-      <p>{{ t('La contratación estará disponible cuando se conecte el servicio de suscripciones.') }}</p>
-    </section>
-    <section class="module-card">
-      <h2>{{ t('Mis beneficios') }}</h2>
-      <div class="empty-state"><mat-icon>redeem</mat-icon><p>{{ t('Aún no tienes beneficios asociados a tu cuenta.') }}</p></div>
-    </section>
-  </div>
+  <section class="module-card">
+    <h2>{{ t('Convenios colectivos') }}</h2>
+    <div class="empty-state"><mat-icon>redeem</mat-icon><p>{{ t('Aún no tienes beneficios asociados a tu cuenta.') }}</p></div>
+  </section>
+  <section class="module-card referral-card">
+    <h2>{{ t('Programa de referidos') }}</h2>
+    <p>{{ t('Tu cuenta todavía no tiene un código de referido.') }}</p>
+  </section>
 }
 
 <ng-template #entryForm let-page>

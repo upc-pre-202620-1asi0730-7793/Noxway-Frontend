@@ -81,6 +81,20 @@ export class PersonalModule implements OnInit {
     return (this.records() ?? []).filter((record) => !district || record.district === district);
   });
 
+  readonly restChart = computed(() => (this.records() ?? []).slice(0, 7).reverse().flatMap((record) => {
+    const duration = /^(\d+) h (\d+) min/.exec(record.details);
+    if (!duration) return [];
+    const minutes = Number(duration[1]) * 60 + Number(duration[2]);
+    return [{ id: record.id, title: record.title.split(' ')[0], minutes, label: duration[0] }];
+  }));
+  readonly chartMaximum = computed(() => Math.max(480, ...this.restChart().map((entry) => entry.minutes)));
+  readonly averageRest = computed(() => {
+    const entries = this.restChart();
+    if (!entries.length) return '—';
+    const minutes = Math.round(entries.reduce((total, entry) => total + entry.minutes, 0) / entries.length);
+    return `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
+  });
+
   title = '';
   category = '';
   district = '';
@@ -124,10 +138,8 @@ export class PersonalModule implements OnInit {
       this.records.update((records) => [record, ...(records ?? [])]);
       form.resetForm();
       this.location.set(null);
-      if (this.section === 'community') {
-        this.selectedDistrict.set('');
-        this.closeComposer();
-      }
+      this.selectedDistrict.set('');
+      this.closeComposer();
     });
   }
 

@@ -5,6 +5,7 @@ import { circleMarker, layerGroup, map, tileLayer, type LayerGroup, type Map } f
 import { finalize, Subscription } from 'rxjs';
 
 const categories = [
+  { label: 'Todos', tag: 'all' },
   { label: 'Farmacias', tag: 'pharmacy' },
   { label: 'Supermercados', tag: 'supermarket' },
   { label: 'Grifos', tag: 'fuel' },
@@ -26,6 +27,7 @@ export class NearbyServices implements AfterViewInit, OnDestroy {
   readonly categories = categories;
   readonly selected = signal<(typeof categories)[number]>(categories[0]);
   readonly results = signal<NearbyPlace[]>([]);
+  readonly selectedPlace = signal<NearbyPlace | null>(null);
   readonly loading = signal(false);
   readonly error = signal('');
   readonly locationError = signal('');
@@ -42,6 +44,7 @@ export class NearbyServices implements AfterViewInit, OnDestroy {
 
   select(category: (typeof categories)[number]): void {
     this.selected.set(category);
+    this.selectedPlace.set(null);
     this.renderPlaces();
   }
 
@@ -63,6 +66,7 @@ export class NearbyServices implements AfterViewInit, OnDestroy {
     if (!this.map) return;
     this.search?.unsubscribe();
     this.places = [];
+    this.selectedPlace.set(null);
     this.renderPlaces();
     this.error.set('');
     this.loading.set(true);
@@ -78,7 +82,8 @@ export class NearbyServices implements AfterViewInit, OnDestroy {
   }
 
   private renderPlaces(): void {
-    const places = this.places.filter((place) => place.category === this.selected().tag).slice(0, 40);
+    const category = this.selected().tag;
+    const places = this.places.filter((place) => category === 'all' || place.category === category).slice(0, 40);
     this.markers?.clearLayers();
     this.results.set(places);
     for (const place of places) {
@@ -86,7 +91,7 @@ export class NearbyServices implements AfterViewInit, OnDestroy {
       label.textContent = this.placeName(place);
       if (this.markers) {
         circleMarker([place.lat, place.lon], { radius: 8, color: '#fff', weight: 2, fillColor: '#2563eb', fillOpacity: 1 })
-          .bindTooltip(label).addTo(this.markers);
+          .bindTooltip(label).on('click', () => this.selectedPlace.set(place)).addTo(this.markers);
       }
     }
   }
@@ -96,7 +101,12 @@ export class NearbyServices implements AfterViewInit, OnDestroy {
   }
 
   focus(place: NearbyPlace): void {
+    this.selectedPlace.set(place);
     this.map?.setView([place.lat, place.lon], 17);
+  }
+
+  placeUrl(place: NearbyPlace): string {
+    return `https://www.openstreetmap.org/?mlat=${place.lat}&mlon=${place.lon}#map=17/${place.lat}/${place.lon}`;
   }
 
   ngOnDestroy(): void {

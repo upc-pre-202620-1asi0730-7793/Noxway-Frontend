@@ -85,3 +85,27 @@ button:disabled { opacity: .6; cursor: default; }
 @media (max-width: 760px) {
   .account-community .community-main-grid { grid-template-columns: 1fr; }
 }
+
+.module-banner, .contact-card, .module-grid > .module-card { background: #1d2738; }
+.module-banner > div { flex: 1; }
+.module-banner.wellness-banner { background: #1e1b49; border-color: #5149a5; }
+.membership-banner { background: #203d81; border-color: #3b82f6; }
+.membership-banner h1 { margin-top: 8px; }
+.referral-card { border-color: #315999; background: #1d2738; }
+.rest-stats { display: grid; gap: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rest-stats .module-card { background: #1d2738; }
+.rest-stats h2 { color: #cbd5e1; font-size: 13px; margin-bottom: 8px; }
+.rest-stats strong { font-size: 20px; color: #93c5fd; }
+.rest-chart { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(70px, 1fr); gap: 12px; margin: 16px 0; padding: 16px; overflow-x: auto; border: 1px solid #334155; border-radius: 8px; background: #0b1323; }
+.rest-column { display: grid; justify-items: center; gap: 8px; color: #cbd5e1; }
+.rest-bar-track { display: flex; align-items: flex-end; width: 34px; height: 115px; background: #162641; border-radius: 4px; }
+.rest-bar { display: block; width: 100%; background: #10b981; border-radius: 4px; }
+.sleep-guide p { background: #0b1323; border-radius: 8px; padding: 12px; }
+.module-grid.contact-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.contact-identity { display: flex; align-items: center; gap: 12px; }
+.contact-identity h2 { margin: 0; }
+.notice-dialog form { margin-top: 14px; }
+@media (max-width: 760px) {
+  .module-banner { flex-wrap: wrap; }
+  .rest-stats, .module-grid.contact-cards { grid-template-columns: 1fr; }
+}

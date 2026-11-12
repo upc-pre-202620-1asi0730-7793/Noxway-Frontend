@@ -21,6 +21,7 @@
           <div><strong>{{ t('Llegada') }}</strong><p>{{ t('Pendiente de confirmación') }}</p></div>
         </div>
       </div>
+      <progress class="journey-progress" max="2" value="1" [attr.aria-label]="t('Progreso del trayecto')"></progress>
       <div class="metrics-grid local-metrics">
         <div class="metric-box"><span class="metric-label">{{ t('Origen') }}</span><strong>{{ journey.origin }}</strong></div>
         <div class="metric-box"><span class="metric-label">{{ t('Destino') }}</span><strong>{{ journey.destination }}</strong></div>

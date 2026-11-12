@@ -15,3 +15,9 @@ button[aria-pressed='true'] { background: #1d4ed8; border-color: #93c5fd; }
   .services-grid { grid-template-columns: 1fr; }
   .map { height: 360px; }
 }
+
+.services > header.panel { background: #101728; }
+.results { background: #1d2738; }
+.place-detail { background: #0b1323; border: 1px solid #334155; border-radius: 8px; padding: 12px; margin-bottom: 14px; }
+.place-detail h3 { margin: 0; }
+.place-detail a { color: #93c5fd; }

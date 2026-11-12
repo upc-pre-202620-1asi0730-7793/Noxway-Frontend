@@ -40,6 +40,10 @@ describe('Noxway access', () => {
     await login;
 
     const harness = await RouterTestingHarness.create('/dashboard');
+    const summary = { completedTrips: 0, activeTrip: null, contactCount: 0, lastRest: null, noticeCount: 0 };
+    http.expectOne('/api/local/me/dashboard').flush(summary);
+    harness.detectChanges();
+    expect(harness.routeNativeElement?.textContent).toContain('Trayectos completados');
     expect(harness.routeNativeElement?.textContent).toContain('Hola, QA Entrevista');
     expect(harness.routeNativeElement?.textContent).not.toContain('Jorge Luis');
     await harness.navigateByUrl('/profile');
@@ -67,7 +71,12 @@ describe('Noxway access', () => {
         harness.detectChanges();
         expect(dialog?.querySelector('app-report-location')).toBeTruthy();
       } else {
-        expect(harness.routeNativeElement?.querySelector('form')).toBeTruthy();
+        const dialog = harness.routeNativeElement?.querySelector('dialog');
+        expect(dialog).toBeTruthy();
+        dialog!.showModal = () => dialog!.setAttribute('open', '');
+        harness.routeNativeElement?.querySelector<HTMLButtonElement>('.publish-btn')?.click();
+        harness.detectChanges();
+        expect(dialog?.querySelector('form')).toBeTruthy();
       }
       expect(harness.routeNativeElement?.textContent).not.toContain('Primax');
     }
@@ -94,6 +103,7 @@ describe('Noxway access', () => {
     harness.detectChanges();
     expect(harness.routeNativeElement?.textContent).toContain('No active plan');
     await harness.navigateByUrl('/dashboard');
+    http.expectOne('/api/local/me/dashboard').flush(summary);
     expect(harness.routeNativeElement?.textContent).toContain('Hello, QA Entrevista');
     http.verify();
   });
