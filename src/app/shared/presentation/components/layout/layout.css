@@ -542,12 +542,3 @@
   max-width: 1560px;
   margin: 0 auto;
 }
-
-.module-preview {
-  margin: 0 0 16px;
-  padding: 12px 16px;
-  color: #dbeafe;
-  background: #10192b;
-  border: 1px solid #334766;
-  border-radius: 8px;
-}

@@ -3,6 +3,9 @@ import { Layout } from './shared/presentation/components/layout/layout';
 import { Access } from './iam/presentation/views/access/access';
 import { requireDemo, requireSession } from './iam/infrastructure/session.guard';
 import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { SessionService } from './iam/infrastructure/session.service';
+import { PersonalModule } from './shared/presentation/views/personal-module/personal-module';
 import { Dashboard } from './dashboard/presentation/views/dashboard/dashboard';
 import { Journey } from './commute/presentation/views/journey/journey';
 import { MapView } from './community/presentation/views/map-view/map-view';
@@ -39,31 +42,31 @@ const portalRoutes: Routes = [
   { path: 'my-journeys', component: LocalJourneys, title: 'Noxway - Mi trayecto' },
   {
     path: 'map',
-    data: { preview: true },
+    data: { section: 'services' },
     component: MapView,
     title: `${baseTitle} - Servicios Cercanos`,
   },
   {
     path: 'community',
-    data: { preview: true },
+    data: { section: 'community' },
     component: Community,
     title: `${baseTitle} - Comunidad`,
   },
   {
     path: 'wellness',
-    data: { preview: true },
+    data: { section: 'wellness' },
     component: Wellness,
     title: `${baseTitle} - Bitácora de Descanso`,
   },
   {
     path: 'benefits',
-    data: { preview: true },
+    data: { section: 'benefits' },
     component: Benefits,
     title: `${baseTitle} - Beneficios Colectivos`,
   },
   {
     path: 'trusted-contacts',
-    data: { preview: true },
+    data: { section: 'contacts' },
     component: TrustedContacts,
     title: `${baseTitle} - Contactos de Confianza`,
   },
@@ -120,12 +123,17 @@ export const routes: Routes = [
     path: '',
     component: Layout,
     canActivateChild: [requireSession],
-    children: portalRoutes.map((route) => ({
-      ...route,
-      canActivate: route.data?.['preview'] || ['dashboard', 'profile', 'my-journeys'].includes(route.path ?? '')
-        ? []
-        : [requireDemo],
-    })),
+    children: portalRoutes.flatMap((route) => {
+      if (route.data?.['section']) {
+        return [
+          { ...route, canMatch: [() => inject(SessionService).demo()] },
+          { ...route, component: PersonalModule },
+        ];
+      }
+      return ['dashboard', 'profile', 'my-journeys'].includes(route.path ?? '')
+        ? [route]
+        : [{ ...route, canActivate: [requireDemo] }];
+    }),
   },
   {
     path: '**',

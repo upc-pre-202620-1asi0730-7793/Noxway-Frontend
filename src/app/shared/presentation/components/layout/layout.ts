@@ -53,12 +53,6 @@ export class Layout implements OnInit, OnDestroy {
     return this.currentUrlSignal().startsWith('/companion');
   });
 
-  readonly showsPreview = computed(() => {
-    this.currentUrlSignal();
-    const page = this.router.routerState.snapshot.root.firstChild?.firstChild;
-    return !this.session.demo() && page?.data['preview'] === true;
-  });
-
   private readonly workerNavDefinitions: NavOption[] = [
     { link: '/dashboard', labelKey: 'nav.dashboard', icon: 'circle' },
     {
