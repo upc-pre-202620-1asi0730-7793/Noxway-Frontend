@@ -1,3 +1,7 @@
+import { LocalJourneys } from './commute/presentation/views/local-journeys/local-journeys';
+import { Layout } from './shared/presentation/components/layout/layout';
+import { Access } from './iam/presentation/views/access/access';
+import { requireDemo, requireSession } from './iam/infrastructure/session.guard';
 import { Routes } from '@angular/router';
 import { Dashboard } from './dashboard/presentation/views/dashboard/dashboard';
 import { Journey } from './commute/presentation/views/journey/journey';
@@ -20,7 +24,7 @@ const pageNotFound = () =>
 
 const baseTitle = 'Noxway';
 
-export const routes: Routes = [
+const portalRoutes: Routes = [
   // Worker Portal Routes
   {
     path: 'dashboard',
@@ -32,6 +36,7 @@ export const routes: Routes = [
     component: Journey,
     title: `${baseTitle} - Mi Trayecto Activo`,
   },
+  { path: 'my-journeys', component: LocalJourneys, title: 'Noxway - Mi trayecto' },
   {
     path: 'map',
     component: MapView,
@@ -100,10 +105,20 @@ export const routes: Routes = [
     component: Home,
     title: `${baseTitle} - Home`,
   },
+];
+
+export const routes: Routes = [
+  { path: 'login', component: Access, title: 'Noxway - Iniciar sesión' },
+  { path: 'register', component: Access, data: { registering: true }, title: 'Noxway - Registro' },
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
     path: '',
-    redirectTo: 'dashboard',
-    pathMatch: 'full',
+    component: Layout,
+    canActivateChild: [requireSession],
+    children: portalRoutes.map((route) => ({
+      ...route,
+      canActivate: ['dashboard', 'profile', 'my-journeys'].includes(route.path ?? '') ? [] : [requireDemo],
+    })),
   },
   {
     path: '**',

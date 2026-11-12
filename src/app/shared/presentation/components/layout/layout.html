@@ -85,12 +85,12 @@
       <!-- Worker User Identity Card -->
       <div class="user-card">
         <div class="avatar">
-          JL
+          {{ session.profile()?.avatar ?? 'JL' }}
         </div>
 
         <div class="user-info">
-          <strong>Jorge Luis Huamán</strong>
-          <span class="user-badge">{{ languageService.translate('sidebar.workerRole') }}</span>
+          <strong>{{ session.profile()?.fullName ?? 'Jorge Luis Huamán' }}</strong>
+          <span class="user-badge">{{ session.profile()?.role ?? languageService.translate('sidebar.workerRole') }}</span>
         </div>
       </div>
 
@@ -124,6 +124,7 @@
         }
       </nav>
 
+      @if (session.demo()) {
       <div class="sidebar-footer">
         <button
           mat-flat-button
@@ -133,6 +134,7 @@
           {{ languageService.translate('sidebar.sosAlert') }}
         </button>
       </div>
+      }
     }
 
   </aside>
@@ -180,13 +182,14 @@
         <!-- Worker Network Indicator in Topbar -->
         <div class="network-status">
           <span class="status-dot"></span>
-          <span>{{ languageService.translate('topbar.activeNetwork') }}</span>
+          <span>{{ session.demo() ? 'Demostración · Datos de ejemplo' : 'Prueba local' }}</span>
         </div>
 
         <div class="topbar-actions">
           <!-- Language Switcher Component -->
           <app-language-switcher/>
 
+          @if (session.demo()) {
           <a
             mat-stroked-button
             routerLink="/companion/live"
@@ -195,19 +198,22 @@
             <mat-icon class="portal-icon">visibility</mat-icon>
             <span>{{ languageService.translate('sidebar.switchPortal') }}</span>
           </a>
+          }
 
           <div class="clock">
             <mat-icon class="clock-icon">schedule</mat-icon>
             <span>{{ currentTime() }}</span>
           </div>
 
+          @if (session.demo()) {
           <button
             class="alert-dot-button"
             aria-label="Network activity indicator">
             <span class="red-ping"></span>
           </button>
+          }
 
-          <button mat-stroked-button class="logout-btn">
+          <button mat-stroked-button class="logout-btn" (click)="logout()">
             <span>{{ languageService.translate('sidebar.logout') }}</span>
             <mat-icon class="logout-icon">open_in_new</mat-icon>
           </button>
