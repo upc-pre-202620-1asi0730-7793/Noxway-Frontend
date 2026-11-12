@@ -82,6 +82,7 @@ describe('Noxway access', () => {
     }
 
     await harness.navigateByUrl('/map');
+    http.expectOne('/api/local/me/records/community').flush([]);
     http.expectOne('https://tiles.openfreemap.org/planet')
       .flush({ tiles: ['https://tiles.openfreemap.org/qa/{z}/{x}/{y}.pbf'] });
     const tiles = http.match((request) => request.url.startsWith('https://tiles.openfreemap.org/qa/14/'));

@@ -16,6 +16,7 @@ export interface NearbyPlace {
   lat: number;
   lon: number;
   distance: number;
+  openAllDay?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -65,7 +66,7 @@ export class NearbyPlaces {
 
       const name = String(feature.properties['name'] ?? '');
       const id = `${category}/${lat.toFixed(5)}/${lon.toFixed(5)}/${name}`;
-      places.push({ id, category, name, lat, lon, distance });
+      places.push({ id, category, name, lat, lon, distance, openAllDay: feature.properties['opening_hours'] === '24/7' });
     }
     return places;
   }

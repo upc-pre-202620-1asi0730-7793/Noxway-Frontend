@@ -41,7 +41,7 @@ export class Layout implements OnInit, OnDestroy {
   public readonly languageService = inject(LanguageService);
 
   private readonly currentUrlSignal = signal<string>('/dashboard');
-  readonly wideJourney = computed(() => this.currentUrlSignal().split('?')[0] === '/my-journeys');
+  readonly wideContent = computed(() => ['/my-journeys', '/map'].includes(this.currentUrlSignal().split('?')[0]));
   readonly currentTime = signal<string>('02:45:18 AM');
   readonly companionTime = signal<string>('02:45 AM');
 

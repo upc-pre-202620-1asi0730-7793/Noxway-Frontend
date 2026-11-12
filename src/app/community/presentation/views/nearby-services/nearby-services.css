@@ -21,3 +21,13 @@ button[aria-pressed='true'] { background: #1d4ed8; border-color: #93c5fd; }
 .place-detail { background: #0b1323; border: 1px solid #334155; border-radius: 8px; padding: 12px; margin-bottom: 14px; }
 .place-detail h3 { margin: 0; }
 .place-detail a { color: #93c5fd; }
+
+.services { gap: 12px; }
+.map-toolbar { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 14px; }
+.map-options { align-items: center; padding: 0 4px; color: #a8b8cc; font-size: 13px; }
+.map-panel { padding: 0; overflow: hidden; background: #0b1323; }
+.map { height: clamp(380px, 65vh, 720px); }
+.results { max-height: clamp(380px, 65vh, 720px); box-sizing: border-box; }
+.report-button { border-radius: 6px; padding: 8px 12px; background: #2563eb; color: white; text-decoration: none; }
+.report-button.danger { color: #fbbf24; background: #243149; }
+.place-type { display: inline-block; color: #34d399; font-size: 12px; margin-bottom: 8px; }

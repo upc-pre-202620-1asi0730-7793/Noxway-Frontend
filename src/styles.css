@@ -9,3 +9,5 @@ img[src="LogoNovctiva.png"] {
     14% 71%, 11% 65%, 9% 59%, 8% 53%, 7.2% 47%, 7.2% 16.3%
   );
 }
+
+app-nearby-services .leaflet-tile-pane { filter: invert(.93) hue-rotate(180deg) saturate(.6) brightness(.86); }

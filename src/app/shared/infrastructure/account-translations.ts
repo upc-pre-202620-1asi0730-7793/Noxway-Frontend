@@ -209,5 +209,21 @@ export const accountTranslations: Readonly<Record<string, string>> = {
   "Llegada confirmada": "Arrival confirmed",
   "Aún no hay eventos de trayecto.": "No trip events yet.",
   "Privacidad del trayecto": "Trip privacy",
-  "El trayecto ya finalizó.": "The trip has already ended."
+  "El trayecto ya finalizó.": "The trip has already ended.",
+  "Zonas de riesgo": "Risk areas",
+  "Reportar local": "Report a place",
+  "Reportar peligro": "Report a hazard",
+  "Solo abiertos 24 horas": "Open 24 hours only",
+  "Radio de búsqueda: 3 km": "Search radius: 3 km",
+  "Aviso de seguridad de tu cuenta": "Safety notice from your account",
+  "Abierto 24 horas": "Open 24 hours",
+  "Horario sin confirmar": "Hours not confirmed",
+  "No se pudieron cargar tus avisos de seguridad.": "Could not load your safety notices.",
+  "No hay establecimientos con horario 24 horas confirmado en esta zona.": "No places with confirmed 24-hour opening in this area.",
+  "No tienes avisos de seguridad en esta zona.": "You have no safety notices in this area.",
+  "Red de Contactos de Confianza": "Trusted contact network",
+  "El contacto aún no está vinculado a otra cuenta.": "This contact is not linked to another account yet.",
+  "Relación (opcional)": "Relationship (optional)",
+  "Contactar": "Contact",
+  "Reporte de local": "Place report"
 };
