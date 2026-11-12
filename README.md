@@ -37,7 +37,7 @@ Spring Boot y MySQL, la publicación comunitaria, los envíos
 de invitaciones, el cifrado del historial y la contratación de planes están
 pendientes.
 
-Servicios Cercanos consulta OpenStreetMap mediante Overpass y requiere conexión
+Servicios Cercanos lee los puntos de interés de OpenStreetMap mediante OpenFreeMap y requiere conexión
 a Internet. Puedes filtrar farmacias, supermercados y grifos en la zona visible.
 Los avisos se crean en Comunidad, que también muestra los reportes privados
 guardados antes desde Servicios Cercanos.

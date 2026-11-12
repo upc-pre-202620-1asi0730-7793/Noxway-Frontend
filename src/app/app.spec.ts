@@ -62,16 +62,19 @@ describe('Noxway access', () => {
     }
 
     await harness.navigateByUrl('/map');
-    const overpass = 'https://overpass.private.coffee/api/interpreter';
-    http.expectOne((request) => request.url === overpass && request.params.get('data')?.includes('amenity=pharmacy') === true)
-      .flush({ elements: [] });
+    http.expectOne('https://tiles.openfreemap.org/planet')
+      .flush({ tiles: ['https://tiles.openfreemap.org/qa/{z}/{x}/{y}.pbf'] });
+    const tiles = http.match((request) => request.url.startsWith('https://tiles.openfreemap.org/qa/14/'));
+    expect(tiles.length).toBeGreaterThan(0);
+    for (const tile of tiles) tile.flush(new ArrayBuffer(0));
     harness.detectChanges();
     const supermarket = Array.from(harness.routeNativeElement?.querySelectorAll('button') ?? [])
       .find((button) => button.textContent.includes('Supermercados'));
     expect(supermarket).toBeTruthy();
     supermarket?.click();
-    http.expectOne((request) => request.url === overpass && request.params.get('data')?.includes('shop=supermarket') === true)
-      .flush({ elements: [] });
+    http.expectNone((request) => request.url.startsWith('https://tiles.openfreemap.org/'));
+    harness.detectChanges();
+    expect(harness.routeNativeElement?.querySelector('h2')?.textContent).toContain('Supermercados');
     expect(harness.routeNativeElement?.textContent).not.toContain('Reportar lugar');
 
     await harness.navigateByUrl('/benefits');

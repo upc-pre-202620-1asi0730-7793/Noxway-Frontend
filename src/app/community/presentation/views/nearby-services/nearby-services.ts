@@ -1,30 +1,13 @@
-import { HttpClient } from '@angular/common/http';
+import { NearbyPlaces, type NearbyPlace } from './nearby-places';
 import { AfterViewInit, Component, ElementRef, inject, OnDestroy, signal, viewChild } from '@angular/core';
 import { LanguageService } from '../../../../shared/infrastructure/language.service';
-import { circleMarker, latLng, layerGroup, map, tileLayer, type LayerGroup, type Map } from 'leaflet';
-import { finalize, Subscription, timeout } from 'rxjs';
-
-interface OverpassPlace {
-  id: number;
-  type: string;
-  lat?: number;
-  lon?: number;
-  center?: { lat: number; lon: number };
-  tags?: Record<string, string>;
-}
-
-interface NearbyPlace {
-  id: string;
-  name: string;
-  lat: number;
-  lon: number;
-  distance: number;
-}
+import { circleMarker, layerGroup, map, tileLayer, type LayerGroup, type Map } from 'leaflet';
+import { finalize, Subscription } from 'rxjs';
 
 const categories = [
-  { label: 'Farmacias', tag: 'amenity=pharmacy' },
-  { label: 'Supermercados', tag: 'shop=supermarket' },
-  { label: 'Grifos', tag: 'amenity=fuel' },
+  { label: 'Farmacias', tag: 'pharmacy' },
+  { label: 'Supermercados', tag: 'supermarket' },
+  { label: 'Grifos', tag: 'fuel' },
 ] as const;
 
 @Component({
@@ -32,7 +15,8 @@ const categories = [
   styleUrl: './nearby-services.css',
 })
 export class NearbyServices implements AfterViewInit, OnDestroy {
-  private readonly http = inject(HttpClient);
+  private readonly nearbyPlaces = inject(NearbyPlaces);
+  private places: NearbyPlace[] = [];
   private readonly container = viewChild.required<ElementRef<HTMLDivElement>>('map');
   private map?: Map;
   private markers?: LayerGroup;
@@ -50,7 +34,7 @@ export class NearbyServices implements AfterViewInit, OnDestroy {
     this.map = map(this.container().nativeElement).setView([-12.0464, -77.0428], 13);
     tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://openfreemap.org">OpenFreeMap</a> · <a href="https://openmaptiles.org">OpenMapTiles</a>',
     }).addTo(this.map);
     this.markers = layerGroup().addTo(this.map);
     this.load();
@@ -58,7 +42,7 @@ export class NearbyServices implements AfterViewInit, OnDestroy {
 
   select(category: (typeof categories)[number]): void {
     this.selected.set(category);
-    this.load();
+    this.renderPlaces();
   }
 
   locate(): void {
@@ -78,39 +62,33 @@ export class NearbyServices implements AfterViewInit, OnDestroy {
   load(): void {
     if (!this.map) return;
     this.search?.unsubscribe();
-    const center = this.map.getCenter();
-    const query = `[out:json][timeout:15];nwr[${this.selected().tag}](around:3000,${center.lat.toFixed(3)},${center.lng.toFixed(3)});out center;`;
-
-    this.markers?.clearLayers();
-    this.results.set([]);
+    this.places = [];
+    this.renderPlaces();
     this.error.set('');
     this.loading.set(true);
 
-    this.search = this.http.get<{ elements: OverpassPlace[] }>(
-      'https://overpass.private.coffee/api/interpreter', { params: { data: query } },
-    ).pipe(timeout(20000), finalize(() => this.loading.set(false))).subscribe({
-      next: ({ elements }) => {
-        const places = elements.flatMap((element) => {
-          const lat = element.lat ?? element.center?.lat;
-          const lon = element.lon ?? element.center?.lon;
-          if (lat === undefined || lon === undefined) return [];
-          return [{
-            id: `${element.type}/${element.id}`, name: element.tags?.['name'] || element.tags?.['brand'] || '',
-            lat, lon, distance: center.distanceTo(latLng(lat, lon)),
-          }];
-        }).sort((left, right) => left.distance - right.distance).slice(0, 40);
-        this.results.set(places);
-        for (const place of places) {
-          const label = document.createElement('span');
-          label.textContent = this.placeName(place);
-          if (this.markers) {
-            circleMarker([place.lat, place.lon], { radius: 8, color: '#fff', weight: 2, fillColor: '#2563eb', fillOpacity: 1 })
-              .bindTooltip(label).addTo(this.markers);
-          }
-        }
-      },
-      error: () => this.error.set('No se pudieron cargar los servicios de OpenStreetMap. Vuelve a intentarlo.'),
-    });
+    this.search = this.nearbyPlaces.load(this.map.getCenter())
+      .pipe(finalize(() => this.loading.set(false))).subscribe({
+        next: (places) => {
+          this.places = places;
+          this.renderPlaces();
+        },
+        error: () => this.error.set('No se pudieron cargar los servicios de OpenStreetMap. Vuelve a intentarlo.'),
+      });
+  }
+
+  private renderPlaces(): void {
+    const places = this.places.filter((place) => place.category === this.selected().tag).slice(0, 40);
+    this.markers?.clearLayers();
+    this.results.set(places);
+    for (const place of places) {
+      const label = document.createElement('span');
+      label.textContent = this.placeName(place);
+      if (this.markers) {
+        circleMarker([place.lat, place.lon], { radius: 8, color: '#fff', weight: 2, fillColor: '#2563eb', fillOpacity: 1 })
+          .bindTooltip(label).addTo(this.markers);
+      }
+    }
   }
 
   placeName(place: NearbyPlace): string {
