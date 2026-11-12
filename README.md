@@ -29,7 +29,8 @@ Al reiniciar la API, los datos se conservan y es necesario iniciar sesión de nu
 
 La opción **Abrir demostración con datos de ejemplo** permite explorar las
 pantallas anteriores. La prueba con cuenta propia abarca el perfil y el registro
-manual de trayectos. Los demás módulos se muestran en la demostración. Las
+manual de trayectos. El menú también permite abrir los otros módulos con datos
+de ejemplo. Las
 preferencias de privacidad se guardan como valores y la prueba local no activa
 GPS, cifrado del historial ni avisos externos. La integración con Spring Boot
 y MySQL queda pendiente.

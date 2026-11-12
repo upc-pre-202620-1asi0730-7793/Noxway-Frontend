@@ -39,26 +39,31 @@ const portalRoutes: Routes = [
   { path: 'my-journeys', component: LocalJourneys, title: 'Noxway - Mi trayecto' },
   {
     path: 'map',
+    data: { preview: true },
     component: MapView,
     title: `${baseTitle} - Servicios Cercanos`,
   },
   {
     path: 'community',
+    data: { preview: true },
     component: Community,
     title: `${baseTitle} - Comunidad`,
   },
   {
     path: 'wellness',
+    data: { preview: true },
     component: Wellness,
     title: `${baseTitle} - Bitácora de Descanso`,
   },
   {
     path: 'benefits',
+    data: { preview: true },
     component: Benefits,
     title: `${baseTitle} - Beneficios Colectivos`,
   },
   {
     path: 'trusted-contacts',
+    data: { preview: true },
     component: TrustedContacts,
     title: `${baseTitle} - Contactos de Confianza`,
   },
@@ -117,7 +122,9 @@ export const routes: Routes = [
     canActivateChild: [requireSession],
     children: portalRoutes.map((route) => ({
       ...route,
-      canActivate: ['dashboard', 'profile', 'my-journeys'].includes(route.path ?? '') ? [] : [requireDemo],
+      canActivate: route.data?.['preview'] || ['dashboard', 'profile', 'my-journeys'].includes(route.path ?? '')
+        ? []
+        : [requireDemo],
     })),
   },
   {

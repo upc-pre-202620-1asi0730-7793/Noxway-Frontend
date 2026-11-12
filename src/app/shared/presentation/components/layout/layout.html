@@ -224,6 +224,11 @@
 
     <main class="content">
       <div class="content-wrapper">
+        @if (showsPreview()) {
+          <p class="module-preview">
+            Módulo de demostración. Usa datos de ejemplo y simula acciones como avisos e invitaciones.
+          </p>
+        }
         <router-outlet/>
       </div>
     </main>

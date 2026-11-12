@@ -53,6 +53,12 @@ export class Layout implements OnInit, OnDestroy {
     return this.currentUrlSignal().startsWith('/companion');
   });
 
+  readonly showsPreview = computed(() => {
+    this.currentUrlSignal();
+    const page = this.router.routerState.snapshot.root.firstChild?.firstChild;
+    return !this.session.demo() && page?.data['preview'] === true;
+  });
+
   private readonly workerNavDefinitions: NavOption[] = [
     { link: '/dashboard', labelKey: 'nav.dashboard', icon: 'circle' },
     {
@@ -96,16 +102,12 @@ export class Layout implements OnInit, OnDestroy {
   readonly workerOptions = computed(() => {
     // Trigger reactivity on current language signal
     this.languageService.currentLang();
-    const options = this.session.demo()
-      ? this.workerNavDefinitions
-      : [
-          this.workerNavDefinitions[0],
-          { link: '/my-journeys', labelKey: 'nav.journey' },
-          { link: '/profile', labelKey: 'nav.profile' },
-        ];
-    return options.map((opt) => ({
-      ...opt,
-      label: this.languageService.translate(opt.labelKey),
+    const demo = this.session.demo();
+    return this.workerNavDefinitions.map((option) => ({
+      ...option,
+      link: !demo && option.link === '/journey' ? '/my-journeys' : option.link,
+      badge: demo ? option.badge : undefined,
+      label: this.languageService.translate(option.labelKey),
     }));
   });
 
