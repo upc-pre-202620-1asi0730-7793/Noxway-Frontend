@@ -19,6 +19,10 @@
   background: #10192b;
 }
 
+.panel > img {
+  justify-self: center;
+}
+
 h1, p { margin: 0; }
 h1 { font-size: 1.55rem; }
 p, small { color: #cbd5e1; }
