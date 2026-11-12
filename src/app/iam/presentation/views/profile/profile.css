@@ -126,7 +126,8 @@
 }
 
 mat-checkbox {
-  color: #cbd5e1;
+  --mat-checkbox-label-text-color: #dbeafe;
+  color: #dbeafe;
   font-size: 13.5px;
 }
 
@@ -217,3 +218,5 @@ mat-checkbox {
   background: #10b981;
   box-shadow: 0 0 8px #10b981;
 }
+
+.form-error { color: #fda4af; }
