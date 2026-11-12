@@ -45,6 +45,13 @@ describe('Noxway access', () => {
     const labels = harness.routeNativeElement?.querySelectorAll('mat-checkbox');
     expect(labels?.length).toBe(3);
     expect(labels?.[0].textContent).toContain('Compartir GPS');
+    await harness.navigateByUrl('/map');
+    const records = http.expectOne('http://127.0.0.1:3000/me/records/services');
+    expect(records.request.headers.get('Authorization')).toBe('Bearer test-token');
+    records.flush([]);
+    harness.detectChanges();
+    expect(harness.routeNativeElement?.textContent).toContain('Aún no has registrado servicios');
+    expect(harness.routeNativeElement?.textContent).not.toContain('Primax');
     http.verify();
   });
 });
