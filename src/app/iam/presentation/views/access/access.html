@@ -1,8 +1,9 @@
 <main class="access">
-  <section class="panel">
+  <section class="panel" [class.register-panel]="registering">
     <img src="LogoNovctiva.png" alt="Noxway" width="64" height="64" />
     <h1>{{ registering ? t('Crea tu cuenta de Noxway') : t('Inicia sesión en Noxway') }}</h1>
-    <p>{{ t('Prueba local para entrevistas. Usa una contraseña exclusiva para esta prueba.') }}</p>
+    <p class="access-intro">{{ t('Tu red de seguridad de día y de noche') }}</p>
+    <div class="account-type">{{ t('Trabajador') }}</div>
 
     <form #form="ngForm" (ngSubmit)="submit(form)">
       @if (registering) {
@@ -14,6 +15,9 @@
         <input name="email" type="email" [(ngModel)]="email" required email maxlength="254" autocomplete="email" />
       </label>
       @if (registering) {
+        <label>{{ t('Teléfono móvil (opcional)') }}
+          <input name="phone" type="tel" [(ngModel)]="phone" maxlength="32" autocomplete="tel" />
+        </label>
         <label>{{ t('Tipo de turno') }}
           <select name="shiftType" [(ngModel)]="shiftType" required>
             <option value="" disabled>{{ t('Selecciona tu turno') }}</option>
@@ -37,8 +41,5 @@
     </form>
 
     <a [routerLink]="registering ? '/login' : '/register'">{{ registering ? t('Ya tengo cuenta') : t('Crear una cuenta') }}</a>
-    @if (!registering) {
-      <button class="demo" type="button" [disabled]="busy()" (click)="enterDemo()">{{ t('Abrir demostración con datos de ejemplo') }}</button>
-    }
   </section>
 </main>

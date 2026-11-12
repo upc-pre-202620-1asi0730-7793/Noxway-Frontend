@@ -10,6 +10,7 @@ interface Credentials {
 
 interface Registration extends Credentials {
   fullName: string;
+  phone?: string;
   shiftType: NonNullable<UserProfile['shiftType']>;
 }
 
@@ -20,7 +21,7 @@ const sessionKey = 'noxway_local_session';
 export class SessionService {
   private readonly http = inject(HttpClient);
   private token = sessionStorage.getItem(sessionKey);
-  private readonly demoMode = signal(sessionStorage.getItem('noxway_demo') === 'true');
+  private readonly demoMode = signal(false);
   private readonly currentProfile = signal<UserProfile | null>(null);
 
   readonly demo = this.demoMode.asReadonly();
@@ -39,12 +40,6 @@ export class SessionService {
         this.currentProfile.set(profile);
       }),
     );
-  }
-
-  enterDemo(): void {
-    this.logout();
-    this.demoMode.set(true);
-    sessionStorage.setItem('noxway_demo', 'true');
   }
 
   restore(): Observable<boolean> {

@@ -42,7 +42,7 @@ server.post('/auth/register', (req, res) => {
     id, email: address, salt, passwordHash,
     profile: {
       id, fullName: name, email: address, avatar: initials(name), shiftType,
-      role: 'Trabajador', phone: '', schedule: '', transport: '', district: '',
+      role: 'Trabajador', phone: clean(req.body?.phone, 32), schedule: '', transport: '', district: '',
       privacyGpsActiveOnly: true, privacyEncryptedHistory: false, privacyAnonymousRatings: false,
       memberSince: 'Cuenta local de prueba',
     },
@@ -97,6 +97,17 @@ server.patch('/me/profile', (req, res) => {
   }
   res.locals.account.assign({ profile: updated }).write();
   return res.json(updated);
+});
+
+server.get('/me/dashboard', (_req, res) => {
+  const { journeys = [], records = {} } = res.locals.account.value();
+  return res.json({
+    completedTrips: journeys.filter((trip) => trip.finishedAt).length,
+    activeTrip: journeys.find((trip) => !trip.finishedAt) ?? null,
+    contactCount: (records.contacts ?? []).length,
+    lastRest: records.wellness?.[0]?.details?.split(' · ')[0] ?? null,
+    noticeCount: (records.community?.length ?? 0) + (records.services?.length ?? 0),
+  });
 });
 
 server.get('/me/journeys', (_req, res) => {

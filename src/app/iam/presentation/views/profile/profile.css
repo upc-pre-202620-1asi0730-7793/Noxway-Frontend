@@ -220,3 +220,6 @@ mat-checkbox {
 }
 
 .form-error { color: #fda4af; }
+
+.profile-card, .aside-card { background: #1d2738 !important; }
+.session-section { margin: 12px 0 4px; border-top: 1px solid #334155; padding-top: 12px; color: #dbeafe; font-weight: 600; }

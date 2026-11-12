@@ -8,7 +8,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { UserProfile } from '../../../domain/model/user-profile.entity';
-import { UserProfileService } from '../../../infrastructure/user-profile.service';
 
 @Component({
   selector: 'app-profile',
@@ -18,7 +17,6 @@ import { UserProfileService } from '../../../infrastructure/user-profile.service
 })
 export class Profile implements OnInit {
   readonly t = inject(LanguageService).ui;
-  private readonly profileService = inject(UserProfileService);
 
   readonly session = inject(SessionService);
   private readonly router = inject(Router);
@@ -30,13 +28,7 @@ export class Profile implements OnInit {
 
   ngOnInit(): void {
     const profile = this.session.profile();
-    if (profile) {
-      this.profile.set({ ...profile });
-      return;
-    }
-    this.profileService.getProfile().subscribe((data) => {
-      this.profile.set({ ...data });
-    });
+    if (profile) this.profile.set({ ...profile });
   }
 
   onSave(): void {
@@ -44,16 +36,6 @@ export class Profile implements OnInit {
     if (!profile) return;
     this.status.set('');
     this.error.set('');
-    if (this.session.demo()) {
-      try {
-        this.profileService.saveProfile(profile);
-        this.status.set('Cambios guardados en la demostración.');
-      } catch {
-        this.error.set('No fue posible guardar los cambios en este navegador.');
-      }
-      return;
-    }
-
     this.saving.set(true);
     this.session.saveProfile(profile).subscribe({
       next: (updated) => {

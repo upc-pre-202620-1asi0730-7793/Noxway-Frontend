@@ -22,6 +22,7 @@ export class Access {
 
   fullName = '';
   email = '';
+  phone = '';
   password = '';
   shiftType: NonNullable<UserProfile['shiftType']> | '' = '';
 
@@ -31,7 +32,7 @@ export class Access {
     this.busy.set(true);
     const credentials = { email: this.email, password: this.password };
     const request: Observable<unknown> = this.registering
-      ? this.session.register({ ...credentials, fullName: this.fullName, shiftType: this.shiftType as NonNullable<UserProfile['shiftType']> })
+      ? this.session.register({ ...credentials, fullName: this.fullName, phone: this.phone, shiftType: this.shiftType as NonNullable<UserProfile['shiftType']> })
       : this.session.login(credentials);
     request.pipe(finalize(() => this.busy.set(false))).subscribe({
       next: () => {
@@ -45,8 +46,4 @@ export class Access {
     });
   }
 
-  enterDemo(): void {
-    this.session.enterDemo();
-    void this.router.navigate(['/dashboard']);
-  }
 }

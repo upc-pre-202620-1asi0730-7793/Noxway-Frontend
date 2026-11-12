@@ -27,10 +27,9 @@ El servidor temporal escucha en el puerto 3000. Guarda las cuentas, los trayecto
 en `server/accounts.local.json`, que se crea al arrancar y se excluye de Git.
 Al reiniciar la API, los datos se conservan y es necesario iniciar sesión de nuevo.
 
-La opción **Abrir demostración con datos de ejemplo** permite explorar las
-pantallas de demostración. Las cuentas registradas empiezan con listas vacías.
-Cada cuenta puede guardar trayectos, avisos privados,
-descansos y contactos. Los planes empiezan sin suscripción activa.
+Las cuentas registradas empiezan con listas vacías. El dashboard resume los
+trayectos, los descansos, los contactos y los avisos de cada cuenta.
+Los planes empiezan sin suscripción activa.
 
 La prueba local guarda las preferencias de privacidad. La integración con
 Spring Boot y MySQL, la publicación comunitaria, los envíos
