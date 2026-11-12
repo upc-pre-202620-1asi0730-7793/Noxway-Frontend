@@ -1,0 +1,14 @@
+textarea {
+  font: inherit;
+  color: #f8fafc;
+  background: #0b1323;
+  border: 1px solid #4b6082;
+  border-radius: 8px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.record-details {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

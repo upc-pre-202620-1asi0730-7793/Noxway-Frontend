@@ -1,0 +1,38 @@
+@if (module; as page) {
+  <section class="panel">
+    <h1>{{ page.title }}</h1>
+    <p>{{ page.note }}</p>
+
+    @if (records(); as entries) {
+      @for (record of entries; track record.id) {
+        <article>
+          <strong>{{ record.title }}</strong>
+          <p class="record-details">{{ record.details }}</p>
+        </article>
+      } @empty {
+        <p>{{ page.empty }}</p>
+      }
+
+      <form #form="ngForm" (ngSubmit)="save(form)">
+        <label>{{ page.titleLabel }}
+          <input name="title" [(ngModel)]="title" required maxlength="150" />
+        </label>
+        <label>{{ page.detailsLabel }}
+          <textarea name="details" [(ngModel)]="details" required maxlength="500" rows="3"></textarea>
+        </label>
+        <button type="submit" [disabled]="form.invalid || busy()">{{ page.action }}</button>
+      </form>
+    } @else if (busy()) {
+      <p role="status">Cargando tus datos…</p>
+    } @else {
+      <button type="button" (click)="load()">Volver a cargar</button>
+    }
+
+    @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+  </section>
+} @else {
+  <section class="panel">
+    <h1>Beneficios & Planes</h1>
+    <p>Tu cuenta aún no tiene un plan activo. La contratación estará disponible cuando se conecte el servicio de suscripciones.</p>
+  </section>
+}
