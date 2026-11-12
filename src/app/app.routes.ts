@@ -35,12 +35,12 @@ export const routes: Routes = [
   {
     path: 'map',
     component: MapView,
-    title: `${baseTitle} - Mapa Comunitario 24h`,
+    title: `${baseTitle} - Servicios Cercanos`,
   },
   {
     path: 'community',
     component: Community,
-    title: `${baseTitle} - Comunidad Nocturna`,
+    title: `${baseTitle} - Comunidad`,
   },
   {
     path: 'wellness',

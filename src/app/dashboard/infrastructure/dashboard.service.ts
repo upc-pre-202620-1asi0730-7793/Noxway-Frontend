@@ -5,7 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 /**
- * Represents aggregated dashboard statistics and active shift summary for the nocturnal worker.
+ * Represents aggregated dashboard statistics and active shift summary for the shift worker.
  */
 export interface DashboardData {
   /** Record unique identifier */

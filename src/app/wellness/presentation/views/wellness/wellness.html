@@ -5,13 +5,13 @@
     <div class="banner-content">
       <span class="health-badge">
         <mat-icon class="badge-icon">bedtime</mat-icon>
-        <span>SALUD DEL SUEÑO DIURNO</span>
+        <span>SALUD DEL SUEÑO EN CADA TURNO</span>
       </span>
 
-      <h1 class="banner-title">Bitácora de Descanso & Hábitos Nocturnos</h1>
+      <h1 class="banner-title">Bitácora de Descanso & Hábitos</h1>
 
       <p class="banner-desc">
-        Registra tus horas diurnas para detectar déficit acumulado y optimizar tus reflejos en turno.
+        Registra tu descanso de día o noche y revisa tus hábitos según tu turno.
       </p>
     </div>
 
@@ -30,7 +30,7 @@
     <mat-card class="stat-card">
       <div class="stat-body">
         <strong class="stat-value">{{ summary()?.lastRestDuration }}</strong>
-        <span class="stat-title">Último Descanso Diurno</span>
+        <span class="stat-title">Último Descanso</span>
         <small class="stat-sub green-text">{{ summary()?.lastRestSchedule }}</small>
       </div>
     </mat-card>
@@ -70,8 +70,8 @@
       <!-- Weekly Chart Card -->
       <mat-card class="chart-card">
         <div class="chart-header">
-          <h2 class="chart-title">Historial Semanal de Descanso Diurno</h2>
-          <p class="chart-subtitle">Comparativa de horas descansadas de día vs. umbral saludable (7.5h)</p>
+          <h2 class="chart-title">Historial Semanal de Descanso</h2>
+          <p class="chart-subtitle">Comparativa de horas descansadas vs. umbral saludable (7.5h)</p>
         </div>
 
         <div class="chart-visual-wrapper">

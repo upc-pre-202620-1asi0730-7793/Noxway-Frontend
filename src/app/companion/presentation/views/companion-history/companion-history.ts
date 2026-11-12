@@ -57,7 +57,7 @@ export class CompanionHistory implements OnInit {
   }
 
   onDownloadPdf(): void {
-    alert('Generando y descargando Reporte Oficial de Auditoría Nocturna (PDF)...');
+    alert('Generando y descargando Reporte de Trayectos (PDF)...');
   }
 
   onViewDetail(record: CompanionHistoryRecord): void {

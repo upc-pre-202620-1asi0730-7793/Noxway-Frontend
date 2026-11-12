@@ -21,7 +21,7 @@ const DEFAULT_SUBSCRIPTION: UserSubscription = {
   benefits: [
     {
       id: 1,
-      name: 'Grifos Primax & Repsol Nocturnos',
+      name: 'Grifos Primax & Repsol',
       subtitle: 'S/. 1.50 menos por galón entre 10:00 PM y 06:00 AM',
       description:
         'Aplica en todas las estaciones de Lima Metropolitana mostrando tu credencial digital.',
@@ -32,9 +32,9 @@ const DEFAULT_SUBSCRIPTION: UserSubscription = {
     },
     {
       id: 2,
-      name: 'Boticas Inkafarma & Mifarma 24h',
+      name: 'Boticas Inkafarma & Mifarma',
       subtitle: '15% de descuento en botiquín y vitaminas',
-      description: 'Descuento en bebidas rehidratantes y suplementos para el turno noche.',
+      description: 'Descuentos en productos de bienestar para tu jornada laboral.',
       code: 'BOTICAS-NOX',
       codeLabel: 'Convenio',
       icon: 'medication',
@@ -52,8 +52,8 @@ const DEFAULT_SUBSCRIPTION: UserSubscription = {
     },
     {
       id: 4,
-      name: 'Asesoría Legal Laboral Nocturna',
-      subtitle: 'Consultas sin costo sobre sobretasa nocturna (35%)',
+      name: 'Asesoría Legal Laboral',
+      subtitle: 'Consultas sobre turnos y derechos laborales',
       description: 'Atención remota 24 horas sobre derechos y compensaciones laborales.',
       code: 'Canal WhatsApp Jurídico',
       codeLabel: 'Canal',

@@ -1,7 +1,7 @@
-﻿import { BaseEntity } from '../../../shared/domain/model/base-entity';
+import { BaseEntity } from '../../../shared/domain/model/base-entity';
 
 /**
- * Represents a discrete waypoint or geographic checkpoint along the nocturnal commute.
+ * Represents a discrete waypoint or geographic checkpoint along the commute.
  */
 export interface CommuteCheckpoint {
   /** Checkpoint numerical identifier */
@@ -29,7 +29,7 @@ export interface TelemetryPing {
 }
 
 /**
- * Aggregate root representing the worker's active nocturnal journey and safety monitoring state.
+ * Aggregate root representing the worker's active journey and safety monitoring state.
  */
 export interface Commute extends BaseEntity {
   /** Journey status text (e.g. 'TRAYECTO EN CURSO · ACOMPAÑAMIENTO ACTIVO') */

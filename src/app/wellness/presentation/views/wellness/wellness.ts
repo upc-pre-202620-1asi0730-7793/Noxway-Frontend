@@ -1,3 +1,4 @@
+import { restPeriod } from '../../../domain/model/rest-period';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,31 +34,38 @@ export class Wellness implements OnInit {
   }
 
   onRegisterRest(): void {
-    const hours = prompt('Horas descansadas (ej. 7.5):');
-    if (!hours) return;
-    const schedule =
-      prompt('Horario de descanso (ej. 08:00 AM - 03:30 PM):') || '08:00 AM - 03:30 PM';
-    const notes =
-      prompt('Condiciones de descanso (ruido, luz, etc.):') || 'Descanso con antifaz y tapones';
+    const startText = prompt('Fecha y hora de inicio del descanso (AAAA-MM-DDTHH:mm):');
+    if (!startText) return;
+    const endText = prompt('Fecha y hora de fin (AAAA-MM-DDTHH:mm; usa el día siguiente si cruza medianoche):');
+    if (!endText) return;
+    const period = restPeriod(startText, endText);
+    if (!period) {
+      alert('Introduce fechas válidas: el fin debe ser posterior al inicio y el descanso no debe superar 24 horas.');
+      return;
+    }
+    const { start, minutes } = period;
+    const duration = `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+    const schedule = `${startText.replace('T', ' ')} → ${endText.replace('T', ' ')}`;
+    const notes = prompt('Condiciones de descanso (ruido, luz, etc.):') || 'Sin observaciones';
 
     const current = this.summary();
     if (!current) return;
 
     const newLog: SleepLogRecord = {
       id: Date.now(),
-      date: 'Hoy',
+      date: start.toLocaleDateString('es-PE'),
       schedule: schedule,
       notes: notes,
-      duration: `${hours}h`,
+      duration: duration,
     };
 
     this.summary.set({
       ...current,
-      lastRestDuration: `${hours}h`,
+      lastRestDuration: duration,
       lastRestSchedule: schedule,
       recentLogs: [newLog, ...current.recentLogs],
     });
 
-    alert('Descanso registrado exitosamente. Se ha actualizado el cálculo de déficit circadiano.');
+    alert('Descanso registrado en la vista actual.');
   }
 }

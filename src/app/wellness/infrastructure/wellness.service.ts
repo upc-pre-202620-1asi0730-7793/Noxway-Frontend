@@ -47,29 +47,29 @@ const DEFAULT_WELLNESS: WellnessSummary = {
     {
       id: 1,
       icon: 'visibility_off',
-      title: 'Bloqueo de Luz Matutina',
+      title: 'Control de Luz al Descansar',
       description:
-        'Usa lentes oscuros al salir del turno a las 06:00 AM para no suprimir la melatonina antes de dormir.',
+        'Adapta la luz de tu habitación al horario de descanso, tanto de día como de noche.',
     },
     {
       id: 2,
       icon: 'coffee',
       title: 'Corte Límite de Cafeína',
       description:
-        'Corta el café a partir de las 03:00 AM. La cafeína tarda hasta 6 horas en metabolizarse en el organismo.',
+        'Revisa tu consumo de cafeína antes de dormir, según tu horario de descanso.',
     },
     {
       id: 3,
       icon: 'headphones',
-      title: 'Aislamiento Acústico Diurno',
+      title: 'Ambiente de Descanso',
       description:
-        'El tráfico diurno de Lima entre 10AM y 1PM fragmenta el descanso. Usa tapones reductores de 32dB.',
+        'Reduce el ruido y las interrupciones durante tu descanso, sin importar el horario de tu jornada.',
     },
   ],
 };
 
 /**
- * Service managing nocturnal sleep tracking, fatigue assessment, and circadian wellness suggestions.
+ * Service managing sleep tracking, fatigue assessment, and circadian wellness suggestions.
  */
 @Injectable({
   providedIn: 'root',
@@ -79,7 +79,7 @@ export class WellnessService {
   private readonly baseUrl = `${environment.apiUrl}/wellness`;
 
   /**
-   * Retrieves the aggregate wellness summary for the nocturnal worker.
+   * Retrieves the aggregate wellness summary for the shift worker.
    */
   getWellnessSummary(): Observable<WellnessSummary> {
     return this.http.get<WellnessSummary[]>(this.baseUrl).pipe(

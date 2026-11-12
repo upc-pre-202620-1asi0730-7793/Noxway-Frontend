@@ -1,4 +1,4 @@
-﻿import { inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -36,7 +36,7 @@ const DEFAULT_CONTACTS: TrustedContact[] = [
 ];
 
 /**
- * Service managing trusted family and companion linkages for nocturnal monitoring.
+ * Service managing trusted family and companion linkages for commute monitoring.
  */
 @Injectable({
   providedIn: 'root',

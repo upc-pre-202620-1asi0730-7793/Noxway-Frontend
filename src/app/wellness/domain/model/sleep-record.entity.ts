@@ -15,7 +15,7 @@ export interface SleepDailyMetric {
 }
 
 /**
- * Detailed daily sleep log item recorded by the nocturnal worker.
+ * Detailed daily sleep log item recorded by the shift worker.
  */
 export interface SleepLogRecord {
   /** Record numerical ID */

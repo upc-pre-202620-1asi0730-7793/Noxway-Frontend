@@ -1,4 +1,4 @@
-﻿<section class="profile-container">
+<section class="profile-container">
 
   @if (profile(); as p) {
     <div class="profile-main-grid">
@@ -47,11 +47,19 @@
           </div>
 
           <div class="form-group">
+            <label class="form-label" for="shift-type">TIPO DE TURNO</label>
+            <select id="shift-type" class="form-input" [(ngModel)]="p.shiftType">
+              <option [ngValue]="undefined" disabled>Selecciona tu turno</option>
+              <option value="day">Diurno</option>
+              <option value="night">Nocturno</option>
+              <option value="rotating">Rotativo</option>
+            </select>
             <label class="form-label">HORARIO HABITUAL DE TURNO</label>
             <input
               type="text"
               class="form-input"
               [(ngModel)]="p.schedule" />
+            <small>Indica inicio y fin; usa +1 día si termina después de medianoche.</small>
           </div>
 
           <div class="form-group">

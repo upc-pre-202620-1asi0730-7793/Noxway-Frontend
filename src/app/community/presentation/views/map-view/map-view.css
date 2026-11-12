@@ -459,3 +459,8 @@
     height: auto;
   }
 }
+
+.availability-filters { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin:0 0 16px; padding:12px; background:var(--surface-color, #111827); border-radius:8px; }
+.availability-filters select, .availability-filters input { padding:8px; background:#0b132b; color:#fff; border:1px solid #475569; border-radius:6px; }
+.availability-filters small { color:#94a3b8; }
+.service-hours { color:#94a3b8; font-size:13px; }

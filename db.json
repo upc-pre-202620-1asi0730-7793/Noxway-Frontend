@@ -39,12 +39,32 @@
       "routeRating": 5,
       "routeFeedback": "Vía rápida y con presencia de serenazgo en puentes.",
       "checkpoints": [
-        { "id": 1, "time": "02:30 AM", "label": "Salida de Planta", "completed": true },
-        { "id": 2, "time": "02:45 AM", "label": "En Tránsito (Av. Colonial)", "completed": true },
-        { "id": 3, "time": "03:05 AM", "label": "Llegada", "completed": false, "estimated": true }
+        {
+          "id": 1,
+          "time": "02:30 AM",
+          "label": "Salida de Planta",
+          "completed": true
+        },
+        {
+          "id": 2,
+          "time": "02:45 AM",
+          "label": "En Tránsito (Av. Colonial)",
+          "completed": true
+        },
+        {
+          "id": 3,
+          "time": "03:05 AM",
+          "label": "Llegada",
+          "completed": false,
+          "estimated": true
+        }
       ],
       "telemetry": [
-        { "timestamp": "02:30:12", "message": "Check-in iniciado en Los Olivos.", "type": "info" },
+        {
+          "timestamp": "02:30:12",
+          "message": "Check-in iniciado en Los Olivos.",
+          "type": "info"
+        },
         {
           "timestamp": "02:30:14",
           "message": "Notificación enviada a Rosa Elena (+51 987654321).",
@@ -86,16 +106,23 @@
       "lat": -11.992,
       "lng": -77.072,
       "icon": "medication",
-      "tag": "Inkafarma 24h"
+      "tag": "Inkafarma 24h",
+      "timeZone": "America/Lima",
+      "openingHours": [
+        {
+          "opens": "00:00",
+          "closes": "24:00"
+        }
+      ]
     },
     {
       "id": 2,
       "type": "gas_station",
-      "typeLabel": "GRIFO 24H",
+      "typeLabel": "GRIFO",
       "name": "Grifo Primax - Av. Mayolo / Universitaria",
       "distance": "A 1.2 km de tu posición actual · Los Olivos",
       "communityTrust": "95% Confiable",
-      "validatedBy": "Validado por 32 repartidores nocturnos.",
+      "validatedBy": "Validado por 32 repartidores.",
       "safetyMeasures": [
         "Guardia de seguridad 24h",
         "Buena iluminación en pista y surtidores",
@@ -105,7 +132,14 @@
       "lat": -11.995,
       "lng": -77.075,
       "icon": "local_gas_station",
-      "tag": "Primax 24h"
+      "tag": "Primax",
+      "timeZone": "America/Lima",
+      "openingHours": [
+        {
+          "opens": "06:00",
+          "closes": "23:00"
+        }
+      ]
     },
     {
       "id": 3,
@@ -114,7 +148,7 @@
       "name": "Tramo Oscuro - Cruce Av. Perú con Dueñas",
       "distance": "A 3.4 km en tu ruta · San Martín de Porres",
       "communityTrust": "Alerta Activa",
-      "validatedBy": "Reportado por 19 trabajadores nocturnos.",
+      "validatedBy": "Reportado por 19 trabajadores.",
       "safetyMeasures": [
         "Tres postes de luz apagados",
         "Poca visibilidad nocturna",
@@ -130,7 +164,7 @@
     {
       "id": 1,
       "authorName": "Marcos Huamán",
-      "authorRole": "Repartidor Nocturno",
+      "authorRole": "Repartidor",
       "avatar": "MH",
       "timeAgo": "Hace 24 min",
       "location": "Los Olivos (Av. Antúnez de Mayolo)",
@@ -170,13 +204,42 @@
       "perceivedQuality": "82%",
       "perceivedQualityRating": "4/5 promedio",
       "weeklyHistory": [
-        { "day": "Lun", "hours": 7.2, "status": "good" },
-        { "day": "Mar", "hours": 6.0, "status": "warning" },
-        { "day": "Mié", "hours": 7.5, "status": "good" },
-        { "day": "Jue", "hours": 5.5, "status": "danger" },
-        { "day": "Vie", "hours": 7.0, "status": "good" },
-        { "day": "Sáb", "hours": 6.8, "status": "good" },
-        { "day": "Dom", "hours": 6.75, "status": "today", "isToday": true }
+        {
+          "day": "Lun",
+          "hours": 7.2,
+          "status": "good"
+        },
+        {
+          "day": "Mar",
+          "hours": 6.0,
+          "status": "warning"
+        },
+        {
+          "day": "Mié",
+          "hours": 7.5,
+          "status": "good"
+        },
+        {
+          "day": "Jue",
+          "hours": 5.5,
+          "status": "danger"
+        },
+        {
+          "day": "Vie",
+          "hours": 7.0,
+          "status": "good"
+        },
+        {
+          "day": "Sáb",
+          "hours": 6.8,
+          "status": "good"
+        },
+        {
+          "day": "Dom",
+          "hours": 6.75,
+          "status": "today",
+          "isToday": true
+        }
       ],
       "recentLogs": [
         {
@@ -198,20 +261,20 @@
         {
           "id": 1,
           "icon": "visibility_off",
-          "title": "Bloqueo de Luz Matutina",
-          "description": "Usa lentes oscuros al salir del turno a las 06:00 AM para no suprimir la melatonina antes de dormir."
+          "title": "Control de Luz al Descansar",
+          "description": "Adapta la luz de tu habitación al horario de descanso, tanto de día como de noche."
         },
         {
           "id": 2,
           "icon": "coffee",
           "title": "Corte Límite de Cafeína",
-          "description": "Corta el café a partir de las 03:00 AM. La cafeína tarda hasta 6 horas en metabolizarse en el organismo."
+          "description": "Revisa tu consumo de cafeína antes de dormir, según tu horario de descanso."
         },
         {
           "id": 3,
           "icon": "headphones",
-          "title": "Aislamiento Acústico Diurno",
-          "description": "El tráfico diurno de Lima entre 10AM y 1PM fragmenta el descanso. Usa tapones reductores de 32dB."
+          "title": "Ambiente de Descanso",
+          "description": "Reduce el ruido y las interrupciones durante tu descanso, sin importar el horario de tu jornada."
         }
       ]
     }
@@ -229,7 +292,7 @@
       "benefits": [
         {
           "id": 1,
-          "name": "Grifos Primax & Repsol Nocturnos",
+          "name": "Grifos Primax & Repsol",
           "subtitle": "S/. 1.50 menos por galón entre 10:00 PM y 06:00 AM",
           "description": "Aplica en todas las estaciones de Lima Metropolitana mostrando tu credencial digital.",
           "code": "NX-GAS2026",
@@ -239,9 +302,9 @@
         },
         {
           "id": 2,
-          "name": "Boticas Inkafarma & Mifarma 24h",
+          "name": "Boticas Inkafarma & Mifarma",
           "subtitle": "15% de descuento en botiquín y vitaminas",
-          "description": "Descuento en bebidas rehidratantes y suplementos para el turno noche.",
+          "description": "Descuentos en productos de bienestar para tu jornada laboral.",
           "code": "BOTICAS-NOX",
           "codeLabel": "Convenio",
           "icon": "medication",
@@ -259,8 +322,8 @@
         },
         {
           "id": 4,
-          "name": "Asesoría Legal Laboral Nocturna",
-          "subtitle": "Consultas sin costo sobre sobretasa nocturna (35%)",
+          "name": "Asesoría Legal Laboral",
+          "subtitle": "Consultas sobre turnos y derechos laborales",
           "description": "Atención remota 24 horas sobre derechos y compensaciones laborales.",
           "code": "Canal WhatsApp Jurídico",
           "codeLabel": "Canal",
@@ -306,14 +369,15 @@
       "avatar": "JL",
       "phone": "+51 987 654 321",
       "email": "jorge.huaman@vigilancia.pe",
-      "schedule": "22:00 a 06:00 (Lunes a Sábado)",
+      "schedule": "22:00 a 06:00 (+1 día) · Lunes a Sábado",
       "transport": "Moto Lineal (Personal)",
       "district": "Cercado de Lima",
       "privacyGpsActiveOnly": true,
       "privacyEncryptedHistory": true,
       "privacyAnonymousRatings": true,
       "passwordUpdated": "Contraseña actualizada hace 20 días.",
-      "activeSessions": "1 dispositivo conectado (Lima, PE)"
+      "activeSessions": "1 dispositivo conectado (Lima, PE)",
+      "shiftType": "night"
     }
   ],
   "companionLive": [
@@ -324,7 +388,7 @@
       "workerDni": "44.298.104",
       "workerAge": "38 años",
       "employer": "Securitas Perú (Vigilante)",
-      "shift": "Noche 19:00 a 07:00",
+      "shift": "Nocturno · 19:00 a 07:00 (+1 día)",
       "vehicle": "Moto Honda CB190R",
       "plate": "4521-7B (Roja/Negra)",
       "origin": "Urb. Mercurio (Los Olivos)",
@@ -457,7 +521,7 @@
       },
       {
         "id": 2,
-        "title": "Inicio de trayecto nocturno confirmado",
+        "title": "Inicio de trayecto confirmado",
         "time": "02:22 AM (Hace 24 min)",
         "description": "Jorge inició trayecto desde Urb. Mercurio (Los Olivos) hacia San Isidro en su moto Honda CB190R.",
         "type": "play",
@@ -550,7 +614,7 @@
       {
         "id": "securitas",
         "code": "Securitas Perú",
-        "name": "Supervisor de Guardia Nocturna",
+        "name": "Supervisor de Guardia",
         "action": "Llamar Base +51 998",
         "number": "+51998000111"
       }
@@ -561,8 +625,8 @@
       "id": 1,
       "name": "Carlos Paredes Morales",
       "relation": "(tu hermano)",
-      "message": "te ha invitado a ser su contacto protector para sus rutas nocturnas de delivery.",
-      "category": "Repartidor Nocturno (San Martín de Porres -> Miraflores)",
+      "message": "te ha invitado a ser su contacto protector para sus trayectos de delivery.",
+      "category": "Repartidor (San Martín de Porres -> Miraflores)",
       "schedule": "20:00 a 04:00 AM",
       "status": "PENDIENTE DE CONFIRMACIÓN"
     },
@@ -573,7 +637,7 @@
         "name": "Jorge Luis Huamán Quispe",
         "badge": "VÍNCULO ACTIVO",
         "relation": "Esposo",
-        "role": "Vigilante Nocturno en Securitas Perú",
+        "role": "Vigilante de Seguridad en Securitas Perú",
         "linkedSince": "15 Ago 2026",
         "gpsRealTime": true,
         "stopAlarm": true,
@@ -590,7 +654,7 @@
       {
         "step": "02",
         "title": "Tú Aceptas el Vínculo",
-        "desc1": "Para proteger la privacidad de ambos, la visibilidad de ubicación solo se activa cuando inicia un trayecto nocturno.",
+        "desc1": "Para proteger la privacidad de ambos, la visibilidad de ubicación solo se activa cuando inicia un trayecto activo.",
         "desc2": "Puedes revocar o pausar el acompañamiento en cualquier momento."
       },
       {
@@ -614,10 +678,10 @@
     "phoneValidation": "Validado con código de seguridad OTP",
     "email": "rosaelena.paredes@correo.pe",
     "address": "Urb. Mercurio Mz. C Lt. 14, Los Olivos",
-    "surveillanceStart": "22:00 PM",
+    "surveillanceStart": "22:00",
     "surveillanceEnd": "07:30 AM",
     "autoRestTitle": "Modo Resguardo Automático",
-    "autoRestDesc": "Cuando Jorge marca llegada a casa por la mañana, el sistema entra en modo reposo para que puedas descansar en calma y sin avisos innecesarios.",
+    "autoRestDesc": "Cuando Jorge confirma su llegada, de día o noche, se pausa el seguimiento de ese trayecto y sus avisos.",
     "encryptionTitle": "Cifrado de Extremo a Extremo",
     "encryptionDesc": "Tus datos de contacto y la ubicación GPS de Jorge solo son visibles entre ustedes dos y las centrales de auxilio distrital autorizadas."
   }
