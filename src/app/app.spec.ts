@@ -47,7 +47,6 @@ describe('Noxway access', () => {
     expect(labels?.length).toBe(3);
     expect(labels?.[0].textContent).toContain('Compartir GPS');
     for (const [route, section, empty] of [
-      ['/map', 'services', 'Aún no has registrado servicios'],
       ['/community', 'community', 'Aún no has creado ningún aviso'],
       ['/wellness', 'wellness', 'Aún no has registrado descansos'],
       ['/trusted-contacts', 'contacts', 'Aún no has agregado contactos'],
@@ -61,6 +60,19 @@ describe('Noxway access', () => {
       expect(harness.routeNativeElement?.querySelector('form')).toBeTruthy();
       expect(harness.routeNativeElement?.textContent).not.toContain('Primax');
     }
+
+    await harness.navigateByUrl('/map');
+    const overpass = 'https://overpass.private.coffee/api/interpreter';
+    http.expectOne((request) => request.url === overpass && request.params.get('data')?.includes('amenity=pharmacy') === true)
+      .flush({ elements: [] });
+    harness.detectChanges();
+    const supermarket = Array.from(harness.routeNativeElement?.querySelectorAll('button') ?? [])
+      .find((button) => button.textContent.includes('Supermercados'));
+    expect(supermarket).toBeTruthy();
+    supermarket?.click();
+    http.expectOne((request) => request.url === overpass && request.params.get('data')?.includes('shop=supermarket') === true)
+      .flush({ elements: [] });
+    expect(harness.routeNativeElement?.textContent).not.toContain('Reportar lugar');
 
     await harness.navigateByUrl('/benefits');
     expect(harness.routeNativeElement?.textContent).toContain('Sin plan activo');

@@ -42,7 +42,7 @@ const portalRoutes: Routes = [
   { path: 'my-journeys', component: LocalJourneys, title: 'Noxway - Mi trayecto' },
   {
     path: 'map',
-    data: { section: 'services' },
+    data: { nearbyServices: true },
     component: MapView,
     title: `${baseTitle} - Servicios Cercanos`,
   },
@@ -124,6 +124,17 @@ export const routes: Routes = [
     component: Layout,
     canActivateChild: [requireSession],
     children: portalRoutes.flatMap((route) => {
+      if (route.data?.['nearbyServices']) {
+        return [
+          { ...route, canMatch: [() => inject(SessionService).demo()] },
+          {
+            path: route.path,
+            title: route.title,
+            loadComponent: () => import('./community/presentation/views/nearby-services/nearby-services')
+              .then((module) => module.NearbyServices),
+          },
+        ];
+      }
       if (route.data?.['section']) {
         return [
           { ...route, canMatch: [() => inject(SessionService).demo()] },

@@ -136,4 +136,18 @@ export const accountTranslations: Readonly<Record<string, string>> = {
   "Indica el origen y el destino.": "Enter the origin and destination.",
   "Completa ambos campos.": "Complete both fields.",
   "El nombre y el tipo de turno son obligatorios.": "Name and shift type are required."
+,
+  "Servicios Cercanos": "Nearby Services",
+  "Farmacias": "Pharmacies",
+  "Supermercados": "Supermarkets",
+  "Grifos": "Gas stations",
+  "Encuentra establecimientos de OpenStreetMap a 3 km del centro del mapa.": "Find places from OpenStreetMap within 3 km of the map center.",
+  "Buscar en esta zona": "Search this area",
+  "Usar mi ubicación": "Use my location",
+  "Mapa de servicios cercanos": "Map of nearby services",
+  "Buscando establecimientos…": "Finding nearby places…",
+  "No se encontraron establecimientos de esta categoría en la zona.": "No places in this category were found in this area.",
+  "No se pudieron cargar los servicios de OpenStreetMap. Vuelve a intentarlo.": "Could not load places from OpenStreetMap. Try again.",
+  "No se pudo obtener tu ubicación. Mueve el mapa y busca en esa zona.": "Could not get your location. Move the map and search that area.",
+  "Establecimiento sin nombre": "Unnamed place"
 };

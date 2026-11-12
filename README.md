@@ -29,7 +29,7 @@ Al reiniciar la API, los datos se conservan y es necesario iniciar sesión de nu
 
 La opción **Abrir demostración con datos de ejemplo** permite explorar las
 pantallas de demostración. Las cuentas registradas empiezan con listas vacías.
-Cada cuenta puede guardar trayectos, reportes de lugares, avisos privados,
+Cada cuenta puede guardar trayectos, avisos privados,
 descansos y contactos. Los planes empiezan sin suscripción activa.
 
 La prueba local guarda las preferencias de privacidad. La integración con
@@ -37,8 +37,10 @@ Spring Boot y MySQL, la publicación comunitaria, los envíos
 de invitaciones, el cifrado del historial y la contratación de planes están
 pendientes.
 
-Servicios Cercanos incluye un mapa de Lima de OpenStreetMap que requiere
-conexión a Internet. Los reportes privados permanecen en la cuenta local.
+Servicios Cercanos consulta OpenStreetMap mediante Overpass y requiere conexión
+a Internet. Puedes filtrar farmacias, supermercados y grifos en la zona visible.
+Los avisos se crean en Comunidad, que también muestra los reportes privados
+guardados antes desde Servicios Cercanos.
 
 ## Code scaffolding
 
