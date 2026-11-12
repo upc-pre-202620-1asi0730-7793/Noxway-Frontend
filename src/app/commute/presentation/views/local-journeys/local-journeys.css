@@ -1,17 +1,7 @@
-:host { display: grid; gap: 20px; }
-
-.panel {
-  padding: 24px;
-  border: 1px solid #253552;
-  border-radius: 12px;
-  background: #10192b;
-}
-
-h1, h2 { margin: 0; }
+h2, h3 { margin: 0; }
 p { color: #cbd5e1; }
-
-form, label { display: grid; gap: 8px; }
-form { gap: 16px; max-width: 480px; }
+form, label { display: grid; gap: 8px; min-width: 0; }
+form { gap: 16px; }
 input, button {
   font: inherit;
   color: #f8fafc;
@@ -20,29 +10,51 @@ input, button {
   border-radius: 8px;
   background: #0b1323;
 }
-button {
-  justify-self: start;
-  background: #1d4ed8;
-  cursor: pointer;
-}
+button { justify-self: start; background: #1d4ed8; cursor: pointer; }
 button:disabled { opacity: .65; cursor: default; }
-article { padding-top: 12px; border-top: 1px solid #253552; }
+article { padding-top: 12px; border-top: 1px solid #344156; }
 .error { color: #fda4af; }
 
-.commute-status-header { align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-.local-fields, .local-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-form { max-width: none; }
-label { min-width: 0; }
-.metric-box { overflow-wrap: anywhere; }
-.checkpoints-row { justify-content: flex-start; gap: 28px; flex-wrap: wrap; }
-.checkpoint-item { display: flex; flex-direction: row; gap: 10px; text-align: left; }
-.checkpoint-item p { margin: 4px 0 0; }
-.journey-step { display: grid; place-items: center; border-radius: 50%; width: 38px; height: 38px; color: #34d399; background: #103133; }
-.journey-step.pending { color: #93c5fd; background: #162641; }
-@media (max-width: 600px) {
-  .local-fields, .local-metrics, .journey-details-grid { grid-template-columns: 1fr; }
+.journey-container { gap: 18px; }
+.active-commute-card, .panel-card {
+  background: #1d2738 !important;
+  border-color: #2d3a50 !important;
+  border-radius: 10px !important;
 }
-
-.active-commute-card, .panel-card { background: #1d2738; }
-.active-commute-card:has(.checkpoints-row) { border-color: #3b82f6; }
-.journey-progress { width: 100%; height: 8px; accent-color: #2563eb; margin: 0 0 14px; }
+.active-commute-card { padding: 20px !important; gap: 12px; }
+.active-commute-card.trip-in-progress { border-color: #3478ff !important; }
+.idle-status { border-color: #415779; color: #cbd5e1; background: #17243a; }
+.checkpoints-row { padding: 0; gap: 10px; flex-wrap: wrap; font-weight: 600; }
+.checkpoint-item.completed { color: #34d399; }
+.checkpoint-item.in-transit { color: #93c5fd; }
+.checkpoint-item.estimated { color: #a5b4cc; }
+.journey-progress { appearance: none; width: 100%; height: 7px; border: 0; border-radius: 10px; overflow: hidden; background: #0b1323; }
+.journey-progress::-webkit-progress-bar { background: #0b1323; }
+.journey-progress::-webkit-progress-value { background: #2563eb; }
+.journey-progress::-moz-progress-bar { background: #2563eb; }
+.metrics-grid { gap: 12px; }
+.metric-box { padding: 10px 14px; border-radius: 6px; }
+.metric-label, .field-label { color: #9aacbf; }
+.departure-value { color: #93c5fd; }
+.delay-value { color: #fbbf24; }
+.commute-actions-row { display: grid; grid-template-columns: 1.7fr 1fr 1fr; gap: 12px; margin: 0; }
+.commute-actions-row > * { width: 100%; box-sizing: border-box; justify-content: center; text-align: center; }
+.delay-btn { color: #fbbf24 !important; }
+.incident-btn { margin: 0; text-decoration: none; color: #fda4af !important; }
+.local-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.journey-details-grid { gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.field-value-box { overflow-wrap: anywhere; min-height: 20px; }
+.route-rating-box { margin-top: 4px; }
+.route-rating-box p { margin-bottom: 0; }
+.manual-badge { border-radius: 12px; padding: 4px 10px; color: #bfdbfe; background: #223a59; font-size: 11px; }
+.trip-log { flex: 1; min-height: 210px; margin: 0; padding: 16px; list-style: none; background: #090f1e; color: #b7c8df; border: 1px solid #334155; border-radius: 6px; font: .85rem/1.75 ui-monospace, monospace; }
+.departure-event { color: #34d399; }
+.privacy-note { border: 1px solid #315b93; background: #1d3150; color: #bfdbfe; border-radius: 6px; padding: 12px; }
+.privacy-note p { margin: 4px 0 0; }
+@media (max-width: 800px) {
+  .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .journey-details-grid, .commute-actions-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 500px) {
+  .local-fields, .two-fields-row { grid-template-columns: 1fr; }
+}

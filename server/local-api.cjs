@@ -133,6 +133,23 @@ server.post('/me/journeys', (req, res) => {
   return res.status(201).json(journey);
 });
 
+server.patch('/me/journeys/:id/delay', (req, res) => {
+  const account = res.locals.account;
+  const journeys = account.value().journeys ?? [];
+  const current = journeys.find((journey) => journey.id === req.params.id);
+  if (!current) return res.sendStatus(404);
+  if (current.finishedAt) return res.status(409).json({ message: 'El trayecto ya finalizó.' });
+
+  const delayed = {
+    ...current,
+    delays: [...(current.delays ?? []), { minutes: 10, reportedAt: new Date().toISOString() }],
+  };
+  account.assign({
+    journeys: journeys.map((journey) => journey.id === delayed.id ? delayed : journey),
+  }).write();
+  return res.json(delayed);
+});
+
 server.patch('/me/journeys/:id/finish', (req, res) => {
   const account = res.locals.account;
   const journeys = account.value().journeys ?? [];

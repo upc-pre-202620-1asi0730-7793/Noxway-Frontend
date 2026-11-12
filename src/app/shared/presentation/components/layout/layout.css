@@ -542,3 +542,5 @@
   max-width: 1560px;
   margin: 0 auto;
 }
+
+.content-wrapper.wide-journey { max-width: none; }
