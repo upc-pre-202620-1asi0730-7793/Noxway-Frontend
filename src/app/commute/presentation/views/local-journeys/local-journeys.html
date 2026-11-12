@@ -1,0 +1,41 @@
+<section class="panel">
+  <h1>Mi trayecto</h1>
+  <p>Registro local de salidas y llegadas. GPS y avisos externos están desactivados en esta prueba.</p>
+
+  @if (active(); as journey) {
+    <h2>Trayecto activo</h2>
+    <p>{{ journey.origin }} → {{ journey.destination }}</p>
+    <p>Salida {{ journey.startedAt | date:'short' }}</p>
+    <button type="button" [disabled]="busy()" (click)="finish(journey)">Confirmar llegada</button>
+  } @else if (journeys()) {
+    <form #form="ngForm" (ngSubmit)="start(form)">
+      <label>Origen
+        <input name="origin" [(ngModel)]="origin" required maxlength="150" />
+      </label>
+      <label>Destino
+        <input name="destination" [(ngModel)]="destination" required maxlength="150" />
+      </label>
+      <button type="submit" [disabled]="form.invalid || busy()">Iniciar trayecto</button>
+    </form>
+  } @else if (busy()) {
+    <p role="status">Cargando tus trayectos…</p>
+  } @else {
+    <button type="button" (click)="load()">Volver a cargar</button>
+  }
+
+  @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+</section>
+
+@if (journeys()) {
+  <section class="panel">
+    <h2>Historial de trayectos</h2>
+    @for (journey of history(); track journey.id) {
+      <article>
+        <strong>{{ journey.origin }} → {{ journey.destination }}</strong>
+        <p>Salida {{ journey.startedAt | date:'short' }} · Llegada {{ journey.finishedAt | date:'short' }}</p>
+      </article>
+    } @empty {
+      <p>Aún no has finalizado ningún trayecto.</p>
+    }
+  </section>
+}
