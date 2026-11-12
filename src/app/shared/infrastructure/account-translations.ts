@@ -157,5 +157,18 @@ export const accountTranslations: Readonly<Record<string, string>> = {
   "Ver ubicación del aviso": "View notice location",
   "Lugar del aviso": "Notice location",
   "Haz clic en el mapa para marcar dónde ocurrió.": "Click the map to mark where it happened.",
-  "Marca el lugar del aviso en el mapa.": "Mark the notice location on the map."
+  "Marca el lugar del aviso en el mapa.": "Mark the notice location on the map.",
+  "Filtrar por distrito": "Filter by district",
+  "Todos los Distritos": "All districts",
+  "Publicar aviso": "Publish notice",
+  "Aún no hay avisos en este distrito.": "There are no notices in this district yet.",
+  "Código de la Comunidad": "Community guidelines",
+  "Describe el hecho con precisión.": "Describe what happened accurately.",
+  "Evita incluir datos privados.": "Avoid including private information.",
+  "Verifica el punto antes de guardar.": "Check the location before saving.",
+  "Mis aportes": "My contributions",
+  "Avisos guardados en esta cuenta": "Notices saved to this account",
+  "Cerrar": "Close",
+  "El aviso se guardará en tu cuenta local.": "The notice will be saved to your local account.",
+  "Distrito (opcional)": "District (optional)"
 };

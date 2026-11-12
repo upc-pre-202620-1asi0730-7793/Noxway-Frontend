@@ -57,7 +57,18 @@ describe('Noxway access', () => {
       records.flush([]);
       harness.detectChanges();
       expect(harness.routeNativeElement?.textContent).toContain(empty);
-      expect(harness.routeNativeElement?.querySelector('form')).toBeTruthy();
+      if (section === 'community') {
+        expect(harness.routeNativeElement?.textContent).toContain('Publicar aviso');
+        expect(harness.routeNativeElement?.textContent).toContain('Código de la Comunidad');
+        const dialog = harness.routeNativeElement?.querySelector('dialog');
+        expect(dialog).toBeTruthy();
+        dialog!.showModal = () => dialog!.setAttribute('open', '');
+        harness.routeNativeElement?.querySelector<HTMLButtonElement>('.publish-btn')?.click();
+        harness.detectChanges();
+        expect(dialog?.querySelector('app-report-location')).toBeTruthy();
+      } else {
+        expect(harness.routeNativeElement?.querySelector('form')).toBeTruthy();
+      }
       expect(harness.routeNativeElement?.textContent).not.toContain('Primax');
     }
 

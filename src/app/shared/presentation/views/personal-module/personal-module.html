@@ -1,4 +1,78 @@
-@if (module; as page) {
+@if (section === 'community') {
+  <section class="community-container account-community">
+    <div class="community-top-bar">
+      <nav class="district-filters" [attr.aria-label]="t('Filtrar por distrito')">
+        <button type="button" class="filter-pill" [class.active]="!selectedDistrict()"
+          [attr.aria-pressed]="!selectedDistrict()" (click)="selectedDistrict.set('')">{{ t('Todos los Distritos') }}</button>
+        @for (district of districts(); track district) {
+          <button type="button" class="filter-pill" [class.active]="selectedDistrict() === district"
+            [attr.aria-pressed]="selectedDistrict() === district" (click)="selectedDistrict.set(district)">{{ district }}</button>
+        }
+      </nav>
+      <button type="button" class="publish-btn" [disabled]="!records() || busy()" (click)="openComposer()">
+        <mat-icon class="btn-icon">add</mat-icon>{{ t('Publicar aviso') }}
+      </button>
+    </div>
+
+    <div class="community-main-grid">
+      <section class="feed-column" [attr.aria-label]="t('Mis avisos')">
+        @if (records()) {
+          @for (record of visibleNotices(); track record.id) {
+            <article class="post-card" [class.danger-border]="record.details.startsWith('Aviso de seguridad · ')">
+              <div class="post-header">
+                <span class="author-avatar">{{ session.profile()?.fullName?.charAt(0) }}</span>
+                <div class="author-info">
+                  <strong class="author-name">{{ session.profile()?.fullName }}</strong>
+                  @if (record.district) { <span class="post-meta">{{ record.district }}</span> }
+                </div>
+              </div>
+              <h2 class="post-title">{{ record.title }}</h2>
+              <p class="post-content record-details">{{ record.details }}</p>
+              @if (record.location; as point) {
+                <a class="report-map-link" [href]="reportMapUrl(point)" target="_blank" rel="noopener noreferrer">
+                  {{ t('Ver ubicación del aviso') }}
+                </a>
+              }
+            </article>
+          } @empty {
+            <div class="post-card">
+              <h2 class="post-title">{{ t('Mis avisos') }}</h2>
+              <p>{{ t(selectedDistrict() ? 'Aún no hay avisos en este distrito.' : 'Aún no has creado ningún aviso.') }}</p>
+            </div>
+          }
+        } @else if (busy()) {
+          <p role="status">{{ t('Cargando tus datos…') }}</p>
+        } @else {
+          <p role="alert">{{ t(error()) }}</p>
+          <button type="button" (click)="load()">{{ t('Volver a cargar') }}</button>
+        }
+      </section>
+      <aside class="community-aside">
+        <section class="aside-card">
+          <h2 class="aside-heading">{{ t('Código de la Comunidad') }}</h2>
+          <div class="code-item"><mat-icon class="code-mat-icon blue-icon">verified</mat-icon><p>{{ t('Describe el hecho con precisión.') }}</p></div>
+          <div class="code-item"><mat-icon class="code-mat-icon amber-icon">lock</mat-icon><p>{{ t('Evita incluir datos privados.') }}</p></div>
+          <div class="code-item"><mat-icon class="code-mat-icon green-icon">location_on</mat-icon><p>{{ t('Verifica el punto antes de guardar.') }}</p></div>
+        </section>
+        <section class="aside-card">
+          <h2 class="aside-heading">{{ t('Mis aportes') }}</h2>
+          <p>{{ records()?.length ?? 0 }} · {{ t('Avisos guardados en esta cuenta') }}</p>
+        </section>
+      </aside>
+    </div>
+
+    <dialog #composer class="notice-dialog" aria-labelledby="notice-dialog-title" (close)="composing.set(false)">
+      <header>
+        <h2 id="notice-dialog-title">{{ t('Crear aviso') }}</h2>
+        <button type="button" (click)="closeComposer()">{{ t('Cerrar') }}</button>
+      </header>
+      <p>{{ t('El aviso se guardará en tu cuenta local.') }}</p>
+      @if (composing() && module; as page) {
+        <ng-container [ngTemplateOutlet]="entryForm" [ngTemplateOutletContext]="{ $implicit: page }" />
+      }
+    </dialog>
+  </section>
+} @else if (module; as page) {
   <header class="module-hero">
     <span class="module-icon"><mat-icon>{{ page.icon }}</mat-icon></span>
     <div><h1>{{ t(page.title) }}</h1><p>{{ t(page.note) }}</p></div>
@@ -34,6 +108,28 @@
 
     <section class="module-card">
       <h2>{{ t(page.formTitle) }}</h2>
+      <ng-container [ngTemplateOutlet]="entryForm" [ngTemplateOutletContext]="{ $implicit: page }" />
+    </section>
+  </div>
+} @else {
+  <header class="module-hero">
+    <span class="module-icon"><mat-icon>workspace_premium</mat-icon></span>
+    <div><h1>{{ t('Beneficios & Planes') }}</h1><p>{{ t('Consulta tu membresía y tus convenios.') }}</p></div>
+  </header>
+  <div class="module-grid">
+    <section class="module-card">
+      <h2>{{ t('Mi membresía') }}</h2>
+      <p class="membership-status">{{ t('Sin plan activo') }}</p>
+      <p>{{ t('La contratación estará disponible cuando se conecte el servicio de suscripciones.') }}</p>
+    </section>
+    <section class="module-card">
+      <h2>{{ t('Mis beneficios') }}</h2>
+      <div class="empty-state"><mat-icon>redeem</mat-icon><p>{{ t('Aún no tienes beneficios asociados a tu cuenta.') }}</p></div>
+    </section>
+  </div>
+}
+
+<ng-template #entryForm let-page>
       <form #form="ngForm" (ngSubmit)="save(form)">
         @if (section === 'wellness') {
           <label>{{ t('Inicio del descanso') }}<input type="datetime-local" name="start" [(ngModel)]="start" required /></label>
@@ -54,6 +150,7 @@
           <label>{{ t(page.detailsLabel) }}<textarea name="details" [(ngModel)]="details" required maxlength="450" rows="3"></textarea></label>
         }
         @if (section === 'community') {
+          <label>{{ t('Distrito (opcional)') }}<input name="district" [(ngModel)]="district" maxlength="80" /></label>
           <fieldset class="report-location">
             <legend>{{ t('Lugar del aviso') }}</legend>
             <p>{{ t('Haz clic en el mapa para marcar dónde ocurrió.') }}</p>
@@ -63,22 +160,4 @@
         <button type="submit" [disabled]="form.invalid || busy() || !records() || (section === 'community' && !location())">{{ t(page.action) }}</button>
       </form>
       @if (records() && error()) { <p class="error" role="alert">{{ t(error()) }}</p> }
-    </section>
-  </div>
-} @else {
-  <header class="module-hero">
-    <span class="module-icon"><mat-icon>workspace_premium</mat-icon></span>
-    <div><h1>{{ t('Beneficios & Planes') }}</h1><p>{{ t('Consulta tu membresía y tus convenios.') }}</p></div>
-  </header>
-  <div class="module-grid">
-    <section class="module-card">
-      <h2>{{ t('Mi membresía') }}</h2>
-      <p class="membership-status">{{ t('Sin plan activo') }}</p>
-      <p>{{ t('La contratación estará disponible cuando se conecte el servicio de suscripciones.') }}</p>
-    </section>
-    <section class="module-card">
-      <h2>{{ t('Mis beneficios') }}</h2>
-      <div class="empty-state"><mat-icon>redeem</mat-icon><p>{{ t('Aún no tienes beneficios asociados a tu cuenta.') }}</p></div>
-    </section>
-  </div>
-}
+</ng-template>

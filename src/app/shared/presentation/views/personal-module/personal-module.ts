@@ -1,7 +1,8 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ReportLocation, type ReportCoordinates } from './report-location';
 import { LanguageService } from '../../../infrastructure/language.service';
 import { HttpClient } from '@angular/common/http';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { restPeriod } from '../../../../wellness/domain/model/rest-period';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -14,6 +15,7 @@ interface PersonalRecord {
   title: string;
   details: string;
   location?: ReportCoordinates;
+  district?: string;
 }
 
 const sections = {
@@ -53,14 +55,14 @@ const sections = {
 };
 
 @Component({
-  imports: [FormsModule, MatIconModule, ReportLocation],
+  imports: [FormsModule, MatIconModule, NgTemplateOutlet, ReportLocation],
   templateUrl: './personal-module.html',
-  styleUrl: './personal-module.css',
+  styleUrls: ['../../../../community/presentation/views/community/community.css', './personal-module.css'],
 })
 export class PersonalModule implements OnInit {
   readonly t = inject(LanguageService).ui;
   private readonly http = inject(HttpClient);
-  private readonly session = inject(SessionService);
+  readonly session = inject(SessionService);
   private readonly router = inject(Router);
   readonly section = inject(ActivatedRoute).snapshot.data['section'] as keyof typeof sections | 'benefits';
   private readonly endpoint = `${localApi}/me/records/${this.section}`;
@@ -70,9 +72,18 @@ export class PersonalModule implements OnInit {
   readonly busy = signal(false);
   readonly error = signal('');
   readonly location = signal<ReportCoordinates | null>(null);
+  private readonly composer = viewChild<ElementRef<HTMLDialogElement>>('composer');
+  readonly composing = signal(false);
+  readonly selectedDistrict = signal('');
+  readonly districts = computed(() => [...new Set((this.records() ?? []).flatMap(({ district }) => district ? [district] : []))]);
+  readonly visibleNotices = computed(() => {
+    const district = this.selectedDistrict();
+    return (this.records() ?? []).filter((record) => !district || record.district === district);
+  });
 
   title = '';
   category = '';
+  district = '';
   start = '';
   end = '';
   details = '';
@@ -88,8 +99,8 @@ export class PersonalModule implements OnInit {
 
   save(form: NgForm): void {
     if (this.busy() || form.invalid) return;
-    let title = this.title.trim();
-    let details = this.details.trim();
+    let title = (this.title ?? '').trim();
+    let details = (this.details ?? '').trim();
 
     if (this.section === 'wellness') {
       const rest = restPeriod(this.start, this.end);
@@ -108,12 +119,27 @@ export class PersonalModule implements OnInit {
     if (!title || !details || (this.section === 'community' && !location)) return;
 
     this.run(this.http.post<PersonalRecord>(this.endpoint, {
-      title, details, ...(location && { location }),
+      title, details, ...(location && { location, district: this.district }),
     }, this.session.requestOptions()), (record) => {
       this.records.update((records) => [record, ...(records ?? [])]);
       form.resetForm();
       this.location.set(null);
+      if (this.section === 'community') {
+        this.selectedDistrict.set('');
+        this.closeComposer();
+      }
     });
+  }
+
+  openComposer(): void {
+    this.error.set('');
+    this.composing.set(true);
+    this.composer()?.nativeElement.showModal();
+  }
+
+  closeComposer(): void {
+    this.composer()?.nativeElement.close();
+    this.composing.set(false);
   }
 
   reportMapUrl({ lat, lon }: ReportCoordinates): string {

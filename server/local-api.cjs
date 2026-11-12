@@ -172,6 +172,8 @@ server.post('/me/records/:section', (req, res) => {
       return res.status(400).json({ message: 'Marca el lugar del aviso en el mapa.' });
     }
     record.location = { lat, lon };
+    const district = clean(req.body?.district, 80);
+    if (district) record.district = district;
   }
   account.assign({ records: { ...records, [section]: [record, ...(records[section] ?? [])] } }).write();
   return res.status(201).json(record);
