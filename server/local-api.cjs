@@ -17,6 +17,7 @@ const sessionDuration = 8 * 60 * 60 * 1000;
 
 server.use(jsonServer.defaults());
 server.use(jsonServer.bodyParser);
+server.use(jsonServer.rewriter({ '/api/local/*': '/$1' }));
 
 const clean = (value, limit = 150) => typeof value === 'string' ? value.trim().slice(0, limit) : '';
 const normalizeEmail = (email) => clean(email, 254).toLowerCase();

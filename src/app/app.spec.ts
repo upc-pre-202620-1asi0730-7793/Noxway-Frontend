@@ -29,7 +29,7 @@ describe('Noxway access', () => {
     const session = TestBed.inject(SessionService);
     const http = TestBed.inject(HttpTestingController);
     const login = firstValueFrom(session.login({ email: 'qa@example.com', password: 'Prueba123!' }));
-    http.expectOne('http://127.0.0.1:3000/auth/login').flush({
+    http.expectOne('/api/local/auth/login').flush({
       token: 'test-token',
       profile: {
         id: 1, fullName: 'QA Entrevista', avatar: 'QE', email: 'qa@example.com',
@@ -52,7 +52,7 @@ describe('Noxway access', () => {
       ['/trusted-contacts', 'contacts', 'Aún no has agregado contactos'],
     ]) {
       await harness.navigateByUrl(route);
-      const records = http.expectOne(`http://127.0.0.1:3000/me/records/${section}`);
+      const records = http.expectOne(`/api/local/me/records/${section}`);
       expect(records.request.headers.get('Authorization')).toBe('Bearer test-token');
       records.flush([]);
       harness.detectChanges();

@@ -13,7 +13,7 @@ interface Registration extends Credentials {
   shiftType: NonNullable<UserProfile['shiftType']>;
 }
 
-export const localApi = 'http://127.0.0.1:3000';
+export const localApi = '/api/local';
 const sessionKey = 'noxway_local_session';
 
 @Injectable({ providedIn: 'root' })
