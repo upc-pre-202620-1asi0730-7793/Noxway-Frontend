@@ -135,6 +135,33 @@ server.patch('/me/journeys/:id/finish', (req, res) => {
   return res.json(finished);
 });
 
+const personalSections = new Set(['services', 'community', 'wellness', 'contacts']);
+
+server.param('section', (req, res, next, section) => {
+  return personalSections.has(section) ? next() : res.sendStatus(404);
+});
+
+server.get('/me/records/:section', (req, res) => {
+  const records = res.locals.account.value().records ?? {};
+  return res.json(records[req.params.section] ?? []);
+});
+
+server.post('/me/records/:section', (req, res) => {
+  const section = req.params.section;
+  const account = res.locals.account;
+  const records = account.value().records ?? {};
+  const title = clean(req.body?.title);
+  const details = clean(req.body?.details, 500);
+
+  if (!title || !details) {
+    return res.status(400).json({ message: 'Completa ambos campos.' });
+  }
+
+  const record = { id: randomBytes(12).toString('hex'), title, details };
+  account.assign({ records: { ...records, [section]: [record, ...(records[section] ?? [])] } }).write();
+  return res.status(201).json(record);
+});
+
 server.post('/me/logout', (_req, res) => {
   sessions.delete(res.locals.token);
   return res.status(204).end();
