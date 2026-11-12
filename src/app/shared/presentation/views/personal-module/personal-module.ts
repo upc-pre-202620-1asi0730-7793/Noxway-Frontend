@@ -83,6 +83,25 @@ export class PersonalModule implements OnInit {
     return (this.records() ?? []).filter((record) => !district || record.district === district);
   });
 
+  readonly benefitCategories = [
+    { icon: 'local_gas_station', label: 'Combustible', color: 'blue' },
+    { icon: 'local_pharmacy', label: 'Farmacias', color: 'green' },
+    { icon: 'health_and_safety', label: 'Seguros', color: 'red' },
+    { icon: 'balance', label: 'Asesoría legal', color: 'violet' },
+  ];
+  readonly locatedNoticeCount = computed(() => (this.records() ?? []).filter((record) => record.location).length);
+  private readonly noticeCategories = ['Aviso de seguridad', 'Reporte de local', 'Recomendación', 'Consulta'];
+
+  noticeCategory(details: string): string {
+    const prefix = details.split(' · ', 1)[0];
+    return this.noticeCategories.includes(prefix) ? prefix : '';
+  }
+
+  noticeDescription(details: string): string {
+    const category = this.noticeCategory(details);
+    return category ? details.slice(category.length + 3) : details;
+  }
+
   readonly restChart = computed(() => (this.records() ?? []).slice(0, 7).reverse().flatMap((record) => {
     const duration = /^(\d+) h (\d+) min/.exec(record.details);
     if (!duration) return [];
@@ -96,6 +115,10 @@ export class PersonalModule implements OnInit {
     const minutes = Math.round(entries.reduce((total, entry) => total + entry.minutes, 0) / entries.length);
     return `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
   });
+
+  readonly longestRest = computed(() =>
+    this.restChart().reduce<{ minutes: number; label: string } | null>(
+      (longest, entry) => !longest || entry.minutes > longest.minutes ? entry : longest, null)?.label ?? '—');
 
   title = '';
   category = '';

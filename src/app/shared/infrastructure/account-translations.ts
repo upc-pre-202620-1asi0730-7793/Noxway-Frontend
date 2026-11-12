@@ -225,5 +225,19 @@ export const accountTranslations: Readonly<Record<string, string>> = {
   "El contacto aún no está vinculado a otra cuenta.": "This contact is not linked to another account yet.",
   "Relación (opcional)": "Relationship (optional)",
   "Contactar": "Contact",
-  "Reporte de local": "Place report"
+  "Reporte de local": "Place report",
+  "Avisos con ubicación": "Notices with a location",
+  "Salud del sueño en cada turno": "Sleep health for every shift",
+  "Descanso más largo de los últimos registros": "Longest recent rest",
+  "Registros de descanso recientes": "Recent rest entries",
+  "Horario de descanso": "Rest schedule",
+  "Luz y ruido": "Light and noise",
+  "Cafeína": "Caffeine",
+  "Evita la cafeína cerca de tu hora de descanso.": "Avoid caffeine close to your rest time.",
+  "Combustible": "Fuel",
+  "Seguros": "Insurance",
+  "Asesoría legal": "Legal advice",
+  "Sin convenios disponibles para tu cuenta.": "No offers are available for your account.",
+  "Invita a un compañero de turno": "Invite a coworker",
+  "Tu código": "Your code"
 };
