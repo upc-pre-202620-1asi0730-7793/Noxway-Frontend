@@ -1,12 +1,171 @@
-/* Global Noxway styles and shared dark-theme component utilities */
+/* Global Noxway styles and shared Day/Night theme component utilities */
+
+:root {
+  color-scheme: dark;
+  --nx-bg: #060b17;
+  --nx-surface: #0d1527;
+  --nx-surface-elevated: #111c34;
+  --nx-surface-subtle: #0a1120;
+  --nx-surface-inset: #081020;
+  --nx-surface-hover: #1c2a47;
+  --nx-surface-hover-soft: #16223b;
+  --nx-border: #1c2a47;
+  --nx-border-strong: #263656;
+  --nx-border-subtle: rgba(28, 42, 71, 0.35);
+  --nx-text: #f8fafc;
+  --nx-text-body: #e2e8f0;
+  --nx-text-secondary: #cbd5e1;
+  --nx-text-muted: #94a3b8;
+  --nx-text-faint: #64748b;
+  --nx-icon-muted: #94a3b8;
+  --nx-nav-track: #475569;
+  --nx-primary: #2563eb;
+  --nx-primary-hover: #1d4ed8;
+  --nx-primary-focus: #3b82f6;
+  --nx-primary-soft-bg: rgba(37, 99, 235, 0.14);
+  --nx-primary-soft-border: rgba(59, 130, 246, 0.45);
+  --nx-primary-soft-text: #93c5fd;
+  --nx-avatar-worker-bg: #172554;
+  --nx-avatar-worker-text: #93c5fd;
+  --nx-role-worker-bg: #1e3a8a;
+  --nx-role-worker-text: #bfdbfe;
+  --nx-emerald-solid: #059669;
+  --nx-emerald-hover: #047857;
+  --nx-emerald-dot: #10b981;
+  --nx-emerald-soft-bg: rgba(16, 185, 129, 0.14);
+  --nx-emerald-soft-border: rgba(16, 185, 129, 0.45);
+  --nx-emerald-soft-text: #34d399;
+  --nx-companion-card-bg: #0b1222;
+  --nx-companion-badge-bg: #064e3b;
+  --nx-companion-badge-border: #059669;
+  --nx-companion-badge-text: #a7f3d0;
+  --nx-amber-soft-bg: rgba(245, 158, 11, 0.14);
+  --nx-amber-soft-border: rgba(245, 158, 11, 0.45);
+  --nx-amber-soft-text: #fbbf24;
+  --nx-danger-solid: #dc2626;
+  --nx-danger-hover: #b91c1c;
+  --nx-danger-vivid: #ef4444;
+  --nx-danger-soft-bg: rgba(239, 68, 68, 0.14);
+  --nx-danger-soft-border: rgba(239, 68, 68, 0.45);
+  --nx-danger-soft-text: #f87171;
+  --nx-error-text: #fecaca;
+  --nx-slate-soft-bg: rgba(148, 163, 184, 0.12);
+  --nx-slate-soft-border: rgba(148, 163, 184, 0.35);
+  --nx-slate-soft-text: #cbd5e1;
+  --nx-banner-bg: rgba(37, 99, 235, 0.1);
+  --nx-banner-border: rgba(59, 130, 246, 0.35);
+  --nx-banner-text: #dbeafe;
+  --nx-toast-success-bg: #064e3b;
+  --nx-toast-success-text: #ecfdf5;
+  --nx-toast-error-bg: #7f1d1d;
+  --nx-toast-error-text: #fef2f2;
+  --nx-toast-info-bg: #111c34;
+  --nx-toast-info-text: #e2e8f0;
+  --nx-shadow-card: none;
+  --nx-shadow-shell: none;
+  --nx-shadow-control: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --nx-radar-glow: rgba(37, 99, 235, 0.14);
+  --nx-bar-gradient: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  --nx-pin-bg: #1e293b;
+  --nx-pin-text: #e2e8f0;
+  --nx-pin-border: #475569;
+  --nx-pin-pharmacy-text: #a7f3d0;
+  --nx-pin-gas-bg: rgba(245, 158, 11, 0.18);
+  --nx-pin-gas-text: #fde68a;
+  --nx-pin-risk-bg: rgba(239, 68, 68, 0.22);
+  --nx-pin-risk-text: #fecaca;
+  --nx-theme-toggle-bg: rgba(99, 102, 241, 0.14);
+  --nx-theme-toggle-border: rgba(129, 140, 248, 0.35);
+  --nx-theme-toggle-text: #fde68a;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --nx-bg: #f1f5f9;
+  --nx-surface: #ffffff;
+  --nx-surface-elevated: #f8fafc;
+  --nx-surface-subtle: #f8fafc;
+  --nx-surface-inset: #f1f5f9;
+  --nx-surface-hover: #e2e8f0;
+  --nx-surface-hover-soft: #e2e8f0;
+  --nx-border: #dbe4ee;
+  --nx-border-strong: #cbd5e1;
+  --nx-border-subtle: rgba(148, 163, 184, 0.28);
+  --nx-text: #0f172a;
+  --nx-text-body: #1e293b;
+  --nx-text-secondary: #334155;
+  --nx-text-muted: #475569;
+  --nx-text-faint: #64748b;
+  --nx-icon-muted: #475569;
+  --nx-nav-track: #94a3b8;
+  --nx-primary: #2563eb;
+  --nx-primary-hover: #1d4ed8;
+  --nx-primary-focus: #2563eb;
+  --nx-primary-soft-bg: rgba(37, 99, 235, 0.08);
+  --nx-primary-soft-border: rgba(37, 99, 235, 0.28);
+  --nx-primary-soft-text: #1d4ed8;
+  --nx-avatar-worker-bg: #dbeafe;
+  --nx-avatar-worker-text: #1d4ed8;
+  --nx-role-worker-bg: #dbeafe;
+  --nx-role-worker-text: #1e40af;
+  --nx-emerald-solid: #059669;
+  --nx-emerald-hover: #047857;
+  --nx-emerald-dot: #10b981;
+  --nx-emerald-soft-bg: #ecfdf5;
+  --nx-emerald-soft-border: #a7f3d0;
+  --nx-emerald-soft-text: #047857;
+  --nx-companion-card-bg: #f0fdf4;
+  --nx-companion-badge-bg: #d1fae5;
+  --nx-companion-badge-border: #6ee7b7;
+  --nx-companion-badge-text: #065f46;
+  --nx-amber-soft-bg: #fffbeb;
+  --nx-amber-soft-border: #fcd34d;
+  --nx-amber-soft-text: #b45309;
+  --nx-danger-solid: #dc2626;
+  --nx-danger-hover: #b91c1c;
+  --nx-danger-vivid: #dc2626;
+  --nx-danger-soft-bg: #fef2f2;
+  --nx-danger-soft-border: #fca5a5;
+  --nx-danger-soft-text: #b91c1c;
+  --nx-error-text: #991b1b;
+  --nx-slate-soft-bg: #f1f5f9;
+  --nx-slate-soft-border: #cbd5e1;
+  --nx-slate-soft-text: #475569;
+  --nx-banner-bg: #eff6ff;
+  --nx-banner-border: #bfdbfe;
+  --nx-banner-text: #1e40af;
+  --nx-toast-success-bg: #ecfdf5;
+  --nx-toast-success-text: #065f46;
+  --nx-toast-error-bg: #fef2f2;
+  --nx-toast-error-text: #991b1b;
+  --nx-toast-info-bg: #eff6ff;
+  --nx-toast-info-text: #1e3a8a;
+  --nx-shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --nx-shadow-shell: 1px 0 8px rgba(15, 23, 42, 0.04);
+  --nx-shadow-control: 0 1px 3px rgba(15, 23, 42, 0.08);
+  --nx-radar-glow: rgba(37, 99, 235, 0.09);
+  --nx-bar-gradient: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  --nx-pin-bg: #ffffff;
+  --nx-pin-text: #1e293b;
+  --nx-pin-border: #cbd5e1;
+  --nx-pin-pharmacy-text: #047857;
+  --nx-pin-gas-bg: #fffbeb;
+  --nx-pin-gas-text: #b45309;
+  --nx-pin-risk-bg: #fef2f2;
+  --nx-pin-risk-text: #b91c1c;
+  --nx-theme-toggle-bg: #fffbeb;
+  --nx-theme-toggle-border: #fcd34d;
+  --nx-theme-toggle-text: #b45309;
+}
 
 html,
 body {
   margin: 0;
   padding: 0;
-  background: #060b17;
-  color: #e2e8f0;
+  background: var(--nx-bg);
+  color: var(--nx-text-body);
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: background-color 180ms ease, color 180ms ease;
 }
 
 * {
@@ -42,13 +201,13 @@ img[src="LogoNovctiva.png"] {
   margin: 0;
   font-size: 22px;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--nx-text);
 }
 
 .nx-subtitle {
   margin: 4px 0 0;
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--nx-text-muted);
 }
 
 .nx-grid {
@@ -75,13 +234,23 @@ img[src="LogoNovctiva.png"] {
 }
 
 .nx-card {
-  background: #0d1527;
-  border: 1px solid #1c2a47;
+  background: var(--nx-surface);
+  border: 1px solid var(--nx-border);
   border-radius: 14px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  box-shadow: var(--nx-shadow-card);
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.nx-card-inset {
+  background: var(--nx-surface-inset);
+}
+
+.nx-card-danger {
+  border-color: var(--nx-danger-vivid);
 }
 
 .nx-card-header {
@@ -95,7 +264,7 @@ img[src="LogoNovctiva.png"] {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--nx-text);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -105,20 +274,20 @@ img[src="LogoNovctiva.png"] {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.7px;
-  color: #64748b;
+  color: var(--nx-text-faint);
   font-weight: 700;
 }
 
 .nx-kpi-value {
   font-size: 26px;
   font-weight: 800;
-  color: #f8fafc;
+  color: var(--nx-text);
   line-height: 1.15;
 }
 
 .nx-kpi-meta {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--nx-text-muted);
 }
 
 .nx-form-grid {
@@ -140,28 +309,28 @@ img[src="LogoNovctiva.png"] {
 .nx-label {
   font-size: 12px;
   font-weight: 600;
-  color: #cbd5e1;
+  color: var(--nx-text-secondary);
 }
 
 .nx-input,
 .nx-select,
 .nx-textarea {
   width: 100%;
-  background: #060b17;
-  border: 1px solid #263656;
+  background: var(--nx-bg);
+  border: 1px solid var(--nx-border-strong);
   border-radius: 8px;
   padding: 9px 12px;
-  color: #f8fafc;
+  color: var(--nx-text);
   font-size: 13px;
   font-family: inherit;
   outline: none;
-  transition: border-color 140ms ease;
+  transition: border-color 140ms ease, background-color 180ms ease;
 }
 
 .nx-input:focus,
 .nx-select:focus,
 .nx-textarea:focus {
-  border-color: #3b82f6;
+  border-color: var(--nx-primary-focus);
 }
 
 .nx-checkbox-row {
@@ -169,7 +338,7 @@ img[src="LogoNovctiva.png"] {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #e2e8f0;
+  color: var(--nx-text-body);
   cursor: pointer;
 }
 
@@ -201,40 +370,40 @@ img[src="LogoNovctiva.png"] {
 }
 
 .nx-btn-primary {
-  background: #2563eb;
+  background: var(--nx-primary);
   color: #ffffff;
 }
 
 .nx-btn-primary:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--nx-primary-hover);
 }
 
 .nx-btn-success {
-  background: #059669;
+  background: var(--nx-emerald-solid);
   color: #ffffff;
 }
 
 .nx-btn-success:hover:not(:disabled) {
-  background: #047857;
+  background: var(--nx-emerald-hover);
 }
 
 .nx-btn-danger {
-  background: #dc2626;
+  background: var(--nx-danger-solid);
   color: #ffffff;
 }
 
 .nx-btn-danger:hover:not(:disabled) {
-  background: #b91c1c;
+  background: var(--nx-danger-hover);
 }
 
 .nx-btn-secondary {
-  background: #111c34;
-  border-color: #263656;
-  color: #e2e8f0;
+  background: var(--nx-surface-elevated);
+  border-color: var(--nx-border-strong);
+  color: var(--nx-text-body);
 }
 
 .nx-btn-secondary:hover:not(:disabled) {
-  background: #1c2a47;
+  background: var(--nx-surface-hover);
 }
 
 .nx-btn-sm {
@@ -256,38 +425,38 @@ img[src="LogoNovctiva.png"] {
 }
 
 .nx-badge-emerald {
-  background: rgba(16, 185, 129, 0.14);
-  border-color: rgba(16, 185, 129, 0.45);
-  color: #34d399;
+  background: var(--nx-emerald-soft-bg);
+  border-color: var(--nx-emerald-soft-border);
+  color: var(--nx-emerald-soft-text);
 }
 
 .nx-badge-amber {
-  background: rgba(245, 158, 11, 0.14);
-  border-color: rgba(245, 158, 11, 0.45);
-  color: #fbbf24;
+  background: var(--nx-amber-soft-bg);
+  border-color: var(--nx-amber-soft-border);
+  color: var(--nx-amber-soft-text);
 }
 
 .nx-badge-red {
-  background: rgba(239, 68, 68, 0.14);
-  border-color: rgba(239, 68, 68, 0.45);
-  color: #f87171;
+  background: var(--nx-danger-soft-bg);
+  border-color: var(--nx-danger-soft-border);
+  color: var(--nx-danger-soft-text);
 }
 
 .nx-badge-blue {
-  background: rgba(59, 130, 246, 0.14);
-  border-color: rgba(59, 130, 246, 0.45);
-  color: #93c5fd;
+  background: var(--nx-primary-soft-bg);
+  border-color: var(--nx-primary-soft-border);
+  color: var(--nx-primary-soft-text);
 }
 
 .nx-badge-slate {
-  background: rgba(148, 163, 184, 0.12);
-  border-color: rgba(148, 163, 184, 0.35);
-  color: #cbd5e1;
+  background: var(--nx-slate-soft-bg);
+  border-color: var(--nx-slate-soft-border);
+  color: var(--nx-slate-soft-text);
 }
 
 .nx-banner {
-  background: rgba(37, 99, 235, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.35);
+  background: var(--nx-banner-bg);
+  border: 1px solid var(--nx-banner-border);
   border-radius: 12px;
   padding: 12px 16px;
   display: flex;
@@ -296,24 +465,24 @@ img[src="LogoNovctiva.png"] {
   justify-content: space-between;
   gap: 12px;
   font-size: 13px;
-  color: #dbeafe;
+  color: var(--nx-banner-text);
 }
 
 .nx-error {
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.45);
+  background: var(--nx-danger-soft-bg);
+  border: 1px solid var(--nx-danger-soft-border);
   border-radius: 10px;
   padding: 10px 14px;
-  color: #fecaca;
+  color: var(--nx-error-text);
   font-size: 13px;
 }
 
 .nx-empty {
-  border: 1px dashed #263656;
+  border: 1px dashed var(--nx-border-strong);
   border-radius: 10px;
   padding: 20px;
   text-align: center;
-  color: #94a3b8;
+  color: var(--nx-text-muted);
   font-size: 13px;
 }
 
@@ -324,8 +493,8 @@ img[src="LogoNovctiva.png"] {
 }
 
 .nx-list-item {
-  background: #0a1120;
-  border: 1px solid #1c2a47;
+  background: var(--nx-surface-subtle);
+  border: 1px solid var(--nx-border);
   border-radius: 10px;
   padding: 12px 14px;
   display: flex;
@@ -336,7 +505,7 @@ img[src="LogoNovctiva.png"] {
 }
 
 .nx-muted {
-  color: #94a3b8;
+  color: var(--nx-text-muted);
   font-size: 12.5px;
 }
 
@@ -351,9 +520,9 @@ img[src="LogoNovctiva.png"] {
 }
 
 .nx-tab {
-  background: #0d1527;
-  border: 1px solid #1c2a47;
-  color: #94a3b8;
+  background: var(--nx-surface);
+  border: 1px solid var(--nx-border);
+  color: var(--nx-text-muted);
   border-radius: 8px;
   padding: 7px 14px;
   font-size: 13px;
@@ -362,8 +531,8 @@ img[src="LogoNovctiva.png"] {
 }
 
 .nx-tab-active {
-  background: #1d4ed8;
-  border-color: #3b82f6;
+  background: var(--nx-primary-hover);
+  border-color: var(--nx-primary-focus);
   color: #ffffff;
 }
 
@@ -377,11 +546,11 @@ img[src="LogoNovctiva.png"] {
 .nx-table td {
   text-align: left;
   padding: 10px 8px;
-  border-bottom: 1px solid #1c2a47;
+  border-bottom: 1px solid var(--nx-border);
 }
 
 .nx-table th {
-  color: #94a3b8;
+  color: var(--nx-text-muted);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -410,15 +579,15 @@ img[src="LogoNovctiva.png"] {
   max-width: 36px;
   min-height: 6px;
   border-radius: 6px 6px 2px 2px;
-  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  background: var(--nx-bar-gradient);
 }
 
 /* Persona Switcher & IAM Pill in Layout */
 .nx-persona-box {
   margin: 0 18px 14px;
   padding: 10px 12px;
-  background: #111c34;
-  border: 1px solid #1c2a47;
+  background: var(--nx-surface-elevated);
+  border: 1px solid var(--nx-border);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -430,13 +599,13 @@ img[src="LogoNovctiva.png"] {
   font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: #93c5fd;
+  color: var(--nx-primary-soft-text);
 }
 
 .nx-persona-select {
-  background: #060b17;
-  color: #f8fafc;
-  border: 1px solid #263656;
+  background: var(--nx-bg);
+  color: var(--nx-text);
+  border: 1px solid var(--nx-border-strong);
   border-radius: 7px;
   padding: 6px 8px;
   font-size: 12px;
@@ -449,9 +618,9 @@ img[src="LogoNovctiva.png"] {
   gap: 6px;
   padding: 6px 12px;
   border-radius: 20px;
-  border: 1px solid #1d4ed8;
-  background: rgba(37, 99, 235, 0.14);
-  color: #93c5fd;
+  border: 1px solid var(--nx-primary-soft-border);
+  background: var(--nx-primary-soft-bg);
+  color: var(--nx-primary-soft-text);
   font-size: 12px;
   font-weight: 600;
   text-decoration: none;
@@ -459,24 +628,24 @@ img[src="LogoNovctiva.png"] {
 }
 
 .nx-iam-chip:hover {
-  background: rgba(37, 99, 235, 0.25);
+  background: var(--nx-surface-hover);
 }
 
 /* Material SnackBar variants */
 .nx-toast-success .mdc-snackbar__surface {
-  background-color: #064e3b !important;
-  color: #ecfdf5 !important;
-  border: 1px solid #10b981;
+  background-color: var(--nx-toast-success-bg) !important;
+  color: var(--nx-toast-success-text) !important;
+  border: 1px solid var(--nx-emerald-dot);
 }
 
 .nx-toast-error .mdc-snackbar__surface {
-  background-color: #7f1d1d !important;
-  color: #fef2f2 !important;
-  border: 1px solid #ef4444;
+  background-color: var(--nx-toast-error-bg) !important;
+  color: var(--nx-toast-error-text) !important;
+  border: 1px solid var(--nx-danger-vivid);
 }
 
 .nx-toast-info .mdc-snackbar__surface {
-  background-color: #111c34 !important;
-  color: #e2e8f0 !important;
-  border: 1px solid #3b82f6;
+  background-color: var(--nx-toast-info-bg) !important;
+  color: var(--nx-toast-info-text) !important;
+  border: 1px solid var(--nx-primary-focus);
 }
