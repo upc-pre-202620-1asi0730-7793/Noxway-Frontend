@@ -13,7 +13,7 @@
   </div>
 
   @if (workersWithOpenIncidents().length > 0) {
-    <section class="nx-card" style="border-color: #ef4444">
+    <section class="nx-card nx-card-danger">
       <div class="nx-card-header">
         <h3 class="nx-card-title">{{ languageService.ui('Incidentes SOS Activos') }}</h3>
         <span class="nx-badge nx-badge-red">{{ workersWithOpenIncidents().length }}</span>
@@ -47,7 +47,7 @@
     </div>
     <div class="nx-grid-3">
       @for (line of directory; track line.number) {
-        <div class="nx-card" style="background: #081020">
+        <div class="nx-card nx-card-inset">
           <span class="nx-kpi-label">{{ line.name }}</span>
           <span class="nx-kpi-value nx-mono">{{ line.number }}</span>
           <span class="nx-kpi-meta">{{ line.scope }}</span>

@@ -3,6 +3,6 @@
 }
 
 .nx-persona-active {
-  border-color: #3b82f6;
-  background: rgba(37, 99, 235, 0.08);
+  border-color: var(--nx-primary-focus);
+  background: var(--nx-primary-soft-bg);
 }

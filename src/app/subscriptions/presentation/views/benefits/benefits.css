@@ -1,4 +1,4 @@
 .nx-plan-card {
-  background: #081020;
+  background: var(--nx-surface-inset);
   gap: 10px;
 }

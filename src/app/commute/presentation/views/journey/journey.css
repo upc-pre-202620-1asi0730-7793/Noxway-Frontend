@@ -1,5 +1,5 @@
 ﻿.nx-subcard {
-  background: #081020;
+  background: var(--nx-surface-inset);
   padding: 14px;
 }
 
@@ -9,5 +9,5 @@
   grid-template-columns: 110px 1fr auto;
   gap: 8px;
   padding-top: 8px;
-  border-top: 1px solid #1c2a47;
+  border-top: 1px solid var(--nx-border);
 }
