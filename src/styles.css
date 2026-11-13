@@ -23,10 +23,6 @@ img[src="LogoNovctiva.png"] {
   );
 }
 
-app-nearby-services .leaflet-tile-pane {
-  filter: invert(.93) hue-rotate(180deg) saturate(.6) brightness(.86);
-}
-
 /* Shared Noxway UI System */
 .nx-page {
   display: flex;
