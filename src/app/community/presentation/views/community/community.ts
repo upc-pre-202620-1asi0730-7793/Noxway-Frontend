@@ -1,6 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, signal, untracked } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { ActivatedRoute } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import {
   CommunityPostResource,
@@ -8,29 +19,46 @@ import {
   ModerationActionResource,
 } from '../../../domain/model/community-post.entity';
 import { CommunityService } from '../../../infrastructure/community.service';
+import {
+  ReportLocation,
+  type ReportCoordinates,
+} from '../../components/report-location/report-location';
 import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
 import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
 import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
 
+export type ComposerMode = 'post' | 'service' | 'risk';
+
+const DEFAULT_CENTER: ReportCoordinates = { lat: -12.0464, lon: -77.0428 };
+
 @Component({
   selector: 'app-community',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatIconModule, ReportLocation],
   templateUrl: './community.html',
   styleUrl: './community.css',
 })
 export class Community {
   private readonly communityService = inject(CommunityService);
   private readonly toast = inject(NotificationToastService);
+  private readonly route = inject(ActivatedRoute);
   readonly actorContext = inject(ActorContextService);
   readonly languageService = inject(LanguageService);
 
+  private readonly composerDialog = viewChild<ElementRef<HTMLDialogElement>>('composer');
+
   readonly loading = signal(true);
+  readonly submitting = signal(false);
+  readonly composing = signal(false);
+  readonly composerMode = signal<ComposerMode>('post');
+  readonly dialogError = signal('');
+
   readonly posts = signal<CommunityPostResource[]>([]);
   readonly reports = signal<CommunityReportResource[]>([]);
   readonly selectedActions = signal<ModerationActionResource[]>([]);
   readonly selectedReportId = signal<string | null>(null);
+  readonly moderationExpanded = signal(false);
 
   readonly district = signal('all');
   readonly reportFilter = signal('PENDING');
@@ -43,26 +71,38 @@ export class Community {
     'Cercado de Lima',
   ]);
 
-  // Create Post form
+  readonly selectedLocation = signal<ReportCoordinates | null>(null);
+  readonly modalMapCenter = signal<ReportCoordinates>(DEFAULT_CENTER);
+
+  readonly locatedPostCount = computed(
+    () =>
+      this.posts().filter((post) => post.latitude != null && post.longitude != null).length,
+  );
+
+  readonly noticeCategories = [
+    'Aviso de seguridad',
+    'Reporte de local',
+    'Recomendación',
+    'Consulta',
+  ];
+
+  // Post form fields
+  postCategory = 'Aviso de seguridad';
   postTitle = '';
   postContent = '';
   postDistrict = '';
 
-  // Submit Service Point form
+  // Service Point form fields
   serviceName = '';
   serviceType: 'PHARMACY' | 'GAS_STATION' | 'HOSPITAL' | 'POLICE_STATION' | 'OTHER' = 'PHARMACY';
-  serviceLat = -12.0112;
-  serviceLng = -77.0601;
   serviceIs24h = true;
   serviceOpensAt = '08:00';
   serviceClosesAt = '22:00';
   serviceClosesNextDay = false;
 
-  // Report Risk Zone form
+  // Risk Zone form fields
   riskDesc = '';
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' = 'MEDIUM';
-  riskLat = -12.0464;
-  riskLng = -77.0428;
 
   // Moderation notes
   decisionNotes = '';
@@ -72,13 +112,49 @@ export class Community {
       this.actorContext.revision();
       untracked(() => this.loadAll());
     });
+
+    effect(() => {
+      const shouldOpen = this.composing();
+      const dialog = this.composerDialog()?.nativeElement;
+      if (!dialog) return;
+      if (shouldOpen && !dialog.open && typeof dialog.showModal === 'function') {
+        dialog.showModal();
+      } else if (!shouldOpen && dialog.open && typeof dialog.close === 'function') {
+        dialog.close();
+      }
+    });
+
+    this.route.queryParamMap.subscribe((params) => {
+      const action = params.get('action');
+      const notice = params.get('notice');
+      const lat = Number(params.get('lat'));
+      const lng = Number(params.get('lng'));
+      const hasValidCoords =
+        Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
+        params.has('lat') &&
+        params.has('lng');
+
+      const center: ReportCoordinates = hasValidCoords
+        ? { lat: Number(lat.toFixed(5)), lon: Number(lng.toFixed(5)) }
+        : DEFAULT_CENTER;
+      this.modalMapCenter.set(center);
+
+      if (action === 'service' || notice === 'place') {
+        this.openComposer('service', hasValidCoords ? center : null);
+      } else if (action === 'risk' || notice === 'hazard') {
+        this.openComposer('risk', hasValidCoords ? center : null);
+      } else if (action === 'post') {
+        this.openComposer('post', hasValidCoords ? center : null);
+      }
+    });
   }
 
   loadAll(): void {
     this.loading.set(true);
 
     forkJoin({
-      posts: this.communityService.listPosts(this.district(), 0, 30).pipe(catchError(() => of(null))),
+      posts: this.communityService.listPosts(this.district(), 0, 50).pipe(catchError(() => of(null))),
       reports: this.communityService
         .listReports(this.reportFilter() === 'ALL' ? undefined : this.reportFilter(), 0, 30)
         .pipe(catchError(() => of(null))),
@@ -98,6 +174,35 @@ export class Community {
     });
   }
 
+  openComposer(mode: ComposerMode, initialPoint: ReportCoordinates | null = null): void {
+    this.dialogError.set('');
+    this.composerMode.set(mode);
+    if (initialPoint) {
+      this.selectedLocation.set(initialPoint);
+    } else if (!this.selectedLocation()) {
+      this.selectedLocation.set(this.modalMapCenter());
+    }
+    this.composing.set(true);
+    const dialog = this.composerDialog()?.nativeElement;
+    if (dialog && !dialog.open && typeof dialog.showModal === 'function') {
+      dialog.showModal();
+    }
+  }
+
+  switchComposerMode(mode: ComposerMode): void {
+    this.dialogError.set('');
+    this.composerMode.set(mode);
+  }
+
+  closeComposer(): void {
+    const dialog = this.composerDialog()?.nativeElement;
+    if (dialog?.open && typeof dialog.close === 'function') {
+      dialog.close();
+    }
+    this.composing.set(false);
+    this.dialogError.set('');
+  }
+
   onServiceHoursChange(): void {
     this.serviceClosesNextDay = this.serviceClosesAt <= this.serviceOpensAt;
   }
@@ -113,23 +218,45 @@ export class Community {
   }
 
   publishPost(): void {
-    if (!this.postTitle.trim() || !this.postContent.trim() || !this.postDistrict.trim()) return;
+    if (this.submitting()) return;
+    if (!this.postTitle.trim() || !this.postContent.trim()) {
+      this.dialogError.set(this.languageService.ui('Completa ambos campos.'));
+      return;
+    }
+    const point = this.selectedLocation();
+    if (!point) {
+      this.dialogError.set(this.languageService.ui('Marca el lugar del aviso en el mapa.'));
+      return;
+    }
+
+    const districtValue = this.postDistrict.trim() || 'Lima Centro';
+    this.submitting.set(true);
+    this.dialogError.set('');
 
     this.communityService
       .createPost({
         title: this.postTitle.trim(),
         content: this.postContent.trim(),
-        district: this.postDistrict.trim(),
+        district: districtValue,
+        category: this.postCategory || null,
+        latitude: point.lat,
+        longitude: point.lon,
       })
       .subscribe({
         next: () => {
           this.postTitle = '';
           this.postContent = '';
           this.postDistrict = '';
+          this.selectedLocation.set(null);
+          this.submitting.set(false);
+          this.closeComposer();
           this.toast.success(this.languageService.ui('Aviso comunitario publicado.'));
           this.loadAll();
         },
-        error: (err) => this.toast.error(extractProblemMessage(err, 'No se pudo publicar aviso.')),
+        error: (err) => {
+          this.submitting.set(false);
+          this.dialogError.set(extractProblemMessage(err, 'No se pudo publicar aviso.'));
+        },
       });
   }
 
@@ -149,8 +276,25 @@ export class Community {
     );
   }
 
+  isSecurityPost(post: CommunityPostResource): boolean {
+    return post.category === 'Aviso de seguridad';
+  }
+
+  osmUrl(lat: number, lon: number): string {
+    return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=17/${lat}/${lon}`;
+  }
+
   submitService(): void {
-    if (!this.serviceName.trim()) return;
+    if (this.submitting()) return;
+    if (!this.serviceName.trim()) {
+      this.dialogError.set(this.languageService.ui('Nombre del establecimiento') + ' requerido.');
+      return;
+    }
+    const point = this.selectedLocation();
+    if (!point) {
+      this.dialogError.set(this.languageService.ui('Marca el lugar del aviso en el mapa.'));
+      return;
+    }
 
     const hours = Array.from({ length: 7 }, (_, index) => ({
       dayOfWeek: index + 1,
@@ -160,46 +304,73 @@ export class Community {
       is24Hours: this.serviceIs24h,
     }));
 
+    this.submitting.set(true);
+    this.dialogError.set('');
+
     this.communityService
       .submitService({
         name: this.serviceName.trim(),
         type: this.serviceType,
-        latitude: Number(this.serviceLat),
-        longitude: Number(this.serviceLng),
+        latitude: point.lat,
+        longitude: point.lon,
         timeZone: 'America/Lima',
         openingHours: hours,
       })
       .subscribe({
         next: () => {
           this.serviceName = '';
+          this.selectedLocation.set(null);
+          this.submitting.set(false);
+          this.closeComposer();
           this.toast.success(
             this.languageService.ui('Punto enviado a cola de moderación comunitaria.'),
           );
           this.loadAll();
         },
-        error: (err) => this.toast.error(extractProblemMessage(err, 'Error al registrar punto.')),
+        error: (err) => {
+          this.submitting.set(false);
+          this.dialogError.set(extractProblemMessage(err, 'Error al registrar punto.'));
+        },
       });
   }
 
   reportRisk(): void {
-    if (!this.riskDesc.trim()) return;
+    if (this.submitting()) return;
+    if (!this.riskDesc.trim()) {
+      this.dialogError.set(this.languageService.ui('Descripción') + ' requerida.');
+      return;
+    }
+    const point = this.selectedLocation();
+    if (!point) {
+      this.dialogError.set(this.languageService.ui('Marca el lugar del aviso en el mapa.'));
+      return;
+    }
+
+    this.submitting.set(true);
+    this.dialogError.set('');
 
     this.communityService
       .reportRiskZone({
         description: this.riskDesc.trim(),
         riskLevel: this.riskLevel,
-        latitude: Number(this.riskLat),
-        longitude: Number(this.riskLng),
+        latitude: point.lat,
+        longitude: point.lon,
       })
       .subscribe({
         next: () => {
           this.riskDesc = '';
+          this.selectedLocation.set(null);
+          this.submitting.set(false);
+          this.closeComposer();
           this.toast.success(
             this.languageService.ui('Zona de riesgo enviada a moderación.'),
           );
           this.loadAll();
         },
-        error: (err) => this.toast.error(extractProblemMessage(err, 'Error al reportar zona.')),
+        error: (err) => {
+          this.submitting.set(false);
+          this.dialogError.set(extractProblemMessage(err, 'Error al reportar zona.'));
+        },
       });
   }
 
@@ -216,7 +387,8 @@ export class Community {
           this.loadAuditActions(reportId);
         }
       },
-      error: (err) => this.toast.error(extractProblemMessage(err, 'Solo Admin puede moderar reportes.')),
+      error: (err) =>
+        this.toast.error(extractProblemMessage(err, 'Solo Admin puede moderar reportes.')),
     });
   }
 

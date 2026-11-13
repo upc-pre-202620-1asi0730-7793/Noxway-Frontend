@@ -1,1 +1,181 @@
-﻿/* Layout and visual styles come from shared src/styles.css */
+﻿.nx-community-page {
+  display: grid;
+  gap: 16px;
+}
+
+.nx-community-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--nx-border);
+  background: var(--nx-surface);
+  box-shadow: var(--nx-shadow-card);
+}
+
+.nx-risk-trigger {
+  color: var(--nx-amber-soft-text);
+  border-color: var(--nx-amber-soft-border);
+}
+
+.nx-inline-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.nx-community-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.25fr) minmax(240px, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.nx-feed-column,
+.nx-community-aside {
+  display: grid;
+  gap: 14px;
+}
+
+.nx-post-card {
+  gap: 10px;
+}
+
+.nx-post-danger {
+  border-color: var(--nx-danger-soft-border);
+}
+
+.nx-post-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nx-post-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nx-post-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--nx-avatar-worker-bg);
+  color: var(--nx-avatar-worker-text);
+  flex-shrink: 0;
+}
+
+.nx-post-author-name {
+  font-size: 14px;
+  color: var(--nx-text);
+}
+
+.nx-post-title {
+  margin: 2px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--nx-text);
+}
+
+.nx-post-content {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--nx-text-secondary);
+}
+
+.nx-post-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.nx-post-map-link {
+  text-decoration: none;
+}
+
+.nx-code-list {
+  display: grid;
+  gap: 10px;
+}
+
+.nx-code-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.nx-code-item p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--nx-text-secondary);
+}
+
+.nx-code-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.nx-code-blue {
+  color: var(--nx-primary-focus);
+}
+
+.nx-code-amber {
+  color: var(--nx-amber-soft-text);
+}
+
+.nx-code-emerald {
+  color: var(--nx-emerald-dot);
+}
+
+.nx-contrib-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--nx-text-secondary);
+}
+
+.nx-contrib-row strong {
+  color: var(--nx-amber-soft-text);
+  font-size: 15px;
+}
+
+.nx-contrib-row strong.nx-contrib-emerald {
+  color: var(--nx-emerald-soft-text);
+}
+
+.nx-dialog-form {
+  display: grid;
+  gap: 12px;
+}
+
+.nx-location-box {
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--nx-border-strong);
+  border-radius: 10px;
+  background: var(--nx-surface-subtle);
+}
+
+@media (max-width: 840px) {
+  .nx-community-grid {
+    grid-template-columns: 1fr;
+  }
+}

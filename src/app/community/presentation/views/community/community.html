@@ -1,297 +1,487 @@
-<div class="nx-page">
-  <div class="nx-header">
-    <div>
-      <h2 class="nx-title">{{ languageService.ui('Comunidad, Aportes & Moderación') }}</h2>
-      <p class="nx-subtitle">
-        {{
-          languageService.ui(
-            'Publicaciones por distrito, sugerencias de puntos 24h y cola de moderación.'
-          )
-        }}
-      </p>
+<section class="nx-community-page">
+  <header class="nx-community-topbar">
+    <nav class="nx-tabs" [attr.aria-label]="languageService.ui('Filtrar por distrito')">
+      <button
+        type="button"
+        class="nx-tab"
+        [class.nx-tab-active]="district() === 'all'"
+        [attr.aria-pressed]="district() === 'all'"
+        (click)="changeDistrict('all')">
+        {{ languageService.ui('Todos los Distritos') }}
+      </button>
+      @for (d of knownDistricts(); track d) {
+        <button
+          type="button"
+          class="nx-tab"
+          [class.nx-tab-active]="district() === d"
+          [attr.aria-pressed]="district() === d"
+          (click)="changeDistrict(d)">
+          {{ d }}
+        </button>
+      }
+    </nav>
+
+    <div class="nx-actions">
+      <button
+        type="button"
+        class="nx-btn nx-btn-secondary nx-btn-sm"
+        (click)="openComposer('service')">
+        {{ languageService.ui('Sugerir local 24h') }}
+      </button>
+      <button
+        type="button"
+        class="nx-btn nx-btn-secondary nx-btn-sm nx-risk-trigger"
+        (click)="openComposer('risk')">
+        {{ languageService.ui('Reportar peligro') }}
+      </button>
+      <button type="button" class="nx-btn nx-btn-primary nx-btn-sm" (click)="openComposer('post')">
+        <mat-icon class="nx-inline-icon">add</mat-icon>
+        {{ languageService.ui('Publicar aviso') }}
+      </button>
     </div>
-    <button type="button" class="nx-btn nx-btn-secondary" (click)="loadAll()">
-      {{ languageService.ui('Actualizar') }}
-    </button>
-  </div>
+  </header>
 
-  <!-- Community Posts & Contribute Forms -->
-  <div class="nx-grid-2">
-    <section class="nx-card">
-      <div class="nx-card-header">
-        <h3 class="nx-card-title">{{ languageService.ui('Tablón Comunitario') }}</h3>
-        <select
-          class="nx-select"
-          style="width: auto"
-          [value]="district()"
-          (change)="changeDistrict($any($event.target).value)">
-          <option value="all">Todos los distritos</option>
-          @for (dist of knownDistricts(); track dist) {
-            <option [value]="dist">{{ dist }}</option>
-          }
-        </select>
-      </div>
-
-      <form class="nx-form-grid" (ngSubmit)="publishPost()">
-        <div class="nx-field">
-          <label class="nx-label" for="cp-title">Título</label>
-          <input
-            id="cp-title"
-            class="nx-input"
-            name="postTitle"
-            [(ngModel)]="postTitle"
-            placeholder="Ej. Ruta iluminada"
-            required />
+  <div class="nx-community-grid">
+    <section class="nx-feed-column" [attr.aria-label]="languageService.ui('Publicaciones de la Comunidad')">
+      @if (loading()) {
+        <div class="nx-card">
+          <p class="nx-muted" role="status">{{ languageService.ui('Cargando feed comunitario...') }}</p>
         </div>
-        <div class="nx-field">
-          <label class="nx-label" for="cp-dist">Distrito</label>
-          <input
-            id="cp-dist"
-            class="nx-input"
-            name="postDistrict"
-            [(ngModel)]="postDistrict"
-            placeholder="Ej. Lince"
-            required />
-        </div>
-        <div class="nx-field nx-field-full">
-          <label class="nx-label" for="cp-body">Mensaje</label>
-          <textarea
-            id="cp-body"
-            class="nx-textarea"
-            rows="2"
-            name="postContent"
-            [(ngModel)]="postContent"
-            placeholder="Describe condiciones de tránsito o seguridad nocturna"
-            required></textarea>
-        </div>
-        <div class="nx-field nx-field-full">
-          <button type="submit" class="nx-btn nx-btn-primary nx-btn-sm">
-            {{ languageService.ui('Publicar Aviso') }}
-          </button>
-        </div>
-      </form>
-
-      <div class="nx-list">
+      } @else {
         @for (post of posts(); track post.id) {
-          <div class="nx-list-item">
-            <div>
-              <strong>{{ post.title }}</strong>
-              <span class="nx-badge nx-badge-blue" style="margin-left: 8px">{{ post.district }}</span>
-              <p style="margin: 6px 0 4px">{{ post.content }}</p>
-              <span class="nx-muted">{{ post.authorName }} · {{ post.createdAt | date: 'short' }}</span>
+          <article class="nx-card nx-post-card" [class.nx-post-danger]="isSecurityPost(post)">
+            <div class="nx-post-header">
+              <div class="nx-post-author">
+                <span class="nx-post-avatar">
+                  {{ (post.authorName || 'N').charAt(0).toUpperCase() }}
+                </span>
+                <div>
+                  <strong class="nx-post-author-name">{{ post.authorName || 'Trabajador Noxway' }}</strong>
+                  <div class="nx-muted">
+                    {{ post.district }} · {{ post.createdAt | date: 'short' }}
+                  </div>
+                </div>
+              </div>
+
+              @if (post.category) {
+                <span
+                  class="nx-badge"
+                  [class.nx-badge-red]="isSecurityPost(post)"
+                  [class.nx-badge-blue]="!isSecurityPost(post)">
+                  {{ languageService.ui(post.category) }}
+                </span>
+              }
             </div>
-            @if (canDeletePost(post)) {
-              <button
-                type="button"
-                class="nx-btn nx-btn-danger nx-btn-sm"
-                (click)="deletePost(post.id)">
-                Eliminar
-              </button>
+
+            <h3 class="nx-post-title">{{ post.title }}</h3>
+            <p class="nx-post-content">{{ post.content }}</p>
+
+            @if ((post.latitude != null && post.longitude != null) || canDeletePost(post)) {
+              <div class="nx-post-footer">
+                @if (post.latitude != null && post.longitude != null) {
+                  <a
+                    class="nx-btn nx-btn-secondary nx-btn-sm nx-post-map-link"
+                    [href]="osmUrl(post.latitude, post.longitude)"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    <mat-icon class="nx-inline-icon">location_on</mat-icon>
+                    {{ languageService.ui('Ver ubicación del aviso') }}
+                  </a>
+                }
+                @if (canDeletePost(post)) {
+                  <button
+                    type="button"
+                    class="nx-btn nx-btn-danger nx-btn-sm"
+                    (click)="deletePost(post.id)">
+                    {{ languageService.ui('Eliminar') }}
+                  </button>
+                }
+              </div>
             }
-          </div>
+          </article>
         } @empty {
-          <div class="nx-empty">{{ languageService.ui('No hay avisos en este distrito.') }}</div>
+          <div class="nx-card">
+            <h3 class="nx-card-title">{{ languageService.ui('Publicaciones de la Comunidad') }}</h3>
+            <p class="nx-muted" style="margin: 0">
+              {{
+                languageService.ui(
+                  district() === 'all'
+                    ? 'Aún no hay publicaciones en este distrito.'
+                    : 'Aún no hay avisos en este distrito.'
+                )
+              }}
+            </p>
+          </div>
         }
-      </div>
+      }
     </section>
 
-    <!-- Suggest Service & Risk Zone -->
-    <div class="nx-grid">
+    <aside class="nx-community-aside">
       <section class="nx-card">
-        <div class="nx-card-header">
-          <h3 class="nx-card-title">{{ languageService.ui('Sugerir Punto Seguro 24h') }}</h3>
-          <span class="nx-badge nx-badge-slate">POST /community/services</span>
+        <h3 class="nx-card-title">{{ languageService.ui('Código de la Comunidad') }}</h3>
+        <div class="nx-code-list">
+          <div class="nx-code-item">
+            <mat-icon class="nx-code-icon nx-code-blue">verified</mat-icon>
+            <p>{{ languageService.ui('Describe el hecho con precisión.') }}</p>
+          </div>
+          <div class="nx-code-item">
+            <mat-icon class="nx-code-icon nx-code-amber">lock</mat-icon>
+            <p>{{ languageService.ui('Evita incluir datos privados.') }}</p>
+          </div>
+          <div class="nx-code-item">
+            <mat-icon class="nx-code-icon nx-code-emerald">location_on</mat-icon>
+            <p>{{ languageService.ui('Verifica el punto antes de guardar.') }}</p>
+          </div>
         </div>
+      </section>
 
-        <form class="nx-form-grid" (ngSubmit)="submitService()">
-          <div class="nx-field">
-            <label class="nx-label" for="svc-name">Nombre</label>
-            <input id="svc-name" class="nx-input" name="serviceName" [(ngModel)]="serviceName" required />
-          </div>
-          <div class="nx-field">
-            <label class="nx-label" for="svc-type">Categoría</label>
-            <select id="svc-type" class="nx-select" name="serviceType" [(ngModel)]="serviceType">
-              <option value="PHARMACY">PHARMACY</option>
-              <option value="GAS_STATION">GAS_STATION</option>
-              <option value="HOSPITAL">HOSPITAL</option>
-              <option value="POLICE_STATION">POLICE_STATION</option>
-              <option value="OTHER">OTHER</option>
-            </select>
-          </div>
-          <div class="nx-field">
-            <label class="nx-label" for="svc-lat">Latitud</label>
-            <input id="svc-lat" class="nx-input" type="number" step="0.0001" name="serviceLat" [(ngModel)]="serviceLat" />
-          </div>
-          <div class="nx-field">
-            <label class="nx-label" for="svc-lng">Longitud</label>
-            <input id="svc-lng" class="nx-input" type="number" step="0.0001" name="serviceLng" [(ngModel)]="serviceLng" />
-          </div>
-          <div class="nx-field nx-field-full">
-            <label class="nx-checkbox-row">
-              <input type="checkbox" name="serviceIs24h" [(ngModel)]="serviceIs24h" />
-              <span>{{ languageService.ui('Atención 24 horas (00:00 - 00:00)') }}</span>
-            </label>
-          </div>
-          @if (!serviceIs24h) {
-            <div class="nx-field">
-              <label class="nx-label" for="svc-open">Abre</label>
-              <input
-                id="svc-open"
-                class="nx-input"
-                type="time"
-                name="serviceOpensAt"
-                [(ngModel)]="serviceOpensAt"
-                (ngModelChange)="onServiceHoursChange()" />
-            </div>
-            <div class="nx-field">
-              <label class="nx-label" for="svc-close">Cierra</label>
-              <input
-                id="svc-close"
-                class="nx-input"
-                type="time"
-                name="serviceClosesAt"
-                [(ngModel)]="serviceClosesAt"
-                (ngModelChange)="onServiceHoursChange()" />
-            </div>
-            <div class="nx-field nx-field-full">
-              <label class="nx-checkbox-row">
-                <input
-                  type="checkbox"
-                  name="serviceClosesNextDay"
-                  [(ngModel)]="serviceClosesNextDay" />
-                <span>{{ languageService.ui('Cierra al día siguiente (+1 día)') }}</span>
-              </label>
-            </div>
-          }
-          <div class="nx-field nx-field-full">
-            <button type="submit" class="nx-btn nx-btn-primary nx-btn-sm">
-              {{ languageService.ui('Enviar a Moderación') }}
-            </button>
-          </div>
-        </form>
+      <section class="nx-card">
+        <h3 class="nx-card-title">{{ languageService.ui('Mis aportes') }}</h3>
+        <div class="nx-contrib-row">
+          <span>{{ languageService.ui('Avisos guardados en la comunidad') }}</span>
+          <strong>{{ posts().length }}</strong>
+        </div>
+        <div class="nx-contrib-row">
+          <span>{{ languageService.ui('Avisos con ubicación') }}</span>
+          <strong class="nx-contrib-emerald">{{ locatedPostCount() }}</strong>
+        </div>
       </section>
 
       <section class="nx-card">
         <div class="nx-card-header">
-          <h3 class="nx-card-title">{{ languageService.ui('Reportar Zona de Riesgo') }}</h3>
-          <span class="nx-badge nx-badge-amber">POST /community/risk-zones</span>
+          <h3 class="nx-card-title">{{ languageService.ui('Moderación y reportes') }}</h3>
+          <span class="nx-badge nx-badge-amber">{{ reports().length }}</span>
         </div>
-
-        <form class="nx-form-grid" (ngSubmit)="reportRisk()">
-          <div class="nx-field nx-field-full">
-            <label class="nx-label" for="rz-desc">Descripción</label>
-            <input id="rz-desc" class="nx-input" name="riskDesc" [(ngModel)]="riskDesc" required />
-          </div>
-          <div class="nx-field">
-            <label class="nx-label" for="rz-lvl">Nivel</label>
-            <select id="rz-lvl" class="nx-select" name="riskLevel" [(ngModel)]="riskLevel">
-              <option value="LOW">LOW</option>
-              <option value="MEDIUM">MEDIUM</option>
-              <option value="HIGH">HIGH</option>
-            </select>
-          </div>
-          <div class="nx-field">
-            <label class="nx-label" for="rz-lat">Lat / Lng</label>
-            <div class="nx-actions">
-              <input id="rz-lat" class="nx-input" type="number" step="0.0001" name="riskLat" [(ngModel)]="riskLat" />
-              <input class="nx-input" type="number" step="0.0001" name="riskLng" [(ngModel)]="riskLng" />
-            </div>
-          </div>
-          <div class="nx-field nx-field-full">
-            <button type="submit" class="nx-btn nx-btn-danger nx-btn-sm">
-              {{ languageService.ui('Reportar Riesgo') }}
-            </button>
-          </div>
-        </form>
+        <button
+          type="button"
+          class="nx-btn nx-btn-secondary nx-btn-sm"
+          (click)="moderationExpanded.update((v) => !v)">
+          {{
+            moderationExpanded()
+              ? languageService.ui('Cerrar')
+              : languageService.ui('Cola de Moderación Comunitaria')
+          }}
+        </button>
       </section>
-    </div>
+    </aside>
   </div>
 
-  <!-- Moderation Queue -->
-  <section class="nx-card">
-    <div class="nx-card-header">
-      <h3 class="nx-card-title">{{ languageService.ui('Cola de Moderación Comunitaria') }}</h3>
-      <div class="nx-actions">
-        @for (status of ['PENDING', 'APPROVED', 'REJECTED', 'ALL']; track status) {
-          <button
-            type="button"
-            class="nx-tab"
-            [class.nx-tab-active]="reportFilter() === status"
-            (click)="changeReportFilter(status)">
-            {{ status }}
-          </button>
-        }
-      </div>
-    </div>
-
-    <div class="nx-field">
-      <label class="nx-label" for="mod-notes">{{ languageService.ui('Notas de moderación') }}</label>
-      <input
-        id="mod-notes"
-        class="nx-input"
-        [(ngModel)]="decisionNotes"
-        placeholder="Ej. Verificado y validado por moderación Noxway" />
-    </div>
-
-    <div class="nx-list">
-      @for (report of reports(); track report.id) {
-        <div class="nx-list-item">
-          <div>
-            <strong>[{{ report.targetType }}] {{ report.targetTitle }}</strong>
-            <div class="nx-muted">
-              {{ report.reason }} · Reportado por {{ report.reporterName }}
-            </div>
-          </div>
-
-          <div class="nx-actions">
-            <span
-              class="nx-badge"
-              [class.nx-badge-amber]="report.status === 'PENDING'"
-              [class.nx-badge-emerald]="report.status === 'APPROVED'"
-              [class.nx-badge-red]="report.status === 'REJECTED'">
-              {{ report.status }}
-            </span>
-
-            @if (actorContext.isAdmin() && report.status === 'PENDING') {
-              <button
-                type="button"
-                class="nx-btn nx-btn-success nx-btn-sm"
-                (click)="decideReport(report.id, 'APPROVE')">
-                Aprobar
-              </button>
-              <button
-                type="button"
-                class="nx-btn nx-btn-danger nx-btn-sm"
-                (click)="decideReport(report.id, 'REJECT')">
-                Rechazar
-              </button>
-            }
-
+  @if (moderationExpanded()) {
+    <section class="nx-card">
+      <div class="nx-card-header">
+        <h3 class="nx-card-title">{{ languageService.ui('Cola de Moderación Comunitaria') }}</h3>
+        <div class="nx-actions">
+          @for (status of ['PENDING', 'APPROVED', 'REJECTED', 'ALL']; track status) {
             <button
               type="button"
-              class="nx-btn nx-btn-secondary nx-btn-sm"
-              (click)="loadAuditActions(report.id)">
-              Auditoría
+              class="nx-tab"
+              [class.nx-tab-active]="reportFilter() === status"
+              (click)="changeReportFilter(status)">
+              {{ status }}
             </button>
-          </div>
+          }
         </div>
-      } @empty {
-        <div class="nx-empty">{{ languageService.ui('No hay reportes en esta cola.') }}</div>
-      }
-    </div>
+      </div>
 
-    @if (selectedReportId()) {
+      <div class="nx-field">
+        <label class="nx-label" for="mod-notes">{{ languageService.ui('Notas de moderación') }}</label>
+        <input
+          id="mod-notes"
+          class="nx-input"
+          [(ngModel)]="decisionNotes"
+          placeholder="Ej. Verificado y validado por moderación Noxway" />
+      </div>
+
       <div class="nx-list">
-        <div class="nx-kpi-label">Auditoría reporte {{ selectedReportId() }}</div>
-        @for (action of selectedActions(); track action.id) {
+        @for (report of reports(); track report.id) {
           <div class="nx-list-item">
-            <span>{{ action.moderatorName }} · <strong>{{ action.decision }}</strong></span>
-            <span class="nx-muted">{{ action.notes }} · {{ action.createdAt | date: 'short' }}</span>
+            <div>
+              <strong>[{{ report.targetType }}] {{ report.targetTitle }}</strong>
+              <div class="nx-muted">
+                {{ report.reason }} · {{ report.reporterName }}
+              </div>
+            </div>
+
+            <div class="nx-actions">
+              <span
+                class="nx-badge"
+                [class.nx-badge-amber]="report.status === 'PENDING'"
+                [class.nx-badge-emerald]="report.status === 'APPROVED'"
+                [class.nx-badge-red]="report.status === 'REJECTED'">
+                {{ report.status }}
+              </span>
+
+              @if (actorContext.isAdmin() && report.status === 'PENDING') {
+                <button
+                  type="button"
+                  class="nx-btn nx-btn-success nx-btn-sm"
+                  (click)="decideReport(report.id, 'APPROVE')">
+                  Aprobar
+                </button>
+                <button
+                  type="button"
+                  class="nx-btn nx-btn-danger nx-btn-sm"
+                  (click)="decideReport(report.id, 'REJECT')">
+                  Rechazar
+                </button>
+              }
+
+              <button
+                type="button"
+                class="nx-btn nx-btn-secondary nx-btn-sm"
+                (click)="loadAuditActions(report.id)">
+                Auditoría
+              </button>
+            </div>
           </div>
         } @empty {
-          <div class="nx-empty">Sin decisiones registradas aún.</div>
+          <div class="nx-empty">{{ languageService.ui('No hay reportes en esta cola.') }}</div>
         }
       </div>
+
+      @if (selectedReportId()) {
+        <div class="nx-list">
+          <div class="nx-kpi-label">Auditoría reporte {{ selectedReportId() }}</div>
+          @for (action of selectedActions(); track action.id) {
+            <div class="nx-list-item">
+              <span>{{ action.moderatorName }} · <strong>{{ action.decision }}</strong></span>
+              <span class="nx-muted">{{ action.notes }} · {{ action.createdAt | date: 'short' }}</span>
+            </div>
+          } @empty {
+            <div class="nx-empty">Sin decisiones registradas aún.</div>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <dialog
+    #composer
+    class="nx-dialog"
+    aria-labelledby="nx-community-dialog-title"
+    (close)="composing.set(false)">
+    <div class="nx-dialog-header">
+      <h2 id="nx-community-dialog-title" class="nx-dialog-title">
+        @switch (composerMode()) {
+          @case ('post') {
+            {{ languageService.ui('Crear aviso') }}
+          }
+          @case ('service') {
+            {{ languageService.ui('Sugerir local 24h') }}
+          }
+          @case ('risk') {
+            {{ languageService.ui('Reportar zona de riesgo') }}
+          }
+        }
+      </h2>
+      <button type="button" class="nx-btn nx-btn-secondary nx-btn-sm" (click)="closeComposer()">
+        {{ languageService.ui('Cerrar') }}
+      </button>
+    </div>
+
+    <p class="nx-muted" style="margin: 0 0 12px">
+      {{ languageService.ui('El aviso se publicará en la red comunitaria de Noxway.') }}
+    </p>
+
+    <div class="nx-tabs" style="margin-bottom: 14px">
+      <button
+        type="button"
+        class="nx-tab"
+        [class.nx-tab-active]="composerMode() === 'post'"
+        (click)="switchComposerMode('post')">
+        {{ languageService.ui('Aviso') }}
+      </button>
+      <button
+        type="button"
+        class="nx-tab"
+        [class.nx-tab-active]="composerMode() === 'service'"
+        (click)="switchComposerMode('service')">
+        {{ languageService.ui('Local 24h') }}
+      </button>
+      <button
+        type="button"
+        class="nx-tab"
+        [class.nx-tab-active]="composerMode() === 'risk'"
+        (click)="switchComposerMode('risk')">
+        {{ languageService.ui('Zona de riesgo') }}
+      </button>
+    </div>
+
+    @if (dialogError()) {
+      <div class="nx-error" role="alert" style="margin-bottom: 12px">{{ dialogError() }}</div>
     }
-  </section>
-</div>
+
+    @if (composing()) {
+      @switch (composerMode()) {
+        @case ('post') {
+          <form class="nx-dialog-form" (ngSubmit)="publishPost()">
+            <div class="nx-field">
+              <label class="nx-label" for="cp-cat">{{ languageService.ui('Categoría') }}</label>
+              <select id="cp-cat" class="nx-select" name="postCategory" [(ngModel)]="postCategory">
+                @for (cat of noticeCategories; track cat) {
+                  <option [value]="cat">{{ languageService.ui(cat) }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="cp-title">{{ languageService.ui('Título del aviso') }}</label>
+              <input
+                id="cp-title"
+                class="nx-input"
+                name="postTitle"
+                [(ngModel)]="postTitle"
+                required />
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="cp-content">{{ languageService.ui('Descripción') }}</label>
+              <textarea
+                id="cp-content"
+                class="nx-textarea"
+                name="postContent"
+                [(ngModel)]="postContent"
+                required></textarea>
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="cp-district">{{ languageService.ui('Distrito (opcional)') }}</label>
+              <input
+                id="cp-district"
+                class="nx-input"
+                name="postDistrict"
+                [(ngModel)]="postDistrict"
+                list="nx-districts-list"
+                placeholder="Lima Centro" />
+              <datalist id="nx-districts-list">
+                @for (d of knownDistricts(); track d) {
+                  <option [value]="d"></option>
+                }
+              </datalist>
+            </div>
+
+            <fieldset class="nx-location-box">
+              <legend class="nx-label">{{ languageService.ui('Lugar del aviso') }}</legend>
+              <p class="nx-muted" style="margin: 0 0 8px">
+                {{ languageService.ui('Haz clic en el mapa para marcar dónde ocurrió.') }}
+              </p>
+              <app-report-location
+                [(location)]="selectedLocation"
+                [initialCenter]="modalMapCenter()" />
+            </fieldset>
+
+            <button type="submit" class="nx-btn nx-btn-primary" [disabled]="submitting()">
+              {{ languageService.ui('Guardar aviso') }}
+            </button>
+          </form>
+        }
+
+        @case ('service') {
+          <form class="nx-dialog-form" (ngSubmit)="submitService()">
+            <div class="nx-field">
+              <label class="nx-label" for="sv-name">{{ languageService.ui('Nombre del establecimiento') }}</label>
+              <input
+                id="sv-name"
+                class="nx-input"
+                name="serviceName"
+                [(ngModel)]="serviceName"
+                required />
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="sv-type">{{ languageService.ui('Tipo de establecimiento') }}</label>
+              <select id="sv-type" class="nx-select" name="serviceType" [(ngModel)]="serviceType">
+                <option value="PHARMACY">{{ languageService.ui('Farmacia') }}</option>
+                <option value="GAS_STATION">{{ languageService.ui('Grifo') }}</option>
+                <option value="HOSPITAL">{{ languageService.ui('Hospital / Clínica') }}</option>
+                <option value="POLICE_STATION">{{ languageService.ui('Comisaría / Serenazgo') }}</option>
+                <option value="OTHER">{{ languageService.ui('Otro servicio') }}</option>
+              </select>
+            </div>
+
+            <label class="nx-checkbox-row">
+              <input type="checkbox" name="serviceIs24h" [(ngModel)]="serviceIs24h" />
+              <span>{{ languageService.ui('Atención las 24 horas') }}</span>
+            </label>
+
+            @if (!serviceIs24h) {
+              <div class="nx-form-grid">
+                <div class="nx-field">
+                  <label class="nx-label" for="sv-open">{{ languageService.ui('Hora de apertura') }}</label>
+                  <input
+                    id="sv-open"
+                    class="nx-input"
+                    type="time"
+                    name="serviceOpensAt"
+                    [(ngModel)]="serviceOpensAt"
+                    (ngModelChange)="onServiceHoursChange()" />
+                </div>
+                <div class="nx-field">
+                  <label class="nx-label" for="sv-close">{{ languageService.ui('Hora de cierre') }}</label>
+                  <input
+                    id="sv-close"
+                    class="nx-input"
+                    type="time"
+                    name="serviceClosesAt"
+                    [(ngModel)]="serviceClosesAt"
+                    (ngModelChange)="onServiceHoursChange()" />
+                </div>
+              </div>
+            }
+
+            <fieldset class="nx-location-box">
+              <legend class="nx-label">{{ languageService.ui('Lugar del aviso') }}</legend>
+              <p class="nx-muted" style="margin: 0 0 8px">
+                {{ languageService.ui('Haz clic en el mapa para marcar dónde ocurrió.') }}
+              </p>
+              <app-report-location
+                [(location)]="selectedLocation"
+                [initialCenter]="modalMapCenter()" />
+            </fieldset>
+
+            <button type="submit" class="nx-btn nx-btn-primary" [disabled]="submitting()">
+              {{ languageService.ui('Enviar a Moderación') }}
+            </button>
+          </form>
+        }
+
+        @case ('risk') {
+          <form class="nx-dialog-form" (ngSubmit)="reportRisk()">
+            <div class="nx-field">
+              <label class="nx-label" for="rz-lvl">{{ languageService.ui('Nivel de riesgo') }}</label>
+              <select id="rz-lvl" class="nx-select" name="riskLevel" [(ngModel)]="riskLevel">
+                <option value="LOW">LOW</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="HIGH">HIGH</option>
+              </select>
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="rz-desc">{{ languageService.ui('Descripción') }}</label>
+              <textarea
+                id="rz-desc"
+                class="nx-textarea"
+                name="riskDesc"
+                [(ngModel)]="riskDesc"
+                required></textarea>
+            </div>
+
+            <fieldset class="nx-location-box">
+              <legend class="nx-label">{{ languageService.ui('Lugar del aviso') }}</legend>
+              <p class="nx-muted" style="margin: 0 0 8px">
+                {{ languageService.ui('Haz clic en el mapa para marcar dónde ocurrió.') }}
+              </p>
+              <app-report-location
+                [(location)]="selectedLocation"
+                [initialCenter]="modalMapCenter()" />
+            </fieldset>
+
+            <button type="submit" class="nx-btn nx-btn-danger" [disabled]="submitting()">
+              {{ languageService.ui('Reportar Riesgo') }}
+            </button>
+          </form>
+        }
+      }
+    }
+  </dialog>
+</section>
