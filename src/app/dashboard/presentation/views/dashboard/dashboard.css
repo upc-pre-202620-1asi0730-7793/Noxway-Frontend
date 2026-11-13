@@ -1,7 +1,7 @@
 .dashboard-container {
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 20px;
 }
 
 /* Welcome Card */
@@ -9,7 +9,7 @@
   background: #0f192d !important;
   border: 1px solid #1c2a47 !important;
   border-radius: 14px !important;
-  padding: 28px 32px !important;
+  padding: 20px 22px !important;
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
@@ -95,7 +95,7 @@
   background: #0f192d !important;
   border: 1px solid #1c2a47 !important;
   border-radius: 12px !important;
-  padding: 22px 24px !important;
+  padding: 16px !important;
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
@@ -103,8 +103,8 @@
 }
 
 .stat-icon-wrapper {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -166,8 +166,8 @@
 /* Dashboard Body */
 .dashboard-body {
   display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: 26px;
+  grid-template-columns: minmax(0, 2.25fr) minmax(245px, 1fr);
+  gap: 20px;
 }
 
 /* Route Card */
@@ -175,16 +175,17 @@
   background: #0f192d !important;
   border: 1px solid #1c2a47 !important;
   border-radius: 14px !important;
-  padding: 28px !important;
+  padding: 18px 24px !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 22px;
+  gap: 16px;
 }
 
 .card-header-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 10px;
 }
 
 .section-title {
@@ -270,7 +271,8 @@
 .route-meta-bar {
   display: flex;
   align-items: center;
-  gap: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
   font-size: 12.5px;
   color: #94a3b8;
   padding: 4px 0;
@@ -495,8 +497,17 @@
 .welcome-card, .stat-card, .route-card { background: #1d2738 !important; }
 .route-path-box { color: #cbd5e1; }
 .dashboard-account-aside .secondary-btn { width: 100%; }
-@media (max-width: 760px) {
+@media (max-width: 1150px) {
   .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .dashboard-body { grid-template-columns: 1fr; }
   .welcome-card, .route-actions-row { flex-wrap: wrap; }
+}
+@media (max-width: 1000px) {
+  .dashboard-body { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 420px) {
+  .stat-card { padding: 12px !important; gap: 8px; }
+  .route-card { padding: 16px !important; }
+  .route-path-box { padding: 12px; gap: 8px; }
+  .connector-line { display: none; }
 }
