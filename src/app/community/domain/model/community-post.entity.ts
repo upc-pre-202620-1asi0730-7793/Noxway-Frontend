@@ -6,6 +6,9 @@ export interface CommunityPostResource {
   title: string;
   content: string;
   district: string;
+  category?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   createdAt: string;
 }
 
@@ -13,6 +16,9 @@ export interface CreateCommunityPostPayload {
   title: string;
   content: string;
   district: string;
+  category?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface CommunityReportResource {

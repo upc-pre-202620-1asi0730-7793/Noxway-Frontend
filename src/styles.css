@@ -600,3 +600,79 @@ img[src="LogoNovctiva.png"] {
   color: var(--nx-toast-info-text) !important;
   border: 1px solid var(--nx-primary-focus);
 }
+
+/* OpenStreetMap + Leaflet Day/Night integration */
+.leaflet-container {
+  font-family: inherit;
+  background: var(--nx-surface-inset);
+}
+
+:root:not([data-theme='light']) .nx-osm-night .leaflet-tile-pane {
+  filter: brightness(0.76) invert(1) contrast(1.65) hue-rotate(185deg) saturate(0.65);
+}
+
+.leaflet-control-zoom a {
+  background: var(--nx-surface) !important;
+  color: var(--nx-text) !important;
+  border-color: var(--nx-border) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--nx-surface-hover) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(13, 21, 39, 0.78) !important;
+  color: #cbd5e1 !important;
+  font-size: 11px !important;
+}
+
+:root[data-theme='light'] .leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: #475569 !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--nx-primary-soft-text) !important;
+}
+
+.leaflet-tooltip {
+  background: var(--nx-surface-elevated);
+  color: var(--nx-text);
+  border: 1px solid var(--nx-border-strong);
+  box-shadow: var(--nx-shadow-control);
+}
+
+/* Shared Accessible Modal Dialog */
+.nx-dialog {
+  box-sizing: border-box;
+  width: min(600px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  color: var(--nx-text);
+  background: var(--nx-surface);
+  border: 1px solid var(--nx-border-strong);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 24px 60px rgba(2, 6, 23, 0.45);
+}
+
+.nx-dialog::backdrop {
+  background: rgba(4, 9, 20, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.nx-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.nx-dialog-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--nx-text);
+}
