@@ -212,11 +212,6 @@
     <div class="nx-card-header">
       <h3 class="nx-card-title">{{ languageService.ui('Cola de Moderación Comunitaria') }}</h3>
       <div class="nx-actions">
-        @if (!actorContext.isAdmin()) {
-          <button type="button" class="nx-btn nx-btn-primary nx-btn-sm" (click)="switchToAdmin()">
-            {{ languageService.ui('Cambiar a Admin (0901) para moderar') }}
-          </button>
-        }
         @for (status of ['PENDING', 'APPROVED', 'REJECTED', 'ALL']; track status) {
           <button
             type="button"

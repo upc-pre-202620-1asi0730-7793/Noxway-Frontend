@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { catchError, forkJoin, of } from 'rxjs';
 import { TrustLinkResource } from '../../../../iam/domain/model/trusted-contact.entity';
-import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { TrustedContactsService } from '../../../../iam/infrastructure/trusted-contacts.service';
 import { SubscriptionInvitationResource } from '../../../../subscriptions/domain/model/collective-benefit.entity';
 import { SubscriptionsService } from '../../../../subscriptions/infrastructure/subscriptions.service';
@@ -21,7 +20,6 @@ import { extractProblemMessage } from '../../../../shared/infrastructure/problem
 export class CompanionInvitations {
   private readonly contactsService = inject(TrustedContactsService);
   private readonly subService = inject(SubscriptionsService);
-  private readonly session = inject(SessionService);
   private readonly toast = inject(NotificationToastService);
   readonly actorContext = inject(ActorContextService);
   readonly languageService = inject(LanguageService);
@@ -76,16 +74,5 @@ export class CompanionInvitations {
       },
       error: (err) => this.toast.error(extractProblemMessage(err, 'Error procesando invitación.')),
     });
-  }
-
-  switchToMiguel(): void {
-    const contacts = this.actorContext.personas.filter(
-      (persona) => persona.role === 'TRUSTED_CONTACT',
-    );
-    const contact = contacts[1] ?? contacts[0];
-    if (contact) {
-      this.session.switchPersona(contact.id);
-      this.toast.info(`Contacto activo: ${contact.name}`);
-    }
   }
 }

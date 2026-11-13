@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { catchError, of } from 'rxjs';
 import { CommuteService } from '../../../../commute/infrastructure/commute.service';
-import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { CompanionLiveResource } from '../../../domain/model/companion.entity';
 import { CompanionService } from '../../../infrastructure/companion.service';
 import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
@@ -20,7 +19,6 @@ import { extractProblemMessage } from '../../../../shared/infrastructure/problem
 export class CompanionLive {
   private readonly companionService = inject(CompanionService);
   private readonly commuteService = inject(CommuteService);
-  private readonly session = inject(SessionService);
   private readonly toast = inject(NotificationToastService);
   readonly actorContext = inject(ActorContextService);
   readonly languageService = inject(LanguageService);
@@ -54,13 +52,5 @@ export class CompanionLive {
       },
       error: (err) => this.toast.error(extractProblemMessage(err, 'No se pudo resolver.')),
     });
-  }
-
-  switchToRosa(): void {
-    const contact = this.actorContext.findPersonaByRole('TRUSTED_CONTACT');
-    if (contact) {
-      this.session.switchPersona(contact.id);
-      this.toast.info(`Contacto activo: ${contact.name}`);
-    }
   }
 }

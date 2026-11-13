@@ -13,7 +13,6 @@ import {
   SubscriptionResource,
 } from '../../../domain/model/collective-benefit.entity';
 import { SubscriptionsService } from '../../../infrastructure/subscriptions.service';
-import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
 import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
@@ -28,7 +27,6 @@ import { extractProblemMessage } from '../../../../shared/infrastructure/problem
 })
 export class Benefits {
   private readonly subService = inject(SubscriptionsService);
-  private readonly session = inject(SessionService);
   private readonly toast = inject(NotificationToastService);
   readonly actorContext = inject(ActorContextService);
   readonly languageService = inject(LanguageService);
@@ -240,13 +238,5 @@ export class Benefits {
       },
       error: (err) => this.toast.error(extractProblemMessage(err, 'Error al canjear recompensa.')),
     });
-  }
-
-  switchToAdmin(): void {
-    const admin = this.actorContext.findPersonaByRole('ADMIN');
-    if (admin) {
-      this.session.switchPersona(admin.id);
-      this.toast.info(`Administrador (${admin.name}) activo para confirmar pagos`);
-    }
   }
 }

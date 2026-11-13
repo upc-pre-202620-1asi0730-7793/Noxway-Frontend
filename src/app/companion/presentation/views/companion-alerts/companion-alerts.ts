@@ -6,7 +6,6 @@ import {
   NotificationChannel,
   NotificationPreferenceResource,
 } from '../../../../iam/domain/model/user-profile.entity';
-import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { UserProfileService } from '../../../../iam/infrastructure/user-profile.service';
 import { AlertResource } from '../../../domain/model/companion.entity';
 import { CompanionService } from '../../../infrastructure/companion.service';
@@ -25,7 +24,6 @@ import { extractProblemMessage } from '../../../../shared/infrastructure/problem
 export class CompanionAlerts {
   private readonly companionService = inject(CompanionService);
   private readonly profileService = inject(UserProfileService);
-  private readonly session = inject(SessionService);
   private readonly toast = inject(NotificationToastService);
   readonly actorContext = inject(ActorContextService);
   readonly languageService = inject(LanguageService);
@@ -114,12 +112,5 @@ export class CompanionAlerts {
       },
       error: (err) => this.toast.error(extractProblemMessage(err, 'Error al reintentar.')),
     });
-  }
-
-  switchToRosa(): void {
-    const contact = this.actorContext.findPersonaByRole('TRUSTED_CONTACT');
-    if (contact) {
-      this.session.switchPersona(contact.id);
-    }
   }
 }

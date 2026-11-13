@@ -15,21 +15,6 @@
     </button>
   </div>
 
-  @if (!actorContext.isCompanionRole()) {
-    <div class="nx-banner">
-      <span>
-        {{
-          languageService.ui(
-            'Tu persona actual no es Contacto de Confianza. Cambia a Rosa Paredes (0201) para ver su red de trabajadores vinculados.'
-          )
-        }}
-      </span>
-      <button type="button" class="nx-btn nx-btn-success nx-btn-sm" (click)="switchToRosa()">
-        {{ languageService.ui('Cambiar a Rosa Paredes (0201)') }}
-      </button>
-    </div>
-  }
-
   @if (loading()) {
     <div class="nx-card">
       <p class="nx-muted">{{ languageService.ui('Consultando monitoreo en vivo...') }}</p>

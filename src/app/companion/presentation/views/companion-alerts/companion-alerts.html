@@ -20,15 +20,6 @@
     </div>
   </div>
 
-  @if (!actorContext.isCompanionRole()) {
-    <div class="nx-banner">
-      <span>{{ languageService.ui('Cambia a Rosa Paredes (0201) para consultar las alertas del contacto.') }}</span>
-      <button type="button" class="nx-btn nx-btn-success nx-btn-sm" (click)="switchToRosa()">
-        Rosa Paredes (0201)
-      </button>
-    </div>
-  }
-
   @if (loading()) {
     <div class="nx-card">
       <p class="nx-muted">{{ languageService.ui('Cargando alertas...') }}</p>

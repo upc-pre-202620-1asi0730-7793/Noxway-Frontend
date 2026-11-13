@@ -103,11 +103,6 @@
       <section class="nx-card">
         <div class="nx-card-header">
           <h3 class="nx-card-title">{{ languageService.ui('Pagos Offline (Yape / Plin / Agente)') }}</h3>
-          @if (!actorContext.isAdmin()) {
-            <button type="button" class="nx-btn nx-btn-primary nx-btn-sm" (click)="switchToAdmin()">
-              Admin (0901)
-            </button>
-          }
         </div>
 
         <div class="nx-field">
@@ -258,7 +253,7 @@
           <p class="nx-muted">
             {{
               languageService.ui(
-                'Activa una suscripción FAMILY_CREW (o cambia a Carlos Mendoza 0102) para invitar hasta 5 trabajadores.'
+                'Activa una suscripción FAMILY_CREW para invitar hasta 5 trabajadores.'
               )
             }}
           </p>

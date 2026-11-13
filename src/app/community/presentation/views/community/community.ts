@@ -8,7 +8,6 @@ import {
   ModerationActionResource,
 } from '../../../domain/model/community-post.entity';
 import { CommunityService } from '../../../infrastructure/community.service';
-import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
 import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
@@ -23,7 +22,6 @@ import { extractProblemMessage } from '../../../../shared/infrastructure/problem
 })
 export class Community {
   private readonly communityService = inject(CommunityService);
-  private readonly session = inject(SessionService);
   private readonly toast = inject(NotificationToastService);
   readonly actorContext = inject(ActorContextService);
   readonly languageService = inject(LanguageService);
@@ -228,13 +226,5 @@ export class Community {
       next: (actions) => this.selectedActions.set(actions),
       error: () => this.selectedActions.set([]),
     });
-  }
-
-  switchToAdmin(): void {
-    const admin = this.actorContext.findPersonaByRole('ADMIN');
-    if (admin) {
-      this.session.switchPersona(admin.id);
-      this.toast.info(`Administrador / Moderador (${admin.name}) activo`);
-    }
   }
 }
