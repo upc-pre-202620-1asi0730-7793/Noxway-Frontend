@@ -14,10 +14,7 @@ import {
 } from '../../../domain/model/collective-benefit.entity';
 import { SubscriptionsService } from '../../../infrastructure/subscriptions.service';
 import { SessionService } from '../../../../iam/infrastructure/session.service';
-import {
-  ActorContextService,
-  DEMO_PERSONAS,
-} from '../../../../shared/infrastructure/actor-context.service';
+import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
 import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
 import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
@@ -56,8 +53,8 @@ export class Benefits {
       ) ?? null,
   );
 
-  offlineReference = 'YAPE-987654';
-  inviteWorkerEmail = 'jorge.huaman@noxway.pe';
+  offlineReference = '';
+  inviteWorkerEmail = '';
   referralCodeInput = '';
 
   constructor() {
@@ -140,16 +137,29 @@ export class Benefits {
     });
   }
 
+  hasPendingPayment(subscriptionId: string): boolean {
+    return this.payments().some(
+      (pay) => pay.subscriptionId === subscriptionId && pay.status === 'PENDING',
+    );
+  }
+
   confirmOffline(paymentId: string): void {
-    this.subService
-      .confirmOfflinePayment(paymentId, this.offlineReference.trim() || 'YAPE-CONFIRMED')
-      .subscribe({
-        next: () => {
-          this.toast.success(this.languageService.ui('Pago offline confirmado y plan activado.'));
-          this.loadAll();
-        },
-        error: (err) => this.toast.error(extractProblemMessage(err, 'Solo Admin confirma pagos.')),
-      });
+    const reference = this.offlineReference.trim();
+    if (!reference) {
+      this.toast.error(
+        this.languageService.ui('Ingresa una referencia única de comprobante (ej. YAPE-987654).'),
+      );
+      return;
+    }
+
+    this.subService.confirmOfflinePayment(paymentId, reference).subscribe({
+      next: () => {
+        this.offlineReference = '';
+        this.toast.success(this.languageService.ui('Pago offline confirmado y plan activado.'));
+        this.loadAll();
+      },
+      error: (err) => this.toast.error(extractProblemMessage(err, 'Solo Admin confirma pagos.')),
+    });
   }
 
   rejectPayment(paymentId: string): void {
@@ -179,6 +189,7 @@ export class Benefits {
 
     this.subService.inviteMember(sub.id, this.inviteWorkerEmail.trim()).subscribe({
       next: () => {
+        this.inviteWorkerEmail = '';
         this.toast.success(this.languageService.ui('Trabajador invitado al grupo familiar.'));
         this.loadAll();
       },
@@ -232,8 +243,10 @@ export class Benefits {
   }
 
   switchToAdmin(): void {
-    const admin = DEMO_PERSONAS.find((persona) => persona.role === 'ADMIN') ?? DEMO_PERSONAS[4];
-    this.session.switchPersona(admin.id);
-    this.toast.info('Administrador (0901) activo para confirmar pagos');
+    const admin = this.actorContext.findPersonaByRole('ADMIN');
+    if (admin) {
+      this.session.switchPersona(admin.id);
+      this.toast.info(`Administrador (${admin.name}) activo para confirmar pagos`);
+    }
   }
 }

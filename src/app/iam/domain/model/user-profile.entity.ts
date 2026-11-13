@@ -32,14 +32,24 @@ export interface CreateProfilePayload {
   timeZone: string;
 }
 
+export const NOTIFICATION_CHANNELS = ['EMAIL', 'WHATSAPP', 'SMS'] as const;
+export type NotificationChannel = (typeof NOTIFICATION_CHANNELS)[number];
+
 export interface NotificationPreferenceResource {
   id: string;
   accountId: string;
-  channel: 'EMAIL' | 'SMS' | 'WHATSAPP' | string;
+  channel: NotificationChannel | string;
   enabled: boolean;
   priorityStart: string;
   priorityEnd: string;
   timeZone: string;
+}
+
+export function getMissingNotificationChannels(
+  preferences: readonly NotificationPreferenceResource[],
+): NotificationChannel[] {
+  const configured = new Set(preferences.map((pref) => pref.channel));
+  return NOTIFICATION_CHANNELS.filter((channel) => !configured.has(channel));
 }
 
 export interface UpdateNotificationPreferencePayload {

@@ -85,6 +85,19 @@
           <span class="nx-badge nx-badge-slate">{{ preferences().length }} canales</span>
         </div>
 
+        @if (missingChannels().length > 0) {
+          <div class="nx-actions" style="margin-bottom: 12px">
+            @for (channel of missingChannels(); track channel) {
+              <button
+                type="button"
+                class="nx-btn nx-btn-secondary nx-btn-sm"
+                (click)="configureChannel(channel)">
+                + Activar {{ channel }}
+              </button>
+            }
+          </div>
+        }
+
         @if (preferences().length === 0) {
           <div class="nx-empty">{{ languageService.ui('Sin canales configurados.') }}</div>
         } @else {

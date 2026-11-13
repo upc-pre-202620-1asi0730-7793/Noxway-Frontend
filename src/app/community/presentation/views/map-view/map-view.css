@@ -45,3 +45,26 @@
   color: #ffffff;
   z-index: 5;
 }
+
+.nx-map-pin-risk {
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+  background: rgba(245, 158, 11, 0.18);
+  border-color: #f59e0b;
+  color: #fde68a;
+  z-index: 3;
+}
+
+.nx-pin-risk-high {
+  background: rgba(239, 68, 68, 0.22);
+  border-color: #ef4444;
+  color: #fecaca;
+}
+
+.nx-pin-risk-medium {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  color: #fde68a;
+}

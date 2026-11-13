@@ -48,8 +48,8 @@ export class Journey {
   );
 
   // Start Commute form
-  origin = 'Centro Comercial MegaPlaza';
-  destination = 'Av. Universitaria 1850, Los Olivos';
+  origin = '';
+  destination = '';
   transport = 'Motocicleta';
   durationMinutes = 35;
   toleranceMinutes = 15;
@@ -60,12 +60,12 @@ export class Journey {
   pingSpeed = 34;
   delayMinutes = 15;
   incidentType: 'SOS' | 'DELAY' | 'DEVIATION' | 'OTHER' = 'SOS';
-  incidentDescription = 'Parada inesperada por poca iluminación en la vía';
+  incidentDescription = '';
 
   // Route rating inline form
   ratingTargetId = signal<string | null>(null);
   ratingScore = 5;
-  ratingComments = 'Ruta iluminada y tranquila';
+  ratingComments = '';
 
   constructor() {
     effect(() => {
@@ -107,6 +107,11 @@ export class Journey {
   }
 
   startCommute(): void {
+    if (!this.origin.trim() || !this.destination.trim()) {
+      this.toast.error(this.languageService.ui('Ingresa origen y destino para iniciar el trayecto.'));
+      return;
+    }
+
     this.busy.set(true);
     this.errorMessage.set(null);
     const now = new Date();
@@ -124,6 +129,8 @@ export class Journey {
       .subscribe({
         next: () => {
           this.busy.set(false);
+          this.origin = '';
+          this.destination = '';
           this.toast.success(this.languageService.ui('Trayecto seguro iniciado.'));
           this.loadAll();
         },
@@ -183,15 +190,17 @@ export class Journey {
     const active = this.activeCommute();
     if (!active) return;
 
+    const description = this.incidentDescription.trim() || `Alerta ${this.incidentType} reportada`;
     this.busy.set(true);
     this.commuteService
       .triggerIncident(active.id, {
         type: this.incidentType,
-        description: this.incidentDescription.trim(),
+        description,
       })
       .subscribe({
         next: () => {
           this.busy.set(false);
+          this.incidentDescription = '';
           this.toast.error(`Incidente ${this.incidentType} emitido a contactos de confianza`);
           this.loadActiveDetails(active.id);
         },
@@ -245,6 +254,7 @@ export class Journey {
         next: () => {
           this.busy.set(false);
           this.ratingTargetId.set(null);
+          this.ratingComments = '';
           this.toast.success(this.languageService.ui('Calificación guardada.'));
           this.loadAll();
         },

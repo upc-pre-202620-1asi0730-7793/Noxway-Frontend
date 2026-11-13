@@ -6,10 +6,7 @@ import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { TrustedContactsService } from '../../../../iam/infrastructure/trusted-contacts.service';
 import { SubscriptionInvitationResource } from '../../../../subscriptions/domain/model/collective-benefit.entity';
 import { SubscriptionsService } from '../../../../subscriptions/infrastructure/subscriptions.service';
-import {
-  ActorContextService,
-  DEMO_PERSONAS,
-} from '../../../../shared/infrastructure/actor-context.service';
+import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
 import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
 import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
@@ -82,8 +79,13 @@ export class CompanionInvitations {
   }
 
   switchToMiguel(): void {
-    const miguel = DEMO_PERSONAS[3];
-    this.session.switchPersona(miguel.id);
-    this.toast.info(`Contacto activo: ${miguel.name}`);
+    const contacts = this.actorContext.personas.filter(
+      (persona) => persona.role === 'TRUSTED_CONTACT',
+    );
+    const contact = contacts[1] ?? contacts[0];
+    if (contact) {
+      this.session.switchPersona(contact.id);
+      this.toast.info(`Contacto activo: ${contact.name}`);
+    }
   }
 }

@@ -75,7 +75,7 @@
                   [class.nx-badge-red]="sub.status === 'CANCELLED'">
                   {{ sub.status }}
                 </span>
-                @if (sub.status === 'PENDING_PAYMENT') {
+                @if (sub.status === 'PENDING_PAYMENT' && !hasPendingPayment(sub.id)) {
                   <button
                     type="button"
                     class="nx-btn nx-btn-primary nx-btn-sm"
@@ -112,7 +112,11 @@
 
         <div class="nx-field">
           <label class="nx-label" for="off-ref">{{ languageService.ui('Referencia de comprobante') }}</label>
-          <input id="off-ref" class="nx-input" [(ngModel)]="offlineReference" />
+          <input
+            id="off-ref"
+            class="nx-input"
+            [(ngModel)]="offlineReference"
+            placeholder="Ej. YAPE-987654" />
         </div>
 
         <div class="nx-list">
@@ -213,7 +217,14 @@
           <form class="nx-form-grid" (ngSubmit)="inviteCrewMember()">
             <div class="nx-field nx-field-full">
               <label class="nx-label" for="crew-email">Invitar trabajador (email)</label>
-              <input id="crew-email" class="nx-input" name="inviteWorkerEmail" [(ngModel)]="inviteWorkerEmail" required />
+              <input
+                id="crew-email"
+                class="nx-input"
+                type="email"
+                name="inviteWorkerEmail"
+                [(ngModel)]="inviteWorkerEmail"
+                placeholder="trabajador@noxway.pe"
+                required />
             </div>
             <div class="nx-field nx-field-full">
               <button type="submit" class="nx-btn nx-btn-primary nx-btn-sm">

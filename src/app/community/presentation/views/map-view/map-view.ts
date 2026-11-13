@@ -36,13 +36,47 @@ export class MapView {
 
   readonly categories = ['ALL', 'PHARMACY', 'GAS_STATION', 'HOSPITAL', 'POLICE_STATION'];
 
-  readonly mapPins = computed(() =>
-    this.services().map((item) => ({
+  private readonly mapBounds = computed(() => {
+    const activeZones = this.riskZones().filter((zone) => zone.status !== 'RESOLVED');
+    const lats = [
+      ...this.services().map((item) => item.latitude),
+      ...activeZones.map((zone) => zone.latitude),
+    ];
+    const lngs = [
+      ...this.services().map((item) => item.longitude),
+      ...activeZones.map((zone) => zone.longitude),
+    ];
+    const minLat = Math.min(-12.16, ...lats);
+    const maxLat = Math.max(-11.94, ...lats);
+    const minLng = Math.min(-77.14, ...lngs);
+    const maxLng = Math.max(-76.96, ...lngs);
+    return {
+      minLat,
+      maxLat: maxLat > minLat ? maxLat : minLat + 0.01,
+      minLng,
+      maxLng: maxLng > minLng ? maxLng : minLng + 0.01,
+    };
+  });
+
+  readonly mapPins = computed(() => {
+    const bounds = this.mapBounds();
+    return this.services().map((item) => ({
       service: item,
-      leftPct: this.toPercent(item.longitude, -77.14, -76.96),
-      topPct: 100 - this.toPercent(item.latitude, -12.16, -11.94),
-    })),
-  );
+      leftPct: this.toPercent(item.longitude, bounds.minLng, bounds.maxLng),
+      topPct: 100 - this.toPercent(item.latitude, bounds.minLat, bounds.maxLat),
+    }));
+  });
+
+  readonly riskPins = computed(() => {
+    const bounds = this.mapBounds();
+    return this.riskZones()
+      .filter((zone) => zone.status !== 'RESOLVED')
+      .map((zone) => ({
+        zone,
+        leftPct: this.toPercent(zone.longitude, bounds.minLng, bounds.maxLng),
+        topPct: 100 - this.toPercent(zone.latitude, bounds.minLat, bounds.maxLat),
+      }));
+  });
 
   constructor() {
     effect(() => {

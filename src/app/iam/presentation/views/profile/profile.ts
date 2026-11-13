@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import {
   AccountProfileResource,
+  getMissingNotificationChannels,
+  NotificationChannel,
   NotificationPreferenceResource,
 } from '../../../domain/model/user-profile.entity';
 import { SessionService } from '../../../infrastructure/session.service';
@@ -32,6 +34,7 @@ export class Profile {
   readonly errorMessage = signal<string | null>(null);
   readonly profile = signal<AccountProfileResource | null>(null);
   readonly preferences = signal<NotificationPreferenceResource[]>([]);
+  readonly missingChannels = computed(() => getMissingNotificationChannels(this.preferences()));
 
   fullName = '';
   phone = '';
@@ -101,6 +104,18 @@ export class Profile {
       });
   }
 
+  configureChannel(channel: NotificationChannel): void {
+    this.savePreference({
+      id: '',
+      accountId: this.actorContext.activeActorId(),
+      channel,
+      enabled: true,
+      priorityStart: '20:00',
+      priorityEnd: '07:00',
+      timeZone: this.timeZone || 'America/Lima',
+    });
+  }
+
   savePreference(pref: NotificationPreferenceResource): void {
     this.profileService
       .updateNotificationPreference({
@@ -113,7 +128,9 @@ export class Profile {
       .subscribe({
         next: (updated) => {
           this.preferences.update((items) =>
-            items.map((item) => (item.channel === updated.channel ? updated : item)),
+            items.some((item) => item.channel === updated.channel)
+              ? items.map((item) => (item.channel === updated.channel ? updated : item))
+              : [...items, updated],
           );
           this.toast.success(`${updated.channel} ${updated.enabled ? 'activo' : 'pausado'}`);
         },

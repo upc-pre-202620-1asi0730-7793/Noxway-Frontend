@@ -9,10 +9,7 @@ import {
 } from '../../../domain/model/community-post.entity';
 import { CommunityService } from '../../../infrastructure/community.service';
 import { SessionService } from '../../../../iam/infrastructure/session.service';
-import {
-  ActorContextService,
-  DEMO_PERSONAS,
-} from '../../../../shared/infrastructure/actor-context.service';
+import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
 import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
 import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
@@ -39,11 +36,19 @@ export class Community {
 
   readonly district = signal('all');
   readonly reportFilter = signal('PENDING');
+  readonly knownDistricts = signal<string[]>([
+    'Lima Centro',
+    'Miraflores',
+    'Lince',
+    'Los Olivos',
+    'San Isidro',
+    'Cercado de Lima',
+  ]);
 
   // Create Post form
   postTitle = '';
   postContent = '';
-  postDistrict = 'Los Olivos';
+  postDistrict = '';
 
   // Submit Service Point form
   serviceName = '';
@@ -53,6 +58,7 @@ export class Community {
   serviceIs24h = true;
   serviceOpensAt = '08:00';
   serviceClosesAt = '22:00';
+  serviceClosesNextDay = false;
 
   // Report Risk Zone form
   riskDesc = '';
@@ -61,7 +67,7 @@ export class Community {
   riskLng = -77.0428;
 
   // Moderation notes
-  decisionNotes = 'Verificado y validado por moderación Noxway';
+  decisionNotes = '';
 
   constructor() {
     effect(() => {
@@ -79,10 +85,23 @@ export class Community {
         .listReports(this.reportFilter() === 'ALL' ? undefined : this.reportFilter(), 0, 30)
         .pipe(catchError(() => of(null))),
     }).subscribe(({ posts, reports }) => {
-      this.posts.set(posts?.items ?? []);
+      const postItems = posts?.items ?? [];
+      this.posts.set(postItems);
+      const discovered = postItems
+        .map((post) => post.district?.trim())
+        .filter((value): value is string => Boolean(value));
+      if (discovered.length > 0) {
+        this.knownDistricts.update((existing) =>
+          Array.from(new Set([...existing, ...discovered])).sort((a, b) => a.localeCompare(b)),
+        );
+      }
       this.reports.set(reports?.items ?? []);
       this.loading.set(false);
     });
+  }
+
+  onServiceHoursChange(): void {
+    this.serviceClosesNextDay = this.serviceClosesAt <= this.serviceOpensAt;
   }
 
   changeDistrict(nextDistrict: string): void {
@@ -96,7 +115,7 @@ export class Community {
   }
 
   publishPost(): void {
-    if (!this.postTitle.trim() || !this.postContent.trim()) return;
+    if (!this.postTitle.trim() || !this.postContent.trim() || !this.postDistrict.trim()) return;
 
     this.communityService
       .createPost({
@@ -108,6 +127,7 @@ export class Community {
         next: () => {
           this.postTitle = '';
           this.postContent = '';
+          this.postDistrict = '';
           this.toast.success(this.languageService.ui('Aviso comunitario publicado.'));
           this.loadAll();
         },
@@ -138,7 +158,7 @@ export class Community {
       dayOfWeek: index + 1,
       opensAt: this.serviceIs24h ? '00:00' : this.serviceOpensAt,
       closesAt: this.serviceIs24h ? '00:00' : this.serviceClosesAt,
-      closesNextDay: false,
+      closesNextDay: this.serviceIs24h ? false : this.serviceClosesNextDay,
       is24Hours: this.serviceIs24h,
     }));
 
@@ -186,8 +206,12 @@ export class Community {
   }
 
   decideReport(reportId: string, decision: 'APPROVE' | 'REJECT'): void {
-    this.communityService.decideReport(reportId, decision, this.decisionNotes.trim()).subscribe({
+    const notes =
+      this.decisionNotes.trim() ||
+      (decision === 'APPROVE' ? 'Aprobado por moderación' : 'Rechazado por moderación');
+    this.communityService.decideReport(reportId, decision, notes).subscribe({
       next: () => {
+        this.decisionNotes = '';
         this.toast.success(`Reporte ${decision}`);
         this.loadAll();
         if (this.selectedReportId() === reportId) {
@@ -207,8 +231,10 @@ export class Community {
   }
 
   switchToAdmin(): void {
-    const admin = DEMO_PERSONAS.find((persona) => persona.role === 'ADMIN') ?? DEMO_PERSONAS[4];
-    this.session.switchPersona(admin.id);
-    this.toast.info('Administrador / Moderador (0901) activo');
+    const admin = this.actorContext.findPersonaByRole('ADMIN');
+    if (admin) {
+      this.session.switchPersona(admin.id);
+      this.toast.info(`Administrador / Moderador (${admin.name}) activo`);
+    }
   }
 }

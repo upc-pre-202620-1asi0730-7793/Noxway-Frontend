@@ -16,6 +16,7 @@ import { catchError, filter, forkJoin, of } from 'rxjs';
 import { CommuteService } from '../../../../commute/infrastructure/commute.service';
 import { CompanionService } from '../../../../companion/infrastructure/companion.service';
 import { SessionService } from '../../../../iam/infrastructure/session.service';
+import { UserProfileService } from '../../../../iam/infrastructure/user-profile.service';
 import { ActorContextService } from '../../../infrastructure/actor-context.service';
 import { LanguageService } from '../../../infrastructure/language.service';
 import { LanguageSwitcher } from '../language-switcher/language-switcher';
@@ -59,6 +60,7 @@ export class Layout implements OnInit, OnDestroy {
   readonly languageService = inject(LanguageService);
   private readonly commuteService = inject(CommuteService);
   private readonly companionService = inject(CompanionService);
+  private readonly profileService = inject(UserProfileService);
 
   readonly currentUrl = signal(this.router.url || '/dashboard');
   readonly activeCommuteCount = signal(0);
@@ -173,10 +175,12 @@ export class Layout implements OnInit, OnDestroy {
     this.session.loadProfile().pipe(catchError(() => of(null))).subscribe();
 
     forkJoin({
+      directory: this.profileService.getDirectory().pipe(catchError(() => of([]))),
       commutes: this.commuteService.getMyCommutes(0, 5).pipe(catchError(() => of(null))),
       live: this.companionService.getLiveMonitoring().pipe(catchError(() => of([]))),
       alerts: this.companionService.getAlerts(0, 5).pipe(catchError(() => of(null))),
-    }).subscribe(({ commutes, live, alerts }) => {
+    }).subscribe(({ directory, commutes, live, alerts }) => {
+      this.actorContext.syncDirectory(directory);
       const openCommutes = (commutes?.items ?? []).filter((c) => c.status !== 'ARRIVED').length;
       this.activeCommuteCount.set(openCommutes);
 

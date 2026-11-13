@@ -67,6 +67,17 @@
               {{ pin.service.name }}
             </button>
           }
+          @for (rpin of riskPins(); track rpin.zone.id) {
+            <span
+              class="nx-map-pin nx-map-pin-risk"
+              [class.nx-pin-risk-high]="rpin.zone.riskLevel === 'HIGH'"
+              [class.nx-pin-risk-medium]="rpin.zone.riskLevel === 'MEDIUM'"
+              [style.left.%]="rpin.leftPct"
+              [style.top.%]="rpin.topPct"
+              [title]="rpin.zone.description + ' (' + rpin.zone.riskLevel + ')'">
+              ⚠ {{ rpin.zone.description }}
+            </span>
+          }
         </div>
 
         <div class="nx-list">

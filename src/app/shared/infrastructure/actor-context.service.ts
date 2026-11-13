@@ -1,4 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
+import { AccountProfileResource } from '../../iam/domain/model/user-profile.entity';
 
 export type PersonaRole = 'WORKER' | 'TRUSTED_CONTACT' | 'ADMIN';
 
@@ -67,7 +68,7 @@ const STORAGE_KEY = 'noxway_actor_id';
  */
 @Injectable({ providedIn: 'root' })
 export class ActorContextService {
-  readonly personas = DEMO_PERSONAS;
+  private readonly personasSignal = signal<DemoPersona[]>([...DEMO_PERSONAS]);
 
   private readonly actorIdSignal = signal<string>(this.readStoredActorId());
   private readonly revisionSignal = signal<number>(0);
@@ -75,17 +76,74 @@ export class ActorContextService {
   readonly activeActorId = this.actorIdSignal.asReadonly();
   readonly revision = this.revisionSignal.asReadonly();
 
+  get personas(): readonly DemoPersona[] {
+    return this.personasSignal();
+  }
+
   readonly activePersona = computed<DemoPersona>(
     () =>
-      this.personas.find((p) => p.id === this.actorIdSignal()) ?? this.personas[0],
+      this.personasSignal().find((p) => p.id === this.actorIdSignal()) ?? this.personasSignal()[0],
   );
 
   readonly isAdmin = computed(() => this.activePersona().role === 'ADMIN');
   readonly isCompanionRole = computed(() => this.activePersona().role === 'TRUSTED_CONTACT');
   readonly isWorkerRole = computed(() => this.activePersona().role === 'WORKER');
 
+  findPersonaByRole(role: PersonaRole): DemoPersona | undefined {
+    return this.personasSignal().find((persona) => persona.role === role);
+  }
+
+  syncDirectory(accounts: readonly AccountProfileResource[]): void {
+    if (!accounts.length) {
+      return;
+    }
+    const seedById = new Map(DEMO_PERSONAS.map((persona) => [persona.id, persona]));
+    const merged: DemoPersona[] = accounts.map((account) => {
+      const seed = seedById.get(account.id);
+      const normalizedRole: PersonaRole =
+        account.role === 'ADMIN' || account.role === 'MODERATOR'
+          ? 'ADMIN'
+          : account.role === 'TRUSTED_CONTACT'
+            ? 'TRUSTED_CONTACT'
+            : 'WORKER';
+      const defaultRoute =
+        seed?.defaultRoute ??
+        (normalizedRole === 'TRUSTED_CONTACT'
+          ? '/companion/live'
+          : normalizedRole === 'ADMIN'
+            ? '/community'
+            : '/dashboard');
+      const rolePrefixEs =
+        normalizedRole === 'ADMIN'
+          ? 'Admin / Moderador'
+          : normalizedRole === 'TRUSTED_CONTACT'
+            ? 'Contacto'
+            : 'Trabajador';
+      const rolePrefixEn =
+        normalizedRole === 'ADMIN'
+          ? 'Admin / Moderator'
+          : normalizedRole === 'TRUSTED_CONTACT'
+            ? 'Companion'
+            : 'Worker';
+
+      return {
+        id: account.id,
+        name: account.fullName,
+        email: account.email,
+        role: normalizedRole,
+        labelEs: seed?.labelEs ?? `${rolePrefixEs} · ${account.fullName}`,
+        labelEn: seed?.labelEn ?? `${rolePrefixEn} · ${account.fullName}`,
+        defaultRoute,
+      };
+    });
+    this.personasSignal.set(merged);
+    if (!merged.some((p) => p.id === this.actorIdSignal()) && merged[0]) {
+      this.actorIdSignal.set(merged[0].id);
+    }
+  }
+
   setActor(actorId: string): void {
-    if (!this.personas.some((p) => p.id === actorId)) {
+    if (!this.personasSignal().some((p) => p.id === actorId)) {
       return;
     }
     this.actorIdSignal.set(actorId);
@@ -98,9 +156,10 @@ export class ActorContextService {
   }
 
   private readStoredActorId(): string {
+    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved && DEMO_PERSONAS.some((p) => p.id === saved)) {
+      if (saved && (DEMO_PERSONAS.some((p) => p.id === saved) || uuidPattern.test(saved))) {
         return saved;
       }
     } catch {

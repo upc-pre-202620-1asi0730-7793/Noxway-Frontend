@@ -35,7 +35,7 @@ export class Wellness {
   startTimeStr = '08:00';
   endTimeStr = '14:30';
   quality = 4;
-  notes = 'Descanso post-turno con cortinas blackout';
+  notes = '';
 
   readonly maxChartMinutes = computed(() => {
     const items = this.summary()?.dailyBreakdown ?? [];

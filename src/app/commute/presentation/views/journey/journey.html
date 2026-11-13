@@ -94,7 +94,11 @@
             </div>
             <div class="nx-field nx-field-full">
               <label class="nx-label" for="j-inc-desc">Descripción</label>
-              <input id="j-inc-desc" class="nx-input" [(ngModel)]="incidentDescription" />
+              <input
+                id="j-inc-desc"
+                class="nx-input"
+                [(ngModel)]="incidentDescription"
+                placeholder="Ej. Parada inesperada por poca iluminación" />
             </div>
           </div>
           <button type="button" class="nx-btn nx-btn-danger nx-btn-sm" [disabled]="busy()" (click)="triggerIncident()">
@@ -167,11 +171,23 @@
       <form class="nx-form-grid" (ngSubmit)="startCommute()">
         <div class="nx-field">
           <label class="nx-label" for="j-orig">Origen</label>
-          <input id="j-orig" class="nx-input" name="origin" [(ngModel)]="origin" required />
+          <input
+            id="j-orig"
+            class="nx-input"
+            name="origin"
+            [(ngModel)]="origin"
+            placeholder="Ej. Hospital Rebagliati"
+            required />
         </div>
         <div class="nx-field">
           <label class="nx-label" for="j-dest">Destino</label>
-          <input id="j-dest" class="nx-input" name="destination" [(ngModel)]="destination" required />
+          <input
+            id="j-dest"
+            class="nx-input"
+            name="destination"
+            [(ngModel)]="destination"
+            placeholder="Ej. Av. Universitaria 1850, Los Olivos"
+            required />
         </div>
         <div class="nx-field">
           <label class="nx-label" for="j-trans">Transporte</label>

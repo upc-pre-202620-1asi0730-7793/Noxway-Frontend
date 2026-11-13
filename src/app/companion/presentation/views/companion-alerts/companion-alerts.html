@@ -71,6 +71,18 @@
           <div class="nx-card-header">
             <h3 class="nx-card-title">{{ languageService.ui('Mis Canales Habilitados') }}</h3>
           </div>
+          @if (missingChannels().length > 0) {
+            <div class="nx-actions" style="margin-bottom: 12px">
+              @for (channel of missingChannels(); track channel) {
+                <button
+                  type="button"
+                  class="nx-btn nx-btn-secondary nx-btn-sm"
+                  (click)="configureChannel(channel)">
+                  + Activar {{ channel }}
+                </button>
+              }
+            </div>
+          }
           <div class="nx-list">
             @for (pref of preferences(); track pref.channel) {
               <div class="nx-list-item">

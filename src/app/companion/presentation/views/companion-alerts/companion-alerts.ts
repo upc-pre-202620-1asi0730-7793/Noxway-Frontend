@@ -1,15 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { catchError, forkJoin, of } from 'rxjs';
-import { NotificationPreferenceResource } from '../../../../iam/domain/model/user-profile.entity';
+import {
+  getMissingNotificationChannels,
+  NotificationChannel,
+  NotificationPreferenceResource,
+} from '../../../../iam/domain/model/user-profile.entity';
 import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { UserProfileService } from '../../../../iam/infrastructure/user-profile.service';
 import { AlertResource } from '../../../domain/model/companion.entity';
 import { CompanionService } from '../../../infrastructure/companion.service';
-import {
-  ActorContextService,
-  DEMO_PERSONAS,
-} from '../../../../shared/infrastructure/actor-context.service';
+import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
 import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
 import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
@@ -33,6 +34,7 @@ export class CompanionAlerts {
   readonly alerts = signal<AlertResource[]>([]);
   readonly deliveries = signal<AlertResource[]>([]);
   readonly preferences = signal<NotificationPreferenceResource[]>([]);
+  readonly missingChannels = computed(() => getMissingNotificationChannels(this.preferences()));
 
   constructor() {
     effect(() => {
@@ -56,6 +58,21 @@ export class CompanionAlerts {
     });
   }
 
+  configureChannel(channel: NotificationChannel): void {
+    this.toggleChannel(
+      {
+        id: '',
+        accountId: this.actorContext.activeActorId(),
+        channel,
+        enabled: true,
+        priorityStart: '20:00',
+        priorityEnd: '07:00',
+        timeZone: 'America/Lima',
+      },
+      true,
+    );
+  }
+
   toggleChannel(pref: NotificationPreferenceResource, enabled: boolean): void {
     this.profileService
       .updateNotificationPreference({
@@ -68,7 +85,9 @@ export class CompanionAlerts {
       .subscribe({
         next: (updated) => {
           this.preferences.update((items) =>
-            items.map((item) => (item.channel === updated.channel ? updated : item)),
+            items.some((item) => item.channel === updated.channel)
+              ? items.map((item) => (item.channel === updated.channel ? updated : item))
+              : [...items, updated],
           );
           this.toast.success(`${updated.channel} actualizado`);
         },
@@ -79,7 +98,7 @@ export class CompanionAlerts {
   dispatchPending(): void {
     this.companionService.dispatchPendingDeliveries().subscribe({
       next: (res) => {
-        const count = res?.['dispatched'] ?? 0;
+        const count = res?.['processed'] ?? 0;
         this.toast.success(`Despacho ejecutado (${count} alertas procesadas)`);
         this.loadAll();
       },
@@ -98,7 +117,9 @@ export class CompanionAlerts {
   }
 
   switchToRosa(): void {
-    const rosa = DEMO_PERSONAS[2];
-    this.session.switchPersona(rosa.id);
+    const contact = this.actorContext.findPersonaByRole('TRUSTED_CONTACT');
+    if (contact) {
+      this.session.switchPersona(contact.id);
+    }
   }
 }

@@ -32,7 +32,7 @@ export class TrustedContacts {
   readonly links = signal<TrustLinkResource[]>([]);
   readonly directory = signal<AccountProfileResource[]>([]);
 
-  contactEmail = 'miguel.quispe@noxway.pe';
+  contactEmail = '';
 
   readonly companionCandidates = computed(() =>
     this.directory().filter((account) => account.role === 'TRUSTED_CONTACT'),

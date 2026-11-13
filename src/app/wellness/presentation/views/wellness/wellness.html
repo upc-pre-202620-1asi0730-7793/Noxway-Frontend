@@ -100,7 +100,12 @@
           </div>
           <div class="nx-field nx-field-full">
             <label class="nx-label" for="w-notes">Notas</label>
-            <input id="w-notes" class="nx-input" name="notes" [(ngModel)]="notes" />
+            <input
+              id="w-notes"
+              class="nx-input"
+              name="notes"
+              [(ngModel)]="notes"
+              placeholder="Ej. Descanso continuo tras turno nocturno" />
           </div>
           <div class="nx-field nx-field-full">
             <button type="submit" class="nx-btn nx-btn-primary" [disabled]="busy()">
@@ -114,7 +119,7 @@
       <section class="nx-card">
         <div class="nx-card-header">
           <h3 class="nx-card-title">{{ languageService.ui('Ajustar Meta Diaria de Sueño') }}</h3>
-          <span class="nx-badge nx-badge-slate">PUT /wellness/sleep-goal</span>
+          <span class="nx-badge nx-badge-slate">PUT /wellness/goal</span>
         </div>
 
         <form class="nx-form-grid" (ngSubmit)="saveGoal()">

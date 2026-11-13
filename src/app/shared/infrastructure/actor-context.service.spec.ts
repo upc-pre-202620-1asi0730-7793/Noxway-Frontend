@@ -34,4 +34,39 @@ describe('ActorContextService', () => {
     service.setActor('non-existent-id');
     expect(service.activeActorId()).toBe(before);
   });
+
+  it('syncs personas dynamically from the backend account directory', () => {
+    const service = TestBed.inject(ActorContextService);
+    const customId = '11111111-1111-1111-1111-111111111111';
+
+    service.syncDirectory([
+      {
+        id: DEMO_PERSONAS[0].id,
+        email: DEMO_PERSONAS[0].email,
+        fullName: DEMO_PERSONAS[0].name,
+        phone: '+51999111222',
+        role: 'WORKER',
+        timeZone: 'America/Lima',
+        active: true,
+        createdAt: '2026-11-13T00:00:00Z',
+      },
+      {
+        id: customId,
+        email: 'nuevo.admin@noxway.pe',
+        fullName: 'Lucia Vega',
+        phone: '+51999000111',
+        role: 'ADMIN',
+        timeZone: 'America/Lima',
+        active: true,
+        createdAt: '2026-11-13T00:00:00Z',
+      },
+    ]);
+
+    expect(service.personas.some((p) => p.id === customId)).toBe(true);
+    expect(service.findPersonaByRole('ADMIN')?.id).toBe(customId);
+
+    service.setActor(customId);
+    expect(service.activeActorId()).toBe(customId);
+    expect(service.isAdmin()).toBe(true);
+  });
 });

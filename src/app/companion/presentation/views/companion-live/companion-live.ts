@@ -5,10 +5,7 @@ import { CommuteService } from '../../../../commute/infrastructure/commute.servi
 import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { CompanionLiveResource } from '../../../domain/model/companion.entity';
 import { CompanionService } from '../../../infrastructure/companion.service';
-import {
-  ActorContextService,
-  DEMO_PERSONAS,
-} from '../../../../shared/infrastructure/actor-context.service';
+import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
 import { LanguageService } from '../../../../shared/infrastructure/language.service';
 import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
 import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
@@ -60,9 +57,10 @@ export class CompanionLive {
   }
 
   switchToRosa(): void {
-    const rosa =
-      DEMO_PERSONAS.find((persona) => persona.role === 'TRUSTED_CONTACT') ?? DEMO_PERSONAS[2];
-    this.session.switchPersona(rosa.id);
-    this.toast.info(`Contacto activo: ${rosa.name}`);
+    const contact = this.actorContext.findPersonaByRole('TRUSTED_CONTACT');
+    if (contact) {
+      this.session.switchPersona(contact.id);
+      this.toast.info(`Contacto activo: ${contact.name}`);
+    }
   }
 }

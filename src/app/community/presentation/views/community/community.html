@@ -26,21 +26,32 @@
           [value]="district()"
           (change)="changeDistrict($any($event.target).value)">
           <option value="all">Todos los distritos</option>
-          <option value="Los Olivos">Los Olivos</option>
-          <option value="Lince">Lince</option>
-          <option value="San Isidro">San Isidro</option>
-          <option value="Cercado de Lima">Cercado de Lima</option>
+          @for (dist of knownDistricts(); track dist) {
+            <option [value]="dist">{{ dist }}</option>
+          }
         </select>
       </div>
 
       <form class="nx-form-grid" (ngSubmit)="publishPost()">
         <div class="nx-field">
           <label class="nx-label" for="cp-title">Título</label>
-          <input id="cp-title" class="nx-input" name="postTitle" [(ngModel)]="postTitle" required />
+          <input
+            id="cp-title"
+            class="nx-input"
+            name="postTitle"
+            [(ngModel)]="postTitle"
+            placeholder="Ej. Ruta iluminada"
+            required />
         </div>
         <div class="nx-field">
           <label class="nx-label" for="cp-dist">Distrito</label>
-          <input id="cp-dist" class="nx-input" name="postDistrict" [(ngModel)]="postDistrict" required />
+          <input
+            id="cp-dist"
+            class="nx-input"
+            name="postDistrict"
+            [(ngModel)]="postDistrict"
+            placeholder="Ej. Lince"
+            required />
         </div>
         <div class="nx-field nx-field-full">
           <label class="nx-label" for="cp-body">Mensaje</label>
@@ -50,6 +61,7 @@
             rows="2"
             name="postContent"
             [(ngModel)]="postContent"
+            placeholder="Describe condiciones de tránsito o seguridad nocturna"
             required></textarea>
         </div>
         <div class="nx-field nx-field-full">
@@ -123,11 +135,32 @@
           @if (!serviceIs24h) {
             <div class="nx-field">
               <label class="nx-label" for="svc-open">Abre</label>
-              <input id="svc-open" class="nx-input" type="time" name="serviceOpensAt" [(ngModel)]="serviceOpensAt" />
+              <input
+                id="svc-open"
+                class="nx-input"
+                type="time"
+                name="serviceOpensAt"
+                [(ngModel)]="serviceOpensAt"
+                (ngModelChange)="onServiceHoursChange()" />
             </div>
             <div class="nx-field">
               <label class="nx-label" for="svc-close">Cierra</label>
-              <input id="svc-close" class="nx-input" type="time" name="serviceClosesAt" [(ngModel)]="serviceClosesAt" />
+              <input
+                id="svc-close"
+                class="nx-input"
+                type="time"
+                name="serviceClosesAt"
+                [(ngModel)]="serviceClosesAt"
+                (ngModelChange)="onServiceHoursChange()" />
+            </div>
+            <div class="nx-field nx-field-full">
+              <label class="nx-checkbox-row">
+                <input
+                  type="checkbox"
+                  name="serviceClosesNextDay"
+                  [(ngModel)]="serviceClosesNextDay" />
+                <span>{{ languageService.ui('Cierra al día siguiente (+1 día)') }}</span>
+              </label>
             </div>
           }
           <div class="nx-field nx-field-full">
@@ -198,7 +231,11 @@
 
     <div class="nx-field">
       <label class="nx-label" for="mod-notes">{{ languageService.ui('Notas de moderación') }}</label>
-      <input id="mod-notes" class="nx-input" [(ngModel)]="decisionNotes" />
+      <input
+        id="mod-notes"
+        class="nx-input"
+        [(ngModel)]="decisionNotes"
+        placeholder="Ej. Verificado y validado por moderación Noxway" />
     </div>
 
     <div class="nx-list">
