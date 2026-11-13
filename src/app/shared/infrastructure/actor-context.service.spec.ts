@@ -2,7 +2,12 @@ import '@angular/compiler';
 import { getTestBed, TestBed } from '@angular/core/testing';
 import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 import { describe, expect, it } from 'vitest';
-import { ActorContextService, DEMO_PERSONAS } from './actor-context.service';
+import {
+  ActorContextService,
+  DEFAULT_COMPANION_ACTOR_ID,
+  DEFAULT_WORKER_ACTOR_ID,
+  DEMO_PERSONAS,
+} from './actor-context.service';
 
 if (!getTestBed().platform) {
   TestBed.initTestEnvironment(BrowserTestingModule, platformBrowserTesting());
@@ -68,5 +73,19 @@ describe('ActorContextService', () => {
     service.setActor(customId);
     expect(service.activeActorId()).toBe(customId);
     expect(service.isAdmin()).toBe(true);
+  });
+
+  it('binds Companion and Worker portals to their dedicated single open profiles', () => {
+    const service = TestBed.inject(ActorContextService);
+
+    expect(service.syncPortal(true)).toBe(true);
+    expect(service.activeActorId()).toBe(DEFAULT_COMPANION_ACTOR_ID);
+    expect(service.activePersona().role).toBe('TRUSTED_CONTACT');
+    expect(service.syncPortal(true)).toBe(false);
+
+    expect(service.syncPortal(false)).toBe(true);
+    expect(service.activeActorId()).toBe(DEFAULT_WORKER_ACTOR_ID);
+    expect(service.activePersona().role).toBe('WORKER');
+    expect(service.syncPortal(false)).toBe(false);
   });
 });
