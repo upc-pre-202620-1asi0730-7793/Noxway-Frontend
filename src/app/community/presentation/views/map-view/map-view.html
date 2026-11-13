@@ -1,197 +1,188 @@
-<div class="nx-page">
-  <div class="nx-header">
-    <div>
-      <h2 class="nx-title">{{ languageService.ui('Mapa Comunitario 24h & Zonas de Riesgo') }}</h2>
-      <p class="nx-subtitle">
-        {{ languageService.ui('Servicios validados por la comunidad y alertas territoriales en Lima.') }}
-      </p>
+<section class="nx-map-page">
+  <header class="nx-map-toolbar">
+    <div class="nx-tabs" role="tablist">
+      @for (cat of categories; track cat.tag) {
+        <button
+          type="button"
+          class="nx-tab"
+          [class.nx-tab-active]="selectedCategory().tag === cat.tag"
+          [attr.aria-pressed]="selectedCategory().tag === cat.tag"
+          (click)="selectCategory(cat)">
+          {{ languageService.ui(cat.label) }}
+        </button>
+      }
     </div>
 
     <div class="nx-actions">
-      <button
-        type="button"
-        class="nx-btn nx-btn-sm"
-        [class.nx-btn-success]="openOnly()"
-        [class.nx-btn-secondary]="!openOnly()"
-        (click)="toggleOpenOnly()">
-        {{ openOnly() ? languageService.ui('Solo abiertos ahora') : languageService.ui('Todos los horarios') }}
-      </button>
-      <button
-        type="button"
-        class="nx-btn nx-btn-sm"
-        [class.nx-btn-primary]="filterNearLima()"
-        [class.nx-btn-secondary]="!filterNearLima()"
-        (click)="toggleRadius()">
-        {{ filterNearLima() ? 'Radio 15 km Lima Centro' : 'Todos los distritos' }}
-      </button>
+      <a
+        class="nx-btn nx-btn-primary nx-btn-sm nx-link-btn"
+        routerLink="/community"
+        [queryParams]="reportQueryParams('service')">
+        {{ languageService.ui('Reportar local') }}
+      </a>
+      <a
+        class="nx-btn nx-btn-secondary nx-btn-sm nx-link-btn nx-danger-link"
+        routerLink="/community"
+        [queryParams]="reportQueryParams('risk')">
+        {{ languageService.ui('Reportar peligro') }}
+      </a>
     </div>
-  </div>
+  </header>
 
-  <!-- Category Filters -->
-  <div class="nx-tabs">
-    @for (cat of categories; track cat) {
+  <div class="nx-map-options">
+    @if (selectedCategory().tag !== 'risk') {
       <button
         type="button"
-        class="nx-tab"
-        [class.nx-tab-active]="category() === cat"
-        (click)="setCategory(cat)">
-        {{ cat }}
+        class="nx-btn nx-btn-sm"
+        [class.nx-btn-primary]="only24Hours()"
+        [class.nx-btn-secondary]="!only24Hours()"
+        [attr.aria-pressed]="only24Hours()"
+        (click)="toggleOnly24Hours()">
+        {{ languageService.ui('Solo abiertos 24 horas') }}
       </button>
     }
+    <button type="button" class="nx-btn nx-btn-secondary nx-btn-sm" (click)="searchArea()">
+      {{ languageService.ui('Buscar en esta zona') }}
+    </button>
+    <button type="button" class="nx-btn nx-btn-secondary nx-btn-sm" (click)="locate()">
+      {{ languageService.ui('Usar mi ubicación') }}
+    </button>
+    <span class="nx-muted">{{ languageService.ui('Radio de búsqueda: 3 km') }}</span>
   </div>
 
-  @if (loading()) {
-    <div class="nx-card">
-      <p class="nx-muted">{{ languageService.ui('Cargando servicios y zonas de riesgo...') }}</p>
-    </div>
-  } @else {
-    <div class="nx-grid-2">
-      <!-- Lima Coordinate Map Canvas -->
-      <section class="nx-card">
-        <div class="nx-card-header">
-          <h3 class="nx-card-title">{{ languageService.ui('Radar Metropolitano (Lima)') }}</h3>
-          <span class="nx-badge nx-badge-blue">{{ services().length }} puntos</span>
-        </div>
+  @if (locationError()) {
+    <div class="nx-error" role="alert">{{ locationError() }}</div>
+  }
 
-        <div class="nx-map-canvas">
-          <div class="nx-map-grid-label">Lima Metropolitana (-12.0464, -77.0428)</div>
-          @for (pin of mapPins(); track pin.service.id) {
-            <button
-              type="button"
-              class="nx-map-pin"
-              [class.nx-pin-selected]="selectedService()?.id === pin.service.id"
-              [class.nx-pin-open]="pin.service.openAtReference"
-              [style.left.%]="pin.leftPct"
-              [style.top.%]="pin.topPct"
-              (click)="selectedService.set(pin.service)">
-              {{ pin.service.name }}
-            </button>
+  <div class="nx-osm-grid">
+    <section class="nx-card nx-map-panel">
+      <div
+        #map
+        class="nx-map-leaflet nx-osm-night"
+        [attr.aria-label]="languageService.ui('Mapa de servicios cercanos')"></div>
+    </section>
+
+    <section class="nx-card nx-map-results">
+      <div class="nx-card-header">
+        <h3 class="nx-card-title">{{ languageService.ui(selectedCategory().label) }}</h3>
+        <span class="nx-badge nx-badge-blue">{{ visibleItems().length }}</span>
+      </div>
+
+      @if (selectedItem(); as item) {
+        <div class="nx-place-detail">
+          <span
+            class="nx-badge"
+            [class.nx-badge-red]="item.category === 'risk'"
+            [class.nx-badge-emerald]="item.category === 'pharmacy'"
+            [class.nx-badge-amber]="item.category === 'fuel'"
+            [class.nx-badge-blue]="item.category === 'supermarket' || item.category === 'noxway'">
+            {{ item.typeLabel }}
+          </span>
+          <h4 class="nx-place-name">{{ itemTitle(item) }}</h4>
+
+          @if (item.subtitle) {
+            <p class="nx-muted" style="margin: 2px 0">{{ item.subtitle }}</p>
           }
-          @for (rpin of riskPins(); track rpin.zone.id) {
-            <span
-              class="nx-map-pin nx-map-pin-risk"
-              [class.nx-pin-risk-high]="rpin.zone.riskLevel === 'HIGH'"
-              [class.nx-pin-risk-medium]="rpin.zone.riskLevel === 'MEDIUM'"
-              [style.left.%]="rpin.leftPct"
-              [style.top.%]="rpin.topPct"
-              [title]="rpin.zone.description + ' (' + rpin.zone.riskLevel + ')'">
-              ⚠ {{ rpin.zone.description }}
-            </span>
-          }
-        </div>
 
-        <div class="nx-list">
-          @for (svc of services(); track svc.id) {
-            <div class="nx-list-item" (click)="selectedService.set(svc)">
-              <div>
-                <strong>{{ svc.name }}</strong>
-                <div class="nx-muted">
-                  {{ svc.type }} · Score: {{ svc.trustScore }} (+{{ svc.upvotes }} / -{{ svc.downvotes }})
-                </div>
-              </div>
-              <span
-                class="nx-badge"
-                [class.nx-badge-emerald]="svc.openAtReference"
-                [class.nx-badge-slate]="!svc.openAtReference">
-                {{ svc.openAtReference ? 'Abierto ahora' : 'Cerrado' }}
-              </span>
-            </div>
-          } @empty {
-            <div class="nx-empty">{{ languageService.ui('No hay puntos aprobados para este filtro.') }}</div>
-          }
-        </div>
-      </section>
-
-      <!-- Selected Service Drawer + Risk Zones -->
-      <div class="nx-grid">
-        <section class="nx-card">
-          <div class="nx-card-header">
-            <h3 class="nx-card-title">{{ languageService.ui('Detalle del Punto de Auxilio') }}</h3>
-          </div>
-
-          @if (selectedService(); as svc) {
-            <div>
-              <h4 style="margin: 0 0 6px">{{ svc.name }}</h4>
-              <div class="nx-muted">
-                {{ svc.type }} · {{ svc.reporterName }} ·
-                <span class="nx-mono">{{ svc.latitude | number: '1.4-4' }}, {{ svc.longitude | number: '1.4-4' }}</span>
-              </div>
-            </div>
-
-            <div class="nx-actions">
-              <span class="nx-badge nx-badge-emerald">Score: {{ svc.trustScore }}</span>
+          @if (item.service; as svc) {
+            <p class="nx-place-status">
+              {{
+                svc.openAtReference
+                  ? languageService.ui('Abierto ahora')
+                  : languageService.ui('Cerrado')
+              }}
+              · Score: {{ svc.trustScore }} (+{{ svc.upvotes }} / -{{ svc.downvotes }})
+            </p>
+            <div class="nx-actions" style="margin: 8px 0">
               <button
                 type="button"
                 class="nx-btn nx-btn-success nx-btn-sm"
-                (click)="vote(svc.id, svc.myVote === 1 ? 0 : 1)">
-                {{ svc.myVote === 1 ? 'Quitar +1' : 'Útil (+1)' }}
+                (click)="voteService(svc.id, svc.myVote === 1 ? 0 : 1)">
+                {{
+                  svc.myVote === 1
+                    ? languageService.ui('Retirar voto') + ' (+1)'
+                    : languageService.ui('Útil') + ' (+1)'
+                }}
               </button>
               <button
                 type="button"
                 class="nx-btn nx-btn-danger nx-btn-sm"
-                (click)="vote(svc.id, svc.myVote === -1 ? 0 : -1)">
-                {{ svc.myVote === -1 ? 'Quitar -1' : 'No verificado (-1)' }}
+                (click)="voteService(svc.id, svc.myVote === -1 ? 0 : -1)">
+                {{
+                  svc.myVote === -1
+                    ? languageService.ui('Retirar voto') + ' (-1)'
+                    : languageService.ui('No verificado') + ' (-1)'
+                }}
               </button>
             </div>
-
-            <div class="nx-list">
-              @for (slot of svc.openingHours; track slot.dayOfWeek) {
-                <div class="nx-list-item">
-                  <span>{{ dayLabel(slot.dayOfWeek) }}</span>
-                  <span class="nx-mono">
-                    {{ slot.is24Hours ? '24 HORAS' : (slot.opensAt + ' - ' + slot.closesAt) }}
-                  </span>
-                </div>
-              }
-            </div>
+          } @else if (item.riskZone; as zone) {
+            <p class="nx-place-status">{{ zone.riskLevel }} · {{ zone.status }}</p>
+            @if (zone.status !== 'RESOLVED') {
+              <div class="nx-actions" style="margin: 8px 0">
+                <button
+                  type="button"
+                  class="nx-btn nx-btn-secondary nx-btn-sm"
+                  (click)="resolveZone(zone.id)">
+                  {{ languageService.ui('Marcar resuelta') }}
+                </button>
+              </div>
+            }
+          } @else if (item.post; as post) {
+            <p class="nx-place-status">{{ post.content }}</p>
           } @else {
-            <div class="nx-empty">{{ languageService.ui('Selecciona un punto del mapa para ver horarios.') }}</div>
+            <p class="nx-place-status">
+              {{
+                item.openAllDay
+                  ? languageService.ui('Abierto 24 horas')
+                  : languageService.ui('Horario sin confirmar')
+              }}
+            </p>
           }
-        </section>
 
-        <!-- Risk Zones -->
-        <section class="nx-card">
-          <div class="nx-card-header">
-            <h3 class="nx-card-title">{{ languageService.ui('Zonas de Riesgo Reportadas') }}</h3>
-            <span class="nx-badge nx-badge-amber">{{ riskZones().length }}</span>
-          </div>
+          <p class="nx-muted" style="margin: 6px 0">
+            {{ (item.distance / 1000).toFixed(1) }} km ·
+            {{ languageService.ui('Distancia en línea recta') }}
+          </p>
+          <a
+            class="nx-osm-link"
+            [href]="osmExternalUrl(item)"
+            target="_blank"
+            rel="noopener noreferrer">
+            {{ languageService.ui('Abrir en OpenStreetMap') }}
+          </a>
+        </div>
+      }
 
-          @if (riskZones().length === 0) {
-            <div class="nx-empty">{{ languageService.ui('Sin alertas territoriales activas.') }}</div>
-          } @else {
-            <div class="nx-list">
-              @for (zone of riskZones(); track zone.id) {
-                <div class="nx-list-item">
-                  <div>
-                    <strong>{{ zone.description }}</strong>
-                    <div class="nx-muted">
-                      {{ zone.reporterName }} ·
-                      <span class="nx-mono">{{ zone.latitude | number: '1.4-4' }}, {{ zone.longitude | number: '1.4-4' }}</span>
-                    </div>
-                  </div>
-                  <div class="nx-actions">
-                    <span
-                      class="nx-badge"
-                      [class.nx-badge-red]="zone.riskLevel === 'HIGH'"
-                      [class.nx-badge-amber]="zone.riskLevel === 'MEDIUM'"
-                      [class.nx-badge-blue]="zone.riskLevel === 'LOW'">
-                      {{ zone.riskLevel }} ({{ zone.status }})
-                    </span>
-                    @if (zone.status !== 'RESOLVED') {
-                      <button
-                        type="button"
-                        class="nx-btn nx-btn-secondary nx-btn-sm"
-                        (click)="resolveZone(zone.id)">
-                        Resolver
-                      </button>
-                    }
-                  </div>
-                </div>
-              }
-            </div>
+      @if (loadingOsm() && visibleItems().length === 0) {
+        <p class="nx-muted" role="status">{{ languageService.ui('Buscando establecimientos…') }}</p>
+      } @else {
+        @if (osmError()) {
+          <p class="nx-muted" role="alert">{{ osmError() }}</p>
+        }
+        <div class="nx-place-list">
+          @for (item of visibleItems(); track item.id) {
+            <button
+              type="button"
+              class="nx-place-row"
+              [class.nx-place-row-active]="selectedItem()?.id === item.id"
+              [class.nx-place-row-risk]="item.category === 'risk'"
+              (click)="focusItem(item)">
+              <span class="nx-place-row-title">{{ itemTitle(item) }}</span>
+              <span class="nx-place-row-dist">{{ (item.distance / 1000).toFixed(1) }} km</span>
+            </button>
+          } @empty {
+            <p class="nx-empty">
+              {{
+                languageService.ui(
+                  only24Hours()
+                    ? 'No hay establecimientos con horario 24 horas confirmado en esta zona.'
+                    : 'No se encontraron establecimientos de esta categoría en la zona.'
+                )
+              }}
+            </p>
           }
-        </section>
-      </div>
-    </div>
-  }
-</div>
+        </div>
+      }
+    </section>
+  </div>
+</section>
