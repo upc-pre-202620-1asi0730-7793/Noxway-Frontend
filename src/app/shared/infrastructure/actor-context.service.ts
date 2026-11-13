@@ -63,6 +63,9 @@ export const DEMO_PERSONAS: readonly DemoPersona[] = [
 
 const STORAGE_KEY = 'noxway_actor_id';
 
+export const DEFAULT_WORKER_ACTOR_ID = DEMO_PERSONAS[0].id;
+export const DEFAULT_COMPANION_ACTOR_ID = DEMO_PERSONAS[2].id;
+
 /**
  * Holds the active demo/test actor ID sent via X-Actor-Id while IAM login is deferred.
  */
@@ -91,6 +94,23 @@ export class ActorContextService {
 
   findPersonaByRole(role: PersonaRole): DemoPersona | undefined {
     return this.personasSignal().find((persona) => persona.role === role);
+  }
+
+  /**
+   * Ensures each portal runs under its single dedicated open profile:
+   * Jorge Luis Huaman (WORKER) in the Worker portal and Rosa Elena Paredes Morales (TRUSTED_CONTACT) in the Companion portal.
+   */
+  syncPortal(isCompanion: boolean): boolean {
+    const targetId = isCompanion ? DEFAULT_COMPANION_ACTOR_ID : DEFAULT_WORKER_ACTOR_ID;
+    const targetRole: PersonaRole = isCompanion ? 'TRUSTED_CONTACT' : 'WORKER';
+    const targetPersona =
+      this.personasSignal().find((persona) => persona.id === targetId) ??
+      this.findPersonaByRole(targetRole);
+    if (!targetPersona || this.actorIdSignal() === targetPersona.id) {
+      return false;
+    }
+    this.setActor(targetPersona.id);
+    return true;
   }
 
   syncDirectory(accounts: readonly AccountProfileResource[]): void {

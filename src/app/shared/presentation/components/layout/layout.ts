@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule, RoutesRecognized } from '@angular/router';
 import { catchError, filter, forkJoin, of } from 'rxjs';
 import { CommuteService } from '../../../../commute/infrastructure/commute.service';
 import { CompanionService } from '../../../../companion/infrastructure/companion.service';
@@ -38,7 +38,6 @@ const TITLE_KEYS: Record<string, string> = {
   '/benefits': 'title.benefits',
   '/trusted-contacts': 'title.trustedContacts',
   '/profile': 'title.profile',
-  '/access': 'title.access',
   '/companion/live': 'title.companion.live',
   '/companion/history': 'title.companion.history',
   '/companion/alerts': 'title.companion.alerts',
@@ -78,6 +77,10 @@ export class Layout implements OnInit, OnDestroy {
   private clockTimer: ReturnType<typeof setInterval> | null = null;
   private routerSub: { unsubscribe(): void } | null = null;
 
+  readonly activeDisplayName = computed(
+    () => this.session.profile()?.fullName ?? this.actorContext.activePersona().name,
+  );
+
   readonly roleLabel = computed(() => {
     const role = this.actorContext.activePersona().role;
     if (role === 'ADMIN') return this.languageService.t('sidebar.adminRole');
@@ -86,7 +89,7 @@ export class Layout implements OnInit, OnDestroy {
   });
 
   readonly userInitials = computed(() => {
-    const name = this.session.profile()?.fullName ?? this.actorContext.activePersona().name;
+    const name = this.activeDisplayName();
     return name
       .split(' ')
       .filter(Boolean)
@@ -119,7 +122,6 @@ export class Layout implements OnInit, OnDestroy {
       { label: this.languageService.t('nav.benefits'), link: '/benefits' },
       { label: this.languageService.t('nav.trustedContacts'), link: '/trusted-contacts' },
       { label: this.languageService.t('nav.profile'), link: '/profile' },
-      { label: this.languageService.t('nav.access'), link: '/access' },
     ];
   });
 
@@ -142,11 +144,11 @@ export class Layout implements OnInit, OnDestroy {
       { label: this.languageService.t('nav.companion.emergency'), link: '/companion/emergency' },
       { label: this.languageService.t('nav.companion.invitations'), link: '/companion/invitations' },
       { label: this.languageService.t('nav.companion.profile'), link: '/companion/profile' },
-      { label: this.languageService.t('nav.access'), link: '/access' },
     ];
   });
 
   constructor() {
+    this.syncPortalActor(this.router.url || '/dashboard');
     effect(() => {
       this.actorContext.revision();
       untracked(() => this.syncShellContext());
@@ -155,9 +157,15 @@ export class Layout implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.routerSub = this.router.events
-      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .pipe(
+        filter(
+          (event): event is RoutesRecognized | NavigationEnd =>
+            event instanceof RoutesRecognized || event instanceof NavigationEnd,
+        ),
+      )
       .subscribe((event) => {
         this.currentUrl.set(event.urlAfterRedirects);
+        this.syncPortalActor(event.urlAfterRedirects);
       });
 
     this.clockTimer = setInterval(() => {
@@ -183,6 +191,7 @@ export class Layout implements OnInit, OnDestroy {
       alerts: this.companionService.getAlerts(0, 5).pipe(catchError(() => of(null))),
     }).subscribe(({ directory, commutes, live, alerts }) => {
       this.actorContext.syncDirectory(directory);
+      this.session.bindPortal(this.isCompanion());
       const openCommutes = (commutes?.items ?? []).filter((c) => c.status !== 'ARRIVED').length;
       this.activeCommuteCount.set(openCommutes);
 
@@ -193,17 +202,12 @@ export class Layout implements OnInit, OnDestroy {
     });
   }
 
-  onActorChange(event: Event): void {
-    const actorId = (event.target as HTMLSelectElement).value;
-    if (!actorId) return;
-
-    this.session.switchPersona(actorId);
-    const persona = this.actorContext.personas.find((item) => item.id === actorId);
-    if (persona?.role === 'TRUSTED_CONTACT' && !this.currentUrl().startsWith('/companion')) {
-      this.router.navigateByUrl('/companion/live');
-    } else if (persona && persona.role !== 'TRUSTED_CONTACT' && this.currentUrl().startsWith('/companion')) {
-      this.router.navigateByUrl('/dashboard');
+  private syncPortalActor(url: string): void {
+    const cleanUrl = url.split('?')[0];
+    if (cleanUrl === '/' || cleanUrl === '') {
+      return;
     }
+    this.session.bindPortal(cleanUrl.startsWith('/companion'));
   }
 
   onSosClick(): void {

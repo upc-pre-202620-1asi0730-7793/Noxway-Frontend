@@ -10,7 +10,6 @@ import { CompanionLive } from './companion/presentation/views/companion-live/com
 import { CompanionProfile } from './companion/presentation/views/companion-profile/companion-profile';
 import { Dashboard } from './dashboard/presentation/views/dashboard/dashboard';
 import { authGuard } from './iam/infrastructure/session.guard';
-import { Access } from './iam/presentation/views/access/access';
 import { Profile } from './iam/presentation/views/profile/profile';
 import { TrustedContacts } from './iam/presentation/views/trusted-contacts/trusted-contacts';
 import { Layout } from './shared/presentation/components/layout/layout';
@@ -34,9 +33,9 @@ export const routes: Routes = [
       { path: 'benefits', component: Benefits, title: 'Noxway - Beneficios' },
       { path: 'trusted-contacts', component: TrustedContacts, title: 'Noxway - Contactos' },
       { path: 'profile', component: Profile, title: 'Noxway - Perfil' },
-      { path: 'access', component: Access, title: 'Noxway - IAM Estructurado' },
-      { path: 'login', redirectTo: 'access', pathMatch: 'full' },
-      { path: 'register', redirectTo: 'access', pathMatch: 'full' },
+      { path: 'access', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'login', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'register', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'companion',
         children: [

@@ -15,24 +15,6 @@
       </div>
     </div>
 
-    <!-- Active Demo Persona Switcher (IAM structured / open access) -->
-    <div class="nx-persona-box">
-      <label class="nx-persona-label" for="sidebar-persona-select">
-        {{ languageService.t('sidebar.persona') }}
-      </label>
-      <select
-        id="sidebar-persona-select"
-        class="nx-persona-select"
-        [value]="actorContext.activeActorId()"
-        (change)="onActorChange($event)">
-        @for (persona of actorContext.personas; track persona.id) {
-          <option [value]="persona.id">
-            {{ languageService.currentLang() === 'en' ? persona.labelEn : persona.labelEs }}
-          </option>
-        }
-      </select>
-    </div>
-
     @if (isCompanion()) {
       <!-- Companion User Identity Card -->
       <div class="user-card companion-user">
@@ -40,7 +22,7 @@
           {{ userInitials() }}
         </div>
         <div class="user-info">
-          <strong>{{ session.profile()?.fullName ?? actorContext.activePersona().name }}</strong>
+          <strong>{{ activeDisplayName() }}</strong>
           <span class="user-badge companion-badge">{{ roleLabel() }}</span>
         </div>
       </div>
@@ -102,7 +84,7 @@
         </div>
 
         <div class="user-info">
-          <strong>{{ session.profile()?.fullName ?? actorContext.activePersona().name }}</strong>
+          <strong>{{ activeDisplayName() }}</strong>
           <span class="user-badge">{{ roleLabel() }}</span>
         </div>
       </div>
@@ -157,10 +139,6 @@
         <span class="status-dot"></span>
         <span>{{ languageService.t('topbar.activeNetwork') }}</span>
       </div>
-
-      <a routerLink="/access" class="nx-iam-chip">
-        <span>{{ languageService.t('sidebar.iamBanner') }}</span>
-      </a>
 
       <div class="topbar-actions">
         <div

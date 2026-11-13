@@ -582,55 +582,6 @@ img[src="LogoNovctiva.png"] {
   background: var(--nx-bar-gradient);
 }
 
-/* Persona Switcher & IAM Pill in Layout */
-.nx-persona-box {
-  margin: 0 18px 14px;
-  padding: 10px 12px;
-  background: var(--nx-surface-elevated);
-  border: 1px solid var(--nx-border);
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.nx-persona-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: var(--nx-primary-soft-text);
-}
-
-.nx-persona-select {
-  background: var(--nx-bg);
-  color: var(--nx-text);
-  border: 1px solid var(--nx-border-strong);
-  border-radius: 7px;
-  padding: 6px 8px;
-  font-size: 12px;
-  font-family: inherit;
-}
-
-.nx-iam-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--nx-primary-soft-border);
-  background: var(--nx-primary-soft-bg);
-  color: var(--nx-primary-soft-text);
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.nx-iam-chip:hover {
-  background: var(--nx-surface-hover);
-}
-
 /* Material SnackBar variants */
 .nx-toast-success .mdc-snackbar__surface {
   background-color: var(--nx-toast-success-bg) !important;

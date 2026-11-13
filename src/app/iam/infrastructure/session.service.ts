@@ -17,7 +17,10 @@ export class SessionService {
   private readonly actorContext = inject(ActorContextService);
 
   private readonly currentProfile = signal<AccountProfileResource | null>(null);
-  readonly profile = this.currentProfile.asReadonly();
+  readonly profile = computed(() => {
+    const loaded = this.currentProfile();
+    return loaded && loaded.id === this.actorContext.activeActorId() ? loaded : null;
+  });
   readonly demo = computed(() => true);
   readonly activeActor = this.actorContext.activePersona;
 
@@ -33,7 +36,18 @@ export class SessionService {
     );
   }
 
+  bindPortal(isCompanion: boolean): boolean {
+    const switched = this.actorContext.syncPortal(isCompanion);
+    if (switched) {
+      this.currentProfile.set(null);
+    }
+    return switched;
+  }
+
   switchPersona(actorId: string): void {
+    if (this.currentProfile()?.id !== actorId) {
+      this.currentProfile.set(null);
+    }
     this.actorContext.setActor(actorId);
     this.loadProfile().subscribe({ error: () => {} });
   }

@@ -32,7 +32,6 @@ export class LanguageService {
       'nav.benefits': 'Beneficios & Planes',
       'nav.trustedContacts': 'Contactos Confianza',
       'nav.profile': 'Mi Perfil',
-      'nav.access': 'IAM / Acceso',
 
       // Companion Navigation
       'nav.companion.live': 'Monitoreo en Vivo',
@@ -53,13 +52,10 @@ export class LanguageService {
       'sidebar.callJorge': 'LLAMAR AL TRABAJADOR',
       'sidebar.sosAlert': 'ESTADO SOS',
       'sidebar.switchPortal': 'Cambiar Portal',
-      'sidebar.persona': 'Persona Activa (IAM abierto)',
-      'sidebar.iamBanner': 'IAM estructurado · Acceso abierto',
 
       // Topbar
       'topbar.activeJourney': 'Monitoreo conectado a API v1',
       'topbar.activeNetwork': 'Red Activa · Día y Noche',
-      'topbar.iamStatus': 'Estado IAM',
       'topbar.dayMode': 'Día',
       'topbar.nightMode': 'Noche',
       'topbar.themeSelector': 'Modo de apariencia',
@@ -74,7 +70,6 @@ export class LanguageService {
       'title.benefits': 'Beneficios Colectivos, Planes & Referidos',
       'title.trustedContacts': 'Gestión de Contactos de Confianza',
       'title.profile': 'Perfil del Usuario & Preferencias',
-      'title.access': 'Estructura IAM & Cambio de Persona',
       'title.companion.live': 'Monitoreo en Vivo · Red Familiar',
       'title.companion.history': 'Historial de Alertas y Desplazamientos',
       'title.companion.alerts': 'Centro de Avisos & Canales de Alerta',
@@ -92,7 +87,6 @@ export class LanguageService {
       'nav.benefits': 'Benefits & Plans',
       'nav.trustedContacts': 'Trusted Contacts',
       'nav.profile': 'My Profile',
-      'nav.access': 'IAM / Access',
 
       // Companion Navigation
       'nav.companion.live': 'Live Monitoring',
@@ -113,13 +107,10 @@ export class LanguageService {
       'sidebar.callJorge': 'CALL WORKER',
       'sidebar.sosAlert': 'SOS STATUS',
       'sidebar.switchPortal': 'Switch Portal',
-      'sidebar.persona': 'Active Persona (Open IAM)',
-      'sidebar.iamBanner': 'IAM structured · Open preview',
 
       // Topbar
       'topbar.activeJourney': 'Connected to API v1',
       'topbar.activeNetwork': 'Active Network · Day & Night',
-      'topbar.iamStatus': 'IAM Status',
       'topbar.dayMode': 'Day',
       'topbar.nightMode': 'Night',
       'topbar.themeSelector': 'Appearance mode',
@@ -134,7 +125,6 @@ export class LanguageService {
       'title.benefits': 'Collective Benefits, Plans & Referrals',
       'title.trustedContacts': 'Trusted Contacts Management',
       'title.profile': 'User Profile & Preferences',
-      'title.access': 'Structured IAM & Persona Switcher',
       'title.companion.live': 'Live Monitoring · Family Network',
       'title.companion.history': 'Alerts & Commute History',
       'title.companion.alerts': 'Alerts Center & Notification Channels',
