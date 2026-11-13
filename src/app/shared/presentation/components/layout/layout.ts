@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,246 +8,70 @@ import { LanguageService } from '../../../infrastructure/language.service';
 import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { LanguageSwitcher } from '../language-switcher/language-switcher';
 
-/**
- * Representation of a navigation option in the sidebar menu.
- */
-export interface NavOption {
-  link: string;
-  labelKey: string;
-  icon?: string;
-  badge?: string;
-  badgeType?: 'active' | 'counter' | 'live';
-}
+const workerNavigation = [
+  { link: '/dashboard', section: 'dashboard' },
+  { link: '/my-journeys', section: 'journey' },
+  { link: '/map', section: 'map' },
+  { link: '/community', section: 'community' },
+  { link: '/wellness', section: 'wellness' },
+  { link: '/benefits', section: 'benefits' },
+  { link: '/trusted-contacts', section: 'trustedContacts' },
+  { link: '/profile', section: 'profile' },
+];
 
-/**
- * Root application layout shell component.
- * Manages responsive sidebar, topbar headers, internationalization, and portal context.
- */
 @Component({
   selector: 'app-layout',
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    MatIconModule,
-    MatButtonModule,
-    LanguageSwitcher,
-  ],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, MatIconModule, MatButtonModule, LanguageSwitcher],
   templateUrl: './layout.html',
   styleUrl: './layout.css',
 })
-export class Layout implements OnInit, OnDestroy {
+export class Layout implements OnInit {
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
   readonly session = inject(SessionService);
-  public readonly languageService = inject(LanguageService);
+  readonly languageService = inject(LanguageService);
 
-  private readonly currentUrlSignal = signal<string>('/dashboard');
-  readonly wideContent = computed(() => ['/my-journeys', '/map', '/community', '/wellness', '/benefits'].includes(this.currentUrlSignal().split('?')[0]));
-  readonly currentTime = signal<string>('02:45:18 AM');
-  readonly companionTime = signal<string>('02:45 AM');
-
-  private timerInterval: any = null;
-
-  /**
-   * Evaluates whether the user is currently viewing the Companion Portal routes.
-   */
-  readonly isCompanion = computed(() => {
-    return this.currentUrlSignal().startsWith('/companion');
-  });
-
-  private readonly workerNavDefinitions: NavOption[] = [
-    { link: '/dashboard', labelKey: 'nav.dashboard', icon: 'circle' },
-    {
-      link: '/journey',
-      labelKey: 'nav.journey',
-      icon: 'circle',
-      badge: 'ACTIVO',
-      badgeType: 'active',
-    },
-    { link: '/map', labelKey: 'nav.map', icon: 'circle' },
-    {
-      link: '/community',
-      labelKey: 'nav.community',
-      icon: 'circle',
-      badge: '3',
-      badgeType: 'counter',
-    },
-    { link: '/wellness', labelKey: 'nav.wellness', icon: 'circle' },
-    { link: '/benefits', labelKey: 'nav.benefits', icon: 'circle' },
-    { link: '/trusted-contacts', labelKey: 'nav.trustedContacts', icon: 'circle' },
-    { link: '/profile', labelKey: 'nav.profile', icon: 'circle' },
-  ];
-
-  private readonly companionNavDefinitions: NavOption[] = [
-    { link: '/companion/live', labelKey: 'nav.companion.live', badge: 'LIVE', badgeType: 'live' },
-    { link: '/companion/history', labelKey: 'nav.companion.history' },
-    {
-      link: '/companion/alerts',
-      labelKey: 'nav.companion.alerts',
-      badge: '2',
-      badgeType: 'counter',
-    },
-    { link: '/companion/emergency', labelKey: 'nav.companion.emergency' },
-    { link: '/companion/invitations', labelKey: 'nav.companion.invitations' },
-    { link: '/companion/profile', labelKey: 'nav.companion.profile' },
-  ];
-
-  /**
-   * Dynamic worker options reacting to language changes.
-   */
-  readonly workerOptions = computed(() => {
-    // Trigger reactivity on current language signal
-    this.languageService.currentLang();
-    const demo = this.session.demo();
-    return this.workerNavDefinitions.map((option) => ({
-      ...option,
-      link: !demo && option.link === '/journey' ? '/my-journeys' : option.link,
-      badge: demo ? option.badge : undefined,
-      label: this.languageService.translate(option.labelKey),
-    }));
-  });
-
-  /**
-   * Dynamic companion options reacting to language changes.
-   */
-  readonly companionOptions = computed(() => {
-    this.languageService.currentLang();
-    return this.companionNavDefinitions.map((opt) => ({
-      ...opt,
-      label: this.languageService.translate(opt.labelKey),
-    }));
-  });
-
-  /**
-   * Dynamic page title reflecting current route and active language.
-   */
+  private readonly currentPath = signal('/dashboard');
+  readonly currentTime = signal('');
+  readonly wideContent = computed(() =>
+    ['/my-journeys', '/map', '/community', '/wellness', '/benefits'].includes(this.currentPath()),
+  );
+  readonly workerOptions = computed(() => workerNavigation.map(({ link, section }) => ({
+    link,
+    label: this.languageService.translate(`nav.${section}`),
+  })));
   readonly currentPageTitle = computed(() => {
-    const url = this.currentUrlSignal();
-    this.languageService.currentLang();
-
-    if (url.includes('/home')) {
-      return this.languageService.translate('title.home');
-    }
-    if (url.includes('/dashboard')) {
-      return this.languageService.translate('title.dashboard');
-    }
-
-    // Companion Portal Routes
-    if (url.includes('/companion/live')) {
-      return this.languageService.translate('title.companion.live');
-    }
-    if (url.includes('/companion/history')) {
-      return this.languageService.translate('title.companion.history');
-    }
-    if (url.includes('/companion/alerts')) {
-      return this.languageService.translate('title.companion.alerts');
-    }
-    if (url.includes('/companion/emergency')) {
-      return this.languageService.translate('title.companion.emergency');
-    }
-    if (url.includes('/companion/invitations')) {
-      return this.languageService.translate('title.companion.invitations');
-    }
-    if (url.includes('/companion/profile')) {
-      return this.languageService.translate('title.companion.profile');
-    }
-
-    // Worker Portal Routes
-    if (url.includes('/journey') || url.includes('/my-journeys')) {
-      return this.languageService.translate('title.journey');
-    }
-    if (url.includes('/map')) {
-      return this.languageService.translate('title.map');
-    }
-    if (url.includes('/community')) {
-      return this.languageService.translate('title.community');
-    }
-    if (url.includes('/wellness')) {
-      return this.languageService.translate('title.wellness');
-    }
-    if (url.includes('/benefits')) {
-      return this.languageService.translate('title.benefits');
-    }
-    if (url.includes('/trusted-contacts')) {
-      return this.languageService.translate('title.trustedContacts');
-    }
-    if (url.includes('/profile')) {
-      return this.languageService.translate('title.profile');
-    }
-    return this.languageService.translate('title.dashboard');
+    const current = workerNavigation.find(({ link }) => link === this.currentPath());
+    return this.languageService.translate(`title.${current?.section ?? 'dashboard'}`);
   });
 
   ngOnInit(): void {
-    this.currentUrlSignal.set(this.router.url);
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
-        this.currentUrlSignal.set(event.urlAfterRedirects || event.url);
-      });
+    this.setCurrentPath(this.router.url);
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe((event) => this.setCurrentPath(event.urlAfterRedirects));
 
     this.updateClock();
-    this.timerInterval = setInterval(() => this.updateClock(), 1000);
+    const interval = setInterval(() => this.updateClock(), 1000);
+    this.destroyRef.onDestroy(() => clearInterval(interval));
   }
 
-  ngOnDestroy(): void {
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-    }
+  private setCurrentPath(url: string): void {
+    this.currentPath.set(url.split(/[?#]/)[0]);
   }
 
-  /**
-   * Refreshes the real-time digital clock display.
-   */
   private updateClock(): void {
-    const now = new Date();
-    this.currentTime.set(
-      now.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true,
-      }),
-    );
-    this.companionTime.set(
-      now.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      }),
-    );
+    this.currentTime.set(new Date().toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    }));
   }
 
-  /**
-   * Triggers the emergency SOS notification protocol.
-   */
-  onSosClick(): void {
-    const msg =
-      this.languageService.currentLang() === 'es'
-        ? 'Simulación de alerta SOS.'
-        : 'SOS alert simulation.';
-    alert(msg);
-  }
-
-  /**
-   * Initiates a direct priority call to the accompanied worker.
-   */
-  onCallJorgeClick(): void {
-    const msg =
-      this.languageService.currentLang() === 'es'
-        ? 'Simulación de llamada al trabajador.'
-        : 'Worker call simulation.';
-    alert(msg);
-  }
-
-  /**
-   * Reloads the application view.
-   */
   logout(): void {
     this.session.logout();
     void this.router.navigateByUrl('/login');
-  }
-
-  onRefreshClick(): void {
-    window.location.reload();
   }
 }

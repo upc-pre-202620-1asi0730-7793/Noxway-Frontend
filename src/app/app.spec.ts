@@ -4,7 +4,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { firstValueFrom } from 'rxjs';
 import { SessionService } from './iam/infrastructure/session.service';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { routes } from './app.routes';
 
@@ -18,6 +18,17 @@ describe('Noxway access', () => {
   it('redirects a visitor to login when opening the dashboard', async () => {
     const harness = await RouterTestingHarness.create('/dashboard');
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('Inicia sesión');
+  });
+
+  it('rejects a stale demo session and shows blank account fields', async () => {
+    sessionStorage.setItem('noxway_demo', 'true');
+    const harness = await RouterTestingHarness.create('/companion/live');
+
+    expect(TestBed.inject(Router).url).toBe('/login');
+    expect(harness.routeNativeElement?.textContent).not.toMatch(/Jorge Luis|Rosa Elena/);
+    expect(harness.routeNativeElement?.querySelector<HTMLInputElement>('input[name="email"]')?.value).toBe('');
+    expect(harness.routeNativeElement?.querySelector<HTMLInputElement>('input[name="password"]')?.value).toBe('');
+    TestBed.inject(HttpTestingController).verify();
   });
 
   it('renders the registration fields at the registration route', async () => {

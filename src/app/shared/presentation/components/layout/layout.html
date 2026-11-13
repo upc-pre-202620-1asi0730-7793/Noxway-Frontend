@@ -1,231 +1,57 @@
-<div class="app-shell" [class.companion-shell]="isCompanion()">
-
+<div class="app-shell">
   <aside class="sidebar">
-
     <div class="brand">
       <div class="brand-icon">
-        <img src="LogoNovctiva.png" alt="Noxway" />
+        <img src="LogoNovctiva.png" alt="" />
       </div>
-
-      <div class="brand-text">
-        <h1>Noxway</h1>
-        @if (isCompanion()) {
-          <span class="companion-tag">COMPANION PORTAL</span>
-        }
-      </div>
+      <div class="brand-text"><h1>Noxway</h1></div>
     </div>
 
-    @if (isCompanion()) {
-      <!-- Companion User Identity Card -->
-      <div class="user-card companion-user">
-        <div class="avatar avatar-companion">
-          RP
-        </div>
-        <div class="user-info">
-          <strong>Rosa Elena Paredes</strong>
-          <span class="user-badge companion-badge">{{ languageService.translate('sidebar.companionRole') }}</span>
-        </div>
-      </div>
-
-      <!-- Accompanied Worker Telemetry Status Box -->
-      <div class="accompanied-card">
-        <div class="accompanied-label">{{ languageService.translate('sidebar.accompaniedBy') }}</div>
-        <div class="accompanied-worker">
-          <span class="worker-name">Jorge Luis Huamán</span>
-          <span class="worker-status">
-            <span class="dot-online"></span>
-            {{ languageService.translate('sidebar.onMotorcycle') }}
-          </span>
-        </div>
-      </div>
-
-      <p class="menu-title">
-        {{ languageService.translate('sidebar.contactPanel') }}
-      </p>
-
-      <nav class="navigation">
-        @for (option of companionOptions(); track option.link) {
-          <a
-            [routerLink]="option.link"
-            routerLinkActive="active"
-            class="nav-item">
-
-            <span class="nav-bullet"></span>
-
-            <span class="nav-label">
-              {{ option.label }}
-            </span>
-
-            @if (option.badge) {
-              <span
-                class="nav-badge"
-                [class.badge-live]="option.badgeType === 'live'"
-                [class.badge-counter]="option.badgeType === 'counter'">
-                {{ option.badge }}
-              </span>
-            }
-
-          </a>
-        }
-      </nav>
-
-      <div class="sidebar-footer">
-        <button
-          mat-flat-button
-          class="call-worker-button"
-          (click)="onCallJorgeClick()">
-          <mat-icon class="btn-icon">phone</mat-icon>
-          {{ languageService.translate('sidebar.callJorge') }}
-        </button>
-      </div>
-
-    } @else {
-      <!-- Worker User Identity Card -->
+    @if (session.profile(); as profile) {
       <div class="user-card">
-        <div class="avatar">
-          {{ session.profile()?.avatar ?? 'JL' }}
-        </div>
-
+        <div class="avatar">{{ profile.avatar }}</div>
         <div class="user-info">
-          <strong>{{ session.profile()?.fullName ?? 'Jorge Luis Huamán' }}</strong>
-          <span class="user-badge">{{ session.profile() ? languageService.ui(session.profile()!.role) : languageService.translate('sidebar.workerRole') }}</span>
+          <strong>{{ profile.fullName }}</strong>
+          <span class="user-badge">{{ languageService.ui(profile.role) }}</span>
         </div>
       </div>
-
-      <p class="menu-title">
-        {{ languageService.translate('sidebar.workerModules') }}
-      </p>
-
-      <nav class="navigation">
-        @for (option of workerOptions(); track option.link) {
-          <a
-            [routerLink]="option.link"
-            routerLinkActive="active"
-            class="nav-item">
-
-            <span class="nav-bullet"></span>
-
-            <span class="nav-label">
-              {{ option.label }}
-            </span>
-
-            @if (option.badge) {
-              <span
-                class="nav-badge"
-                [class.badge-active]="option.badgeType === 'active'"
-                [class.badge-counter]="option.badgeType === 'counter'">
-                {{ option.badge }}
-              </span>
-            }
-
-          </a>
-        }
-      </nav>
-
-      @if (session.demo()) {
-      <div class="sidebar-footer">
-        <button
-          mat-flat-button
-          class="sos-button"
-          (click)="onSosClick()">
-          <mat-icon class="sos-icon">warning</mat-icon>
-          {{ languageService.translate('sidebar.sosAlert') }}
-        </button>
-      </div>
-      }
     }
 
+    <p class="menu-title">{{ languageService.translate('sidebar.workerModules') }}</p>
+    <nav class="navigation">
+      @for (option of workerOptions(); track option.link) {
+        <a [routerLink]="option.link" routerLinkActive="active" ariaCurrentWhenActive="page" class="nav-item">
+          <span class="nav-bullet"></span>
+          <span class="nav-label">{{ option.label }}</span>
+        </a>
+      }
+    </nav>
   </aside>
 
   <section class="main-shell">
-
     <header class="topbar">
-
-      <div class="page-title">
-        {{ currentPageTitle() }}
+      <div class="page-title">{{ currentPageTitle() }}</div>
+      <div class="network-status">
+        <span class="status-dot"></span>
+        <span>{{ languageService.ui('Prueba local') }}</span>
       </div>
-
-      @if (isCompanion()) {
-        <!-- Companion Active Commute Pill in Topbar -->
-        <div class="companion-header-status">
-          <span class="status-dot"></span>
-          <span>{{ languageService.translate('topbar.activeJourney') }}</span>
+      <div class="topbar-actions">
+        <app-language-switcher />
+        <div class="clock">
+          <mat-icon class="clock-icon">schedule</mat-icon>
+          <span>{{ currentTime() }}</span>
         </div>
-
-        <div class="topbar-actions">
-          <!-- Language Switcher Component -->
-          <app-language-switcher/>
-
-          <div class="clock companion-clock">
-            <span>{{ companionTime() }}</span>
-          </div>
-
-          <a
-            mat-flat-button
-            routerLink="/dashboard"
-            class="hub-button">
-            {{ languageService.translate('topbar.hubScreens') }}
-          </a>
-
-          <button
-            mat-icon-button
-            class="icon-action-btn"
-            aria-label="Refresh view"
-            (click)="onRefreshClick()">
-            <mat-icon>refresh</mat-icon>
-          </button>
-        </div>
-
-      } @else {
-        <!-- Worker Network Indicator in Topbar -->
-        <div class="network-status">
-          <span class="status-dot"></span>
-          <span>{{ session.demo() ? languageService.ui('Demostración · Datos de ejemplo') : languageService.ui('Prueba local') }}</span>
-        </div>
-
-        <div class="topbar-actions">
-          <!-- Language Switcher Component -->
-          <app-language-switcher/>
-
-          @if (session.demo()) {
-          <a
-            mat-stroked-button
-            routerLink="/companion/live"
-            class="switch-portal-btn"
-            title="Open trusted companion view">
-            <mat-icon class="portal-icon">visibility</mat-icon>
-            <span>{{ languageService.translate('sidebar.switchPortal') }}</span>
-          </a>
-          }
-
-          <div class="clock">
-            <mat-icon class="clock-icon">schedule</mat-icon>
-            <span>{{ currentTime() }}</span>
-          </div>
-
-          @if (session.demo()) {
-          <button
-            class="alert-dot-button"
-            aria-label="Network activity indicator">
-            <span class="red-ping"></span>
-          </button>
-          }
-
-          <button mat-stroked-button class="logout-btn" (click)="logout()">
-            <span>{{ languageService.translate('sidebar.logout') }}</span>
-            <mat-icon class="logout-icon">open_in_new</mat-icon>
-          </button>
-        </div>
-      }
-
+        <button mat-stroked-button class="logout-btn" (click)="logout()">
+          <span>{{ languageService.translate('sidebar.logout') }}</span>
+          <mat-icon class="logout-icon">open_in_new</mat-icon>
+        </button>
+      </div>
     </header>
 
     <main class="content">
       <div class="content-wrapper" [class.wide-content]="wideContent()">
-        <router-outlet/>
+        <router-outlet />
       </div>
     </main>
-
   </section>
-
 </div>

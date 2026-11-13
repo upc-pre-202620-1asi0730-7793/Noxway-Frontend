@@ -8,9 +8,3 @@ export const requireSession: CanActivateFn = () => {
   const router = inject(Router);
   return session.restore().pipe(map((allowed) => allowed || router.parseUrl('/login')));
 };
-
-export const requireDemo: CanActivateFn = () => {
-  const session = inject(SessionService);
-  const router = inject(Router);
-  return session.demo() || router.parseUrl('/dashboard');
-};

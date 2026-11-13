@@ -9,7 +9,6 @@ if (!existsSync(accountsPath)) {
 }
 
 const accounts = jsonServer.router(accountsPath).db.get('accounts');
-const demo = jsonServer.router(join(__dirname, '..', 'db.json'));
 const server = jsonServer.create();
 const sessions = new Map();
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -216,7 +215,6 @@ server.post('/me/logout', (_req, res) => {
   return res.status(204).end();
 });
 
-server.use((req, res, next) => req.method === 'GET' ? next() : res.sendStatus(404));
-server.use(demo);
+server.use((_req, res) => res.sendStatus(404));
 const port = process.env.NOXWAY_API_PORT || 3000;
 server.listen(Number(port), '127.0.0.1', () => console.log(`Noxway API local en http://localhost:${port}`));

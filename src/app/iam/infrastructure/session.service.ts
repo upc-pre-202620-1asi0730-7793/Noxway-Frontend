@@ -21,10 +21,8 @@ const sessionKey = 'noxway_local_session';
 export class SessionService {
   private readonly http = inject(HttpClient);
   private token = sessionStorage.getItem(sessionKey);
-  private readonly demoMode = signal(false);
   private readonly currentProfile = signal<UserProfile | null>(null);
 
-  readonly demo = this.demoMode.asReadonly();
   readonly profile = this.currentProfile.asReadonly();
 
   register(data: Registration): Observable<void> {
@@ -43,7 +41,7 @@ export class SessionService {
   }
 
   restore(): Observable<boolean> {
-    if (this.demo() || this.profile()) return of(true);
+    if (this.profile()) return of(true);
     if (!this.token) return of(false);
     return this.http.get<UserProfile>(`${localApi}/me/profile`, this.requestOptions()).pipe(
       tap((profile) => this.currentProfile.set(profile)),
@@ -76,7 +74,6 @@ export class SessionService {
     this.token = null;
     sessionStorage.removeItem(sessionKey);
     sessionStorage.removeItem('noxway_demo');
-    this.demoMode.set(false);
     this.currentProfile.set(null);
   }
 
