@@ -1,6 +1,4 @@
 import { Routes } from '@angular/router';
-import { Community } from './community/presentation/views/community/community';
-import { MapView } from './community/presentation/views/map-view/map-view';
 import { Journey } from './commute/presentation/views/journey/journey';
 import { CompanionAlerts } from './companion/presentation/views/companion-alerts/companion-alerts';
 import { CompanionEmergency } from './companion/presentation/views/companion-emergency/companion-emergency';
@@ -27,8 +25,18 @@ export const routes: Routes = [
       { path: 'dashboard', component: Dashboard, title: 'Noxway - Dashboard' },
       { path: 'journey', component: Journey, title: 'Noxway - Mi Trayecto' },
       { path: 'my-journeys', redirectTo: 'journey', pathMatch: 'full' },
-      { path: 'map', component: MapView, title: 'Noxway - Mapa 24h' },
-      { path: 'community', component: Community, title: 'Noxway - Comunidad' },
+      {
+        path: 'map',
+        loadComponent: () =>
+          import('./community/presentation/views/map-view/map-view').then((m) => m.MapView),
+        title: 'Noxway - Mapa 24h',
+      },
+      {
+        path: 'community',
+        loadComponent: () =>
+          import('./community/presentation/views/community/community').then((m) => m.Community),
+        title: 'Noxway - Comunidad',
+      },
       { path: 'wellness', component: Wellness, title: 'Noxway - Bienestar' },
       { path: 'benefits', component: Benefits, title: 'Noxway - Beneficios' },
       { path: 'trusted-contacts', component: TrustedContacts, title: 'Noxway - Contactos' },

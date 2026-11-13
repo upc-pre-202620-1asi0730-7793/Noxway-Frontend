@@ -155,7 +155,7 @@ export class MapView implements AfterViewInit, OnDestroy {
 
     const mappedRisks: UnifiedMapItem[] = this.riskZones()
       .filter((zone) => zone.status !== 'RESOLVED')
-      .map((zone) => {
+      .map((zone): UnifiedMapItem => {
         const distance = center.distanceTo(latLng(zone.latitude, zone.longitude));
         return {
           id: `risk:${zone.id}`,
@@ -177,7 +177,7 @@ export class MapView implements AfterViewInit, OnDestroy {
         (post): post is CommunityPostResource & { latitude: number; longitude: number } =>
           post.latitude != null && post.longitude != null,
       )
-      .map((post) => {
+      .map((post): UnifiedMapItem => {
         const distance = center.distanceTo(latLng(post.latitude, post.longitude));
         const isSecurityNotice =
           !post.category || post.category.toLowerCase().includes('seguridad');

@@ -244,7 +244,6 @@ export const accountTranslations: Readonly<Record<string, string>> = {
   "Reportar zona de riesgo": "Report risk area",
   "Aviso": "Notice",
   "Local 24h": "24h Place",
-  "Zona de riesgo": "Risk area",
   "El aviso se publicará en la red comunitaria de Noxway.": "The notice will be published to the Noxway community network.",
   "Publicar en la comunidad": "Publish to community",
   "Nombre del establecimiento": "Place name",
