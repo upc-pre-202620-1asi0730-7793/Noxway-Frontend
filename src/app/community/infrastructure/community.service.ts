@@ -1,160 +1,143 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { MapPoint } from '../domain/model/service-point.entity';
-import { CommunityPost, CommunityLeader } from '../domain/model/community-post.entity';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { PagedResource } from '../../shared/domain/model/paged-resource';
+import {
+  CommunityPostResource,
+  CommunityReportResource,
+  CreateCommunityPostPayload,
+  ModerationActionResource,
+} from '../domain/model/community-post.entity';
+import {
+  RateRoutePayload,
+  ReportRiskZonePayload,
+  RiskZoneResource,
+  RouteRatingResource,
+  ServicePointResource,
+  ServiceVoteResource,
+  SubmitServicePointPayload,
+} from '../domain/model/service-point.entity';
 
-/**
- * Fallback static map points representing key safe havens and risk areas in Lima.
- */
-const DEFAULT_MAP_POINTS: MapPoint[] = [
-  {
-    id: 1,
-    type: 'pharmacy',
-    timeZone: 'America/Lima',
-    openingHours: [{ opens: '00:00', closes: '24:00' }],
-    typeLabel: 'FARMACIA 24H',
-    name: 'Inkafarma - Av. Universitaria 3105',
-    distance: 'A 650 metros de tu posición actual · Los Olivos',
-    communityTrust: '98% Confiable',
-    validatedBy: 'Validado por 24 vigilantes y repartidores.',
-    safetyMeasures: [
-      'Reja metálica para atención nocturna',
-      'Cámara de seguridad exterior operando',
-      'Vereda con alumbrado público funcional',
-      'Acepta pagos Yape, Plin y tarjetas',
-    ],
-    lat: -11.992,
-    lng: -77.072,
-    icon: 'medication',
-    tag: 'Inkafarma 24h',
-  },
-  {
-    id: 2,
-    type: 'gas_station',
-    timeZone: 'America/Lima',
-    openingHours: [{ opens: '06:00', closes: '23:00' }],
-    typeLabel: 'GRIFO',
-    name: 'Grifo Primax - Av. Mayolo / Universitaria',
-    distance: 'A 1.2 km de tu posición actual · Los Olivos',
-    communityTrust: '95% Confiable',
-    validatedBy: 'Validado por 32 repartidores.',
-    safetyMeasures: [
-      'Guardia de seguridad 24h',
-      'Buena iluminación en pista y surtidores',
-      'Tienda de conveniencia abierta',
-      'Cámaras de vigilancia activas',
-    ],
-    lat: -11.995,
-    lng: -77.075,
-    icon: 'local_gas_station',
-    tag: 'Primax',
-  },
-  {
-    id: 3,
-    type: 'risk_zone',
-    typeLabel: 'ZONA DE RIESGO',
-    name: 'Tramo Oscuro - Cruce Av. Perú con Dueñas',
-    distance: 'A 3.4 km en tu ruta · San Martín de Porres',
-    communityTrust: 'Alerta Activa',
-    validatedBy: 'Reportado por 19 trabajadores.',
-    safetyMeasures: [
-      'Tres postes de luz apagados',
-      'Poca visibilidad nocturna',
-      'Recomendado desvío por Av. Lima',
-    ],
-    lat: -12.015,
-    lng: -77.065,
-    icon: 'warning',
-    tag: 'Tramo Oscuro',
-  },
-];
+export interface ServiceListQuery {
+  type?: string;
+  openOnly?: boolean;
+  latitude?: number;
+  longitude?: number;
+  radiusKm?: number;
+  page?: number;
+  size?: number;
+}
 
-/**
- * Fallback community posts for local feed.
- */
-const DEFAULT_POSTS: CommunityPost[] = [
-  {
-    id: 1,
-    authorName: 'Marcos Huamán',
-    authorRole: 'Repartidor',
-    avatar: 'MH',
-    timeAgo: 'Hace 24 min',
-    location: 'Los Olivos (Av. Antúnez de Mayolo)',
-    badge: 'Local Verificado',
-    badgeType: 'verified',
-    district: 'los-olivos',
-    title: 'Grifo Primax de Av. Mayolo tiene atención rápida y guardia 24h',
-    content:
-      'Compañeros, acabo de recargar en el Primax con Universitaria. Tienen guardia armado afuera y excelente iluminación en la pista. Muy seguro para detenerse de noche.',
-    upvotes: 28,
-    actionLabel: 'Es verídico',
-  },
-  {
-    id: 2,
-    authorName: 'Valeria Ríos',
-    authorRole: 'Enfermera de Guardia',
-    avatar: 'VR',
-    timeAgo: 'Hace 55 min',
-    location: 'Cercado de Lima (Av. Alfonso Ugarte)',
-    badge: 'Zona Oscura / Riesgo',
-    badgeType: 'danger',
-    district: 'cercado',
-    title: 'Postes apagados en cruce Alfonso Ugarte con Jr. Zepita',
-    content:
-      'Al salir de mi guardia en el Hospital Loayza noté que la cuadra frente al Metropolitano está sin luz. No hay serenazgo a esta hora. Si van a tomar bus, caminen hacia Av. España que tiene luz.',
-    upvotes: 19,
-    actionLabel: 'Confirmar alerta',
-  },
-];
-
-/**
- * Fallback commute safety contributors and leaders.
- */
-const DEFAULT_LEADERS: CommunityLeader[] = [
-  { rank: 1, name: 'Jorge Luis Huamán (Tú)', contributions: 38, isCurrentUser: true },
-  { rank: 2, name: 'Valeria Ríos', contributions: 31 },
-  { rank: 3, name: 'Marcos Huamán', contributions: 27 },
-];
-
-/**
- * Service managing community safety reports, leaderboards, and community map points of interest.
- */
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class CommunityService {
   private readonly http = inject(HttpClient);
-  private readonly mapUrl = `${environment.apiUrl}/mapPoints`;
-  private readonly postsUrl = `${environment.apiUrl}/communityPosts`;
+  private readonly communityUrl = `${environment.apiBaseUrl}/community`;
+  private readonly moderationUrl = `${environment.apiBaseUrl}/moderation`;
 
-  /**
-   * Retrieves verified service points of interest and risk zones for map visualization.
-   * Falls back to high-fidelity mock data if the JSON server is unavailable.
-   */
-  getMapPoints(): Observable<MapPoint[]> {
-    return this.http.get<MapPoint[]>(this.mapUrl).pipe(
-      map((list) => (list && list.length > 0 ? list : DEFAULT_MAP_POINTS)),
-      catchError(() => of(DEFAULT_MAP_POINTS)),
+  listServices(query: ServiceListQuery = {}): Observable<PagedResource<ServicePointResource>> {
+    let params = new HttpParams()
+      .set('page', query.page ?? 0)
+      .set('size', query.size ?? 50)
+      .set('openOnly', query.openOnly ?? false);
+    if (query.type && query.type !== 'ALL') params = params.set('type', query.type);
+    if (query.latitude !== undefined) params = params.set('latitude', query.latitude);
+    if (query.longitude !== undefined) params = params.set('longitude', query.longitude);
+    if (query.radiusKm !== undefined) params = params.set('radiusKm', query.radiusKm);
+    return this.http.get<PagedResource<ServicePointResource>>(`${this.communityUrl}/services`, { params });
+  }
+
+  myServices(): Observable<ServicePointResource[]> {
+    return this.http.get<ServicePointResource[]>(`${this.communityUrl}/services/mine`);
+  }
+
+  submitService(payload: SubmitServicePointPayload): Observable<ServicePointResource> {
+    return this.http.post<ServicePointResource>(`${this.communityUrl}/services`, payload);
+  }
+
+  voteService(serviceId: string, direction: -1 | 0 | 1): Observable<ServiceVoteResource> {
+    return this.http.put<ServiceVoteResource>(`${this.communityUrl}/services/${serviceId}/vote`, {
+      direction,
+    });
+  }
+
+  listRiskZones(page = 0, size = 30): Observable<PagedResource<RiskZoneResource>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<PagedResource<RiskZoneResource>>(`${this.communityUrl}/risk-zones`, { params });
+  }
+
+  reportRiskZone(payload: ReportRiskZonePayload): Observable<RiskZoneResource> {
+    return this.http.post<RiskZoneResource>(`${this.communityUrl}/risk-zones`, payload);
+  }
+
+  resolveRiskZone(id: string): Observable<RiskZoneResource> {
+    return this.http.post<RiskZoneResource>(`${this.communityUrl}/risk-zones/${id}/resolve`, {});
+  }
+
+  listPosts(district?: string, page = 0, size = 30): Observable<PagedResource<CommunityPostResource>> {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (district && district !== 'all') {
+      params = params.set('district', district);
+    }
+    return this.http.get<PagedResource<CommunityPostResource>>(`${this.communityUrl}/posts`, { params });
+  }
+
+  createPost(payload: CreateCommunityPostPayload): Observable<CommunityPostResource> {
+    return this.http.post<CommunityPostResource>(`${this.communityUrl}/posts`, payload);
+  }
+
+  deletePost(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.communityUrl}/posts/${id}`);
+  }
+
+  rateRoute(payload: RateRoutePayload): Observable<RouteRatingResource> {
+    return this.http.post<RouteRatingResource>(`${this.communityUrl}/route-ratings`, payload);
+  }
+
+  myRatings(): Observable<RouteRatingResource[]> {
+    return this.http.get<RouteRatingResource[]>(`${this.communityUrl}/route-ratings/mine`);
+  }
+
+  listReports(
+    status?: string,
+    page = 0,
+    size = 30,
+  ): Observable<PagedResource<CommunityReportResource>> {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (status && status !== 'ALL') {
+      params = params.set('status', status);
+    }
+    return this.http.get<PagedResource<CommunityReportResource>>(`${this.moderationUrl}/reports`, {
+      params,
+    });
+  }
+
+  submitReport(
+    targetType: 'SERVICE' | 'RISK',
+    targetId: string,
+    reason: string,
+  ): Observable<CommunityReportResource> {
+    return this.http.post<CommunityReportResource>(`${this.moderationUrl}/reports`, {
+      targetType,
+      targetId,
+      reason,
+    });
+  }
+
+  decideReport(
+    reportId: string,
+    decision: 'APPROVE' | 'REJECT',
+    notes: string,
+  ): Observable<CommunityReportResource> {
+    return this.http.post<CommunityReportResource>(
+      `${this.moderationUrl}/reports/${reportId}/decision`,
+      { decision, notes },
     );
   }
 
-  /**
-   * Retrieves community posts, street updates, and warnings.
-   */
-  getCommunityPosts(): Observable<CommunityPost[]> {
-    return this.http.get<CommunityPost[]>(this.postsUrl).pipe(
-      map((list) => (list && list.length > 0 ? list : DEFAULT_POSTS)),
-      catchError(() => of(DEFAULT_POSTS)),
+  getReportActions(reportId: string): Observable<ModerationActionResource[]> {
+    return this.http.get<ModerationActionResource[]>(
+      `${this.moderationUrl}/reports/${reportId}/actions`,
     );
-  }
-
-  /**
-   * Retrieves the ranking of top community contributors.
-   */
-  getLeaders(): Observable<CommunityLeader[]> {
-    return of(DEFAULT_LEADERS);
   }
 }

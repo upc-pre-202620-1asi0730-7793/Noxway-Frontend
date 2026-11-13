@@ -1,100 +1,124 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
+import { CommonModule } from '@angular/common';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { isOpenAt, localTime } from '../../../domain/model/service-hours';
-import { MapPoint } from '../../../domain/model/service-point.entity';
+import { catchError, forkJoin, of } from 'rxjs';
+import {
+  RiskZoneResource,
+  ServicePointResource,
+} from '../../../domain/model/service-point.entity';
 import { CommunityService } from '../../../infrastructure/community.service';
+import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
+import { LanguageService } from '../../../../shared/infrastructure/language.service';
+import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
+import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
 
 @Component({
   selector: 'app-map-view',
-  imports: [FormsModule, MatButtonModule, MatIconModule, MatCardModule, MatChipsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './map-view.html',
   styleUrl: './map-view.css',
 })
-export class MapView implements OnInit {
+export class MapView {
   private readonly communityService = inject(CommunityService);
+  private readonly toast = inject(NotificationToastService);
+  readonly actorContext = inject(ActorContextService);
+  readonly languageService = inject(LanguageService);
 
-  readonly allPoints = signal<MapPoint[]>([]);
-  readonly selectedFilter = signal<string>('all');
-  readonly selectedPoint = signal<MapPoint | null>(null);
-  readonly availability = signal<'all' | 'now' | 'arrival'>('all');
-  readonly arrivalTime = signal('12:00');
-  readonly clock = signal(new Date());
-  readonly zoomLevel = signal<number>(1);
+  readonly loading = signal(true);
+  readonly services = signal<ServicePointResource[]>([]);
+  readonly riskZones = signal<RiskZoneResource[]>([]);
+  readonly selectedService = signal<ServicePointResource | null>(null);
 
-  readonly filteredPoints = computed(() => {
-    const f = this.selectedFilter();
-    const pts = this.allPoints();
-    return pts.filter(p => (f === 'all' || p.type === f) &&
-      (this.availability() === 'all' || isOpenAt(p,
-        this.availability() === 'arrival' ? this.arrivalTime() : localTime(p, this.clock()))));
-  });
+  readonly category = signal<string>('ALL');
+  readonly openOnly = signal(false);
+  readonly filterNearLima = signal(false);
 
-  ngOnInit(): void {
-    this.communityService.getMapPoints().subscribe((points) => {
-      this.allPoints.set(points);
-      if (points.length > 0) {
-        this.selectedPoint.set(points[0]);
-      }
+  readonly categories = ['ALL', 'PHARMACY', 'GAS_STATION', 'HOSPITAL', 'POLICE_STATION'];
+
+  readonly mapPins = computed(() =>
+    this.services().map((item) => ({
+      service: item,
+      leftPct: this.toPercent(item.longitude, -77.14, -76.96),
+      topPct: 100 - this.toPercent(item.latitude, -12.16, -11.94),
+    })),
+  );
+
+  constructor() {
+    effect(() => {
+      this.actorContext.revision();
+      untracked(() => this.loadMapData());
     });
   }
 
-  setFilter(filter: string): void {
-    this.selectedFilter.set(filter);
-    this.syncSelection();
+  loadMapData(): void {
+    this.loading.set(true);
+
+    forkJoin({
+      services: this.communityService
+        .listServices({
+          type: this.category(),
+          openOnly: this.openOnly(),
+          ...(this.filterNearLima()
+            ? { latitude: -12.0464, longitude: -77.0428, radiusKm: 15 }
+            : {}),
+          size: 50,
+        })
+        .pipe(catchError(() => of(null))),
+      riskZones: this.communityService.listRiskZones(0, 30).pipe(catchError(() => of(null))),
+    }).subscribe(({ services, riskZones }) => {
+      const list = services?.items ?? [];
+      this.services.set(list);
+      this.riskZones.set(riskZones?.items ?? []);
+      const currentSelectedId = this.selectedService()?.id;
+      this.selectedService.set(
+        list.find((s) => s.id === currentSelectedId) ?? list[0] ?? null,
+      );
+      this.loading.set(false);
+    });
   }
 
-  refreshAvailability(): void {
-    this.clock.set(new Date());
-    this.syncSelection();
+  setCategory(cat: string): void {
+    this.category.set(cat);
+    this.loadMapData();
   }
 
-  syncSelection(): void {
-    const visible = this.filteredPoints();
-    if (!visible.some(p => p.id === this.selectedPoint()?.id)) this.selectedPoint.set(visible[0] ?? null);
+  toggleOpenOnly(): void {
+    this.openOnly.update((val) => !val);
+    this.loadMapData();
   }
 
-  selectPointById(id: number): void {
-    const point = this.filteredPoints().find(p => p.id === id);
-    if (point) this.selectedPoint.set(point);
+  toggleRadius(): void {
+    this.filterNearLima.update((val) => !val);
+    this.loadMapData();
   }
 
-  countType(type: string): number { return this.allPoints().filter(p => p.type === type).length; }
-
-  hasPoint(id: number): boolean { return this.filteredPoints().some(p => p.id === id); }
-
-  hoursLabel(point: MapPoint): string {
-    return point.openingHours?.map(h => h.opens + '–' + h.closes).join(', ') || 'Horario por verificar';
+  vote(serviceId: string, direction: -1 | 0 | 1): void {
+    this.communityService.voteService(serviceId, direction).subscribe({
+      next: () => {
+        this.toast.success(this.languageService.ui('Voto registrado en el servicio.'));
+        this.loadMapData();
+      },
+      error: (err) => this.toast.error(extractProblemMessage(err, 'No se pudo registrar el voto.')),
+    });
   }
 
-  selectPoint(point: MapPoint): void {
-    this.selectedPoint.set(point);
+  resolveZone(zoneId: string): void {
+    this.communityService.resolveRiskZone(zoneId).subscribe({
+      next: () => {
+        this.toast.success(this.languageService.ui('Zona de riesgo marcada como resuelta.'));
+        this.loadMapData();
+      },
+      error: (err) => this.toast.error(extractProblemMessage(err, 'Error al resolver zona.')),
+    });
   }
 
-  zoomIn(): void {
-    const z = this.zoomLevel();
-    if (z < 1.7) this.zoomLevel.set(Math.round((z + 0.2) * 10) / 10);
+  dayLabel(dayOfWeek: number): string {
+    return ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'][dayOfWeek - 1] ?? `D${dayOfWeek}`;
   }
 
-  zoomOut(): void {
-    const z = this.zoomLevel();
-    if (z > 0.8) this.zoomLevel.set(Math.round((z - 0.2) * 10) / 10);
-  }
-
-  resetZoom(): void {
-    this.zoomLevel.set(1);
-  }
-
-  onAddRoute(): void {
-    alert(`Punto agregado: ${this.selectedPoint()?.name} ha sido añadido a tu trayecto activo.`);
-  }
-
-  onVerify(): void {
-    alert(
-      `Confirmación registrada: Has validado la veracidad de las medidas de seguridad de este local.`,
-    );
+  private toPercent(val: number, min: number, max: number): number {
+    const raw = ((val - min) / (max - min)) * 100;
+    return Math.min(92, Math.max(8, raw));
   }
 }

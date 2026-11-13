@@ -1,170 +1,178 @@
-<section class="wellness-container">
-
-  <!-- Top Banner Card -->
-  <mat-card class="wellness-banner">
-    <div class="banner-content">
-      <span class="health-badge">
-        <mat-icon class="badge-icon">bedtime</mat-icon>
-        <span>SALUD DEL SUEÑO EN CADA TURNO</span>
-      </span>
-
-      <h1 class="banner-title">Bitácora de Descanso & Hábitos</h1>
-
-      <p class="banner-desc">
-        Registra tu descanso de día o noche y revisa tus hábitos según tu turno.
+<div class="nx-page">
+  <div class="nx-header">
+    <div>
+      <h2 class="nx-title">{{ languageService.ui('Bienestar & Recuperación de Sueño') }}</h2>
+      <p class="nx-subtitle">
+        {{
+          languageService.ui(
+            'Seguimiento semanal de descanso por turno nocturno, meta diaria y bitácora.'
+          )
+        }}
       </p>
     </div>
-
-    <button
-      mat-flat-button
-      class="primary-btn"
-      (click)="onRegisterRest()">
-      <mat-icon class="btn-icon">add</mat-icon>
-      <span>Registrar Descanso</span>
+    <button type="button" class="nx-btn nx-btn-secondary" (click)="loadAll()">
+      {{ languageService.ui('Actualizar') }}
     </button>
-  </mat-card>
-
-  <!-- 4 Stat Cards Grid -->
-  <div class="stats-grid">
-
-    <mat-card class="stat-card">
-      <div class="stat-body">
-        <strong class="stat-value">{{ summary()?.lastRestDuration }}</strong>
-        <span class="stat-title">Último Descanso</span>
-        <small class="stat-sub green-text">{{ summary()?.lastRestSchedule }}</small>
-      </div>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <div class="stat-body">
-        <strong class="stat-value">{{ summary()?.weeklyAverage }}</strong>
-        <span class="stat-title">Promedio Semanal</span>
-        <small class="stat-sub muted-text">{{ summary()?.weeklyTarget }}</small>
-      </div>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <div class="stat-body">
-        <strong class="stat-value amber-text">{{ summary()?.accumulatedDeficit }}</strong>
-        <span class="stat-title">Déficit Acumulado</span>
-        <small class="stat-sub amber-text">{{ summary()?.fatigueStatus }}</small>
-      </div>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <div class="stat-body">
-        <strong class="stat-value green-text">{{ summary()?.perceivedQuality }}</strong>
-        <span class="stat-title">Calidad Percibida</span>
-        <small class="stat-sub green-text">{{ summary()?.perceivedQualityRating }}</small>
-      </div>
-    </mat-card>
-
   </div>
 
-  <!-- Main Grid: Chart & Logs (Left) + Suggestions (Right) -->
-  <div class="wellness-main-grid">
-
-    <!-- Left Column -->
-    <div class="left-column">
-
-      <!-- Weekly Chart Card -->
-      <mat-card class="chart-card">
-        <div class="chart-header">
-          <h2 class="chart-title">Historial Semanal de Descanso</h2>
-          <p class="chart-subtitle">Comparativa de horas descansadas vs. umbral saludable (7.5h)</p>
+  @if (loading()) {
+    <div class="nx-card">
+      <p class="nx-muted">{{ languageService.ui('Cargando métricas de descanso...') }}</p>
+    </div>
+  } @else {
+    @if (summary(); as sum) {
+      <!-- KPI Grid -->
+      <div class="nx-grid-4">
+        <div class="nx-card">
+          <span class="nx-kpi-label">{{ languageService.ui('Promedio Diario (7d)') }}</span>
+          <span class="nx-kpi-value">{{ (sum.averageDailyMinutes / 60).toFixed(1) }}h</span>
+          <span class="nx-kpi-meta">{{ sum.averageDailyMinutes }} min / día</span>
         </div>
 
-        <div class="chart-visual-wrapper">
-
-          <!-- Target line -->
-          <div class="target-line">
-            <span class="target-label">Meta: 7.5 hrs</span>
-            <div class="dashed-line"></div>
-          </div>
-
-          <!-- Bar Chart Columns -->
-          <div class="bars-container">
-            @for (item of summary()?.weeklyHistory; track item.day) {
-              <div class="bar-column">
-                <span class="bar-value-label">{{ item.hours }}h</span>
-
-                <div class="bar-track">
-                  <div
-                    class="bar-fill"
-                    [class.good]="item.status === 'good'"
-                    [class.warning]="item.status === 'warning'"
-                    [class.danger]="item.status === 'danger'"
-                    [class.today]="item.status === 'today'"
-                    [style.height.%]="(item.hours / 8.5) * 100">
-                  </div>
-                </div>
-
-                <span class="bar-day-label" [class.today-day]="item.isToday">
-                  {{ item.isToday ? 'Hoy' : item.day }}
-                </span>
-              </div>
-            }
-          </div>
-
+        <div class="nx-card">
+          <span class="nx-kpi-label">{{ languageService.ui('Meta Diaria') }}</span>
+          <span class="nx-kpi-value">{{ (sum.targetDailyMinutes / 60).toFixed(1) }}h</span>
+          <span class="nx-kpi-meta">{{ sum.targetDailyMinutes }} min objetivo</span>
         </div>
 
-      </mat-card>
+        <div class="nx-card">
+          <span class="nx-kpi-label">{{ languageService.ui('Déficit Acumulado') }}</span>
+          <span class="nx-kpi-value">{{ (sum.deficitMinutes / 60).toFixed(1) }}h</span>
+          <span class="nx-kpi-meta">{{ sum.deficitMinutes }} min por recuperar</span>
+        </div>
 
-      <!-- Recent Sleep Logs -->
-      <div class="recent-logs-section">
-        <h3 class="logs-section-title">Registros de Descanso Recientes</h3>
-
-        <div class="logs-list">
-          @for (log of summary()?.recentLogs; track log.id) {
-            <mat-card class="log-card">
-              <div class="log-info">
-                <strong class="log-date">{{ log.date }} · {{ log.schedule }}</strong>
-                <span class="log-notes">{{ log.notes }}</span>
-              </div>
-              <div class="log-duration-pill">
-                {{ log.duration }}
-              </div>
-            </mat-card>
-          }
+        <div class="nx-card">
+          <span class="nx-kpi-label">{{ languageService.ui('Calidad Promedio') }}</span>
+          <span class="nx-kpi-value">{{ sum.averageQuality | number: '1.1-1' }} / 5</span>
+          <span class="nx-kpi-meta">{{ sum.fromDate }} -> {{ sum.toDate }}</span>
         </div>
       </div>
 
-    </div>
-
-    <!-- Right Column: Suggestions -->
-    <aside class="right-column">
-
-      <mat-card class="suggestions-card">
-        <h3 class="suggestions-title">Sugerencias del Sueño</h3>
-
-        <!-- Deficit Alert Box -->
-        <div class="deficit-alert-box">
-          <div class="alert-box-header">
-            <mat-icon class="alert-icon">info</mat-icon>
-            <strong class="deficit-title">Déficit acumulado detectado (-2.4h)</strong>
-          </div>
-          <p class="deficit-desc">Horas del jueves fueron insuficientes para tu turno.</p>
+      <!-- 7-day chart -->
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Descanso de los Últimos 7 Días') }}</h3>
+          <span class="nx-badge nx-badge-blue">{{ sum.timeZone }}</span>
         </div>
 
-        <!-- Suggestion Items -->
-        <div class="suggestions-list">
-          @for (sug of summary()?.suggestions; track sug.id) {
-            <div class="suggestion-item">
-              <div class="sug-header">
-                <div class="sug-icon-wrapper">
-                  <mat-icon class="sug-mat-icon">{{ sug.icon }}</mat-icon>
-                </div>
-                <strong class="sug-title">{{ sug.title }}</strong>
-              </div>
-              <p class="sug-desc">{{ sug.description }}</p>
+        <div class="nx-bar-chart">
+          @for (day of sum.dailyBreakdown; track day.date) {
+            <div class="nx-bar-col">
+              <span class="nx-muted">{{ day.hours }}h</span>
+              <div class="nx-bar-fill" [style.height.%]="barHeightPct(day.minutes)"></div>
+              <span class="nx-muted">{{ day.dayLabel }}</span>
             </div>
           }
         </div>
+      </section>
+    }
 
-      </mat-card>
+    <div class="nx-grid-2">
+      <!-- Log Session Form -->
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Registrar Sesión de Descanso') }}</h3>
+          <span class="nx-badge nx-badge-emerald">POST /wellness/rest-sessions</span>
+        </div>
 
-    </aside>
+        <form class="nx-form-grid" (ngSubmit)="logSession()">
+          <div class="nx-field">
+            <label class="nx-label" for="w-date">Fecha</label>
+            <input id="w-date" class="nx-input" type="date" name="logDate" [(ngModel)]="logDate" required />
+          </div>
+          <div class="nx-field">
+            <label class="nx-label" for="w-qual">Calidad (1-5)</label>
+            <select id="w-qual" class="nx-select" name="quality" [(ngModel)]="quality">
+              <option [ngValue]="5">5 - Excelente</option>
+              <option [ngValue]="4">4 - Buena</option>
+              <option [ngValue]="3">3 - Regular</option>
+              <option [ngValue]="2">2 - Baja</option>
+              <option [ngValue]="1">1 - Fragmentada</option>
+            </select>
+          </div>
+          <div class="nx-field">
+            <label class="nx-label" for="w-start">Inicio</label>
+            <input id="w-start" class="nx-input" type="time" name="startTimeStr" [(ngModel)]="startTimeStr" required />
+          </div>
+          <div class="nx-field">
+            <label class="nx-label" for="w-end">Fin</label>
+            <input id="w-end" class="nx-input" type="time" name="endTimeStr" [(ngModel)]="endTimeStr" required />
+          </div>
+          <div class="nx-field nx-field-full">
+            <label class="nx-label" for="w-notes">Notas</label>
+            <input id="w-notes" class="nx-input" name="notes" [(ngModel)]="notes" />
+          </div>
+          <div class="nx-field nx-field-full">
+            <button type="submit" class="nx-btn nx-btn-primary" [disabled]="busy()">
+              {{ languageService.ui('Guardar Descanso') }}
+            </button>
+          </div>
+        </form>
+      </section>
 
-  </div>
+      <!-- Sleep Goal -->
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Ajustar Meta Diaria de Sueño') }}</h3>
+          <span class="nx-badge nx-badge-slate">PUT /wellness/sleep-goal</span>
+        </div>
 
-</section>
+        <form class="nx-form-grid" (ngSubmit)="saveGoal()">
+          <div class="nx-field nx-field-full">
+            <label class="nx-label" for="w-goal">
+              {{ languageService.ui('Minutos diarios objetivo (240 - 720 min)') }}
+            </label>
+            <input
+              id="w-goal"
+              class="nx-input"
+              type="number"
+              min="240"
+              max="720"
+              step="15"
+              name="targetMinutes"
+              [(ngModel)]="targetMinutes"
+              required />
+          </div>
+          <div class="nx-field nx-field-full">
+            <button type="submit" class="nx-btn nx-btn-success" [disabled]="busy()">
+              {{ languageService.ui('Actualizar Meta') }} ({{ (targetMinutes / 60).toFixed(1) }}h)
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <!-- History List -->
+    <section class="nx-card">
+      <div class="nx-card-header">
+        <h3 class="nx-card-title">{{ languageService.ui('Bitácora de Sesiones') }}</h3>
+        <span class="nx-badge nx-badge-slate">{{ sessions().length }}</span>
+      </div>
+
+      @if (sessions().length === 0) {
+        <div class="nx-empty">{{ languageService.ui('No hay sesiones de descanso registradas.') }}</div>
+      } @else {
+        <div class="nx-list">
+          @for (item of sessions(); track item.id) {
+            <div class="nx-list-item">
+              <div>
+                <strong>{{ (item.durationMinutes / 60).toFixed(1) }}h ({{ item.durationMinutes }} min)</strong>
+                <span class="nx-badge nx-badge-blue" style="margin-left: 8px">Calidad {{ item.quality }}/5</span>
+                <div class="nx-muted">
+                  {{ item.startTime | date: 'short' }} -> {{ item.endTime | date: 'shortTime' }} ·
+                  {{ item.notes || 'Sin notas' }}
+                </div>
+              </div>
+              <button
+                type="button"
+                class="nx-btn nx-btn-danger nx-btn-sm"
+                (click)="deleteSession(item.id)">
+                Eliminar
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+</div>

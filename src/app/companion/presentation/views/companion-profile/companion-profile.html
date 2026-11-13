@@ -1,188 +1,48 @@
-<div class="profile-container">
-
-  <!-- Top Hero Profile Card -->
-  @if (profile(); as p) {
-    <mat-card class="profile-hero-card">
-      <div class="hero-left">
-        <div class="profile-avatar">
-          {{ p.avatar }}
-        </div>
-
-        <div class="profile-hero-info">
-          <div class="name-badge-row">
-            <h2 class="profile-full-name">{{ p.fullName }}</h2>
-            <span class="verified-badge">
-              <mat-icon class="badge-icon">check</mat-icon>
-              {{ p.verifiedBadge }}
-            </span>
-          </div>
-
-          <p class="profile-relationship">
-            {{ p.relationship }}
-          </p>
-
-          <div class="profile-meta-row">
-            <mat-icon class="pin-icon">place</mat-icon>
-            <span>{{ p.location }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero-right">
-        <div class="protected-pill">
-          <mat-icon class="pill-check">check</mat-icon>
-          <span>Cuenta Protegida</span>
-        </div>
-      </div>
-    </mat-card>
-  }
-
-  <!-- Main 2-Column Section -->
-  <div class="profile-grid">
-
-    <!-- Left Column: Personal Contact Information -->
-    <mat-card class="section-card">
-      <div class="section-header">
-        <h3 class="section-title">Datos Personales del Contacto</h3>
-      </div>
-
-      <form class="contact-form" (ngSubmit)="onSaveProfile()">
-
-        <!-- Full Name -->
-        <div class="form-group">
-          <label class="form-label" for="fullNameInput">Nombres y Apellidos Completos</label>
-          <input
-            id="fullNameInput"
-            type="text"
-            class="form-input"
-            name="fullName"
-            [(ngModel)]="fullName"
-            placeholder="Nombres completos" />
-        </div>
-
-        <!-- DNI (Readonly) -->
-        <div class="form-group">
-          <label class="form-label" for="dniInput">Documento Nacional de Identidad (DNI)</label>
-          <input
-            id="dniInput"
-            type="text"
-            class="form-input readonly-input"
-            name="dni"
-            [value]="dni"
-            readonly />
-        </div>
-
-        <!-- Phone Mobile -->
-        <div class="form-group">
-          <label class="form-label" for="phoneInput">Teléfono Móvil (WhatsApp Activo)</label>
-          <input
-            id="phoneInput"
-            type="text"
-            class="form-input"
-            name="phone"
-            [(ngModel)]="phone"
-            placeholder="+51 900 000 000" />
-          <div class="validation-note">
-            <mat-icon class="valid-icon">check</mat-icon>
-            <span>Validado con código de seguridad OTP</span>
-          </div>
-        </div>
-
-        <!-- Email -->
-        <div class="form-group">
-          <label class="form-label" for="emailInput">Correo Electrónico</label>
-          <input
-            id="emailInput"
-            type="email"
-            class="form-input"
-            name="email"
-            [(ngModel)]="email"
-            placeholder="correo@ejemplo.com" />
-        </div>
-
-        <!-- Home Address -->
-        <div class="form-group">
-          <label class="form-label" for="addressInput">Dirección de Domicilio Habitual</label>
-          <input
-            id="addressInput"
-            type="text"
-            class="form-input"
-            name="address"
-            [(ngModel)]="address"
-            placeholder="Dirección habitual" />
-        </div>
-
-        <!-- Save Button -->
-        <button
-          type="submit"
-          mat-flat-button
-          class="save-btn"
-          [disabled]="isSaving()">
-          <mat-icon class="btn-icon">save</mat-icon>
-          <span>{{ isSaving() ? 'Guardando...' : 'Guardar Cambios de Perfil' }}</span>
-        </button>
-
-      </form>
-    </mat-card>
-
-    <!-- Right Column: Monitoring Schedules & Privacy -->
-    <mat-card class="section-card">
-      <div class="section-header">
-        <h3 class="section-title">Horarios de Monitoreo &amp; Privacidad</h3>
-      </div>
-
-      <div class="surveillance-intro">
-        <h4 class="intro-heading">Horario de Alertas Prioritarias</h4>
-        <p class="intro-desc">
-          Horario en que el sistema emitirá alarmas audibles prioritarias en tu teléfono:
-        </p>
-      </div>
-
-      <!-- Time Window Boxes -->
-      <div class="time-boxes-row">
-        <div class="time-box">
-          <span class="time-box-label">DESDE:</span>
-          <input aria-label="Inicio de alertas prioritarias" type="time" [(ngModel)]="alertStart" />
-        </div>
-
-        <div class="time-box">
-          <span class="time-box-label">HASTA:</span>
-          <input aria-label="Fin de alertas prioritarias" type="time" [(ngModel)]="alertEnd" />
-        </div>
-      </div>
-
-      <p>Horario local de Lima (UTC−5). Si el fin es anterior al inicio, corresponde al día siguiente.</p>
-      <button mat-stroked-button (click)="saveAlertSchedule()">Guardar preferencia de horario</button>
-      <p>Esta preferencia se guarda en este navegador; no modifica el envío de alertas del servidor.</p>
-
-      <!-- Feature Info Box 1: Auto Rest -->
-      <div class="info-card-box">
-        <h5 class="info-box-title">Modo Resguardo Automático</h5>
-        <p class="info-box-text">
-          Cuando Jorge confirma su llegada, de día o noche, se pausa el seguimiento de ese trayecto y sus avisos.
-        </p>
-      </div>
-
-      <!-- Feature Info Box 2: End-to-end Encryption -->
-      <div class="info-card-box highlight-box">
-        <h5 class="info-box-title green-title">Cifrado de Extremo a Extremo</h5>
-        <p class="info-box-text">
-          Tus datos de contacto y la ubicación GPS de Jorge solo son visibles entre ustedes dos y las centrales de auxilio distrital autorizadas.
-        </p>
-      </div>
-
-      <!-- Logout Action -->
-      <div class="logout-action-area">
-        <button
-          type="button"
-          mat-stroked-button
-          class="logout-danger-btn"
-          (click)="onLogout()">
-          Cerrar Sesión Segura
-        </button>
-      </div>
-    </mat-card>
-
+<div class="nx-page">
+  <div class="nx-header">
+    <div>
+      <h2 class="nx-title">{{ languageService.ui('Mi Perfil de Contacto de Confianza') }}</h2>
+      <p class="nx-subtitle">
+        {{ profile()?.email ?? actorContext.activePersona().email }} ·
+        <span class="nx-badge nx-badge-emerald">{{ profile()?.role ?? actorContext.activePersona().role }}</span>
+      </p>
+    </div>
   </div>
 
+  @if (loading()) {
+    <div class="nx-card">
+      <p class="nx-muted">{{ languageService.ui('Cargando perfil...') }}</p>
+    </div>
+  } @else {
+    <section class="nx-card">
+      <div class="nx-card-header">
+        <h3 class="nx-card-title">{{ languageService.ui('Información de Contacto') }}</h3>
+        <span class="nx-badge nx-badge-emerald">PUT /accounts/me</span>
+      </div>
+
+      <form class="nx-form-grid" (ngSubmit)="save()">
+        <div class="nx-field nx-field-full">
+          <label class="nx-label" for="cp-name">{{ languageService.ui('Nombre completo') }}</label>
+          <input id="cp-name" class="nx-input" name="fullName" [(ngModel)]="fullName" required />
+        </div>
+        <div class="nx-field">
+          <label class="nx-label" for="cp-phone">{{ languageService.ui('Teléfono (+51...)') }}</label>
+          <input id="cp-phone" class="nx-input" name="phone" [(ngModel)]="phone" required />
+        </div>
+        <div class="nx-field">
+          <label class="nx-label" for="cp-tz">{{ languageService.ui('Zona horaria') }}</label>
+          <select id="cp-tz" class="nx-select" name="timeZone" [(ngModel)]="timeZone">
+            <option value="America/Lima">America/Lima</option>
+            <option value="America/Bogota">America/Bogota</option>
+            <option value="America/Santiago">America/Santiago</option>
+          </select>
+        </div>
+        <div class="nx-field nx-field-full">
+          <button type="submit" class="nx-btn nx-btn-primary" [disabled]="saving()">
+            {{ saving() ? languageService.ui('Guardando...') : languageService.ui('Guardar') }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
 </div>

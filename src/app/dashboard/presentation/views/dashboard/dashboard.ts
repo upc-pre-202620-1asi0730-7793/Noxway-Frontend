@@ -1,51 +1,57 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
+import { CommonModule } from '@angular/common';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { LiveDashboardSnapshot, DashboardService } from '../../../infrastructure/dashboard.service';
+import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
 import { LanguageService } from '../../../../shared/infrastructure/language.service';
-import { localApi, SessionService } from '../../../../iam/infrastructure/session.service';
-
-interface DashboardSummary {
-  completedTrips: number;
-  activeTrip: { origin: string; destination: string } | null;
-  contactCount: number;
-  lastRest: string | null;
-  noticeCount: number;
-}
+import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, MatButtonModule, MatIconModule, MatCardModule],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard implements OnInit {
-  readonly t = inject(LanguageService).ui;
-  readonly session = inject(SessionService);
-  private readonly http = inject(HttpClient);
-  private readonly router = inject(Router);
-  readonly summary = signal<DashboardSummary | null>(null);
-  readonly failed = signal(false);
+export class Dashboard {
+  private readonly dashboardService = inject(DashboardService);
+  readonly actorContext = inject(ActorContextService);
+  readonly languageService = inject(LanguageService);
 
-  ngOnInit(): void {
-    this.load();
+  readonly loading = signal(true);
+  readonly errorMessage = signal<string | null>(null);
+  readonly snapshot = signal<LiveDashboardSnapshot | null>(null);
+
+  readonly sleepHoursLabel = computed(() => {
+    const mins = this.snapshot()?.wellnessSummary?.averageDailyMinutes ?? 0;
+    return `${(mins / 60).toFixed(1)}h`;
+  });
+
+  readonly targetHoursLabel = computed(() => {
+    const mins = this.snapshot()?.wellnessSummary?.targetDailyMinutes ?? 420;
+    return `${(mins / 60).toFixed(1)}h`;
+  });
+
+  constructor() {
+    effect(() => {
+      this.actorContext.revision();
+      untracked(() => this.load());
+    });
   }
 
   load(): void {
-    this.failed.set(false);
-    this.http.get<DashboardSummary>(`${localApi}/me/dashboard`, this.session.requestOptions())
-      .subscribe({
-        next: (summary) => this.summary.set(summary),
-        error: (error) => {
-          if (error.status === 401) {
-            this.session.logout();
-            void this.router.navigateByUrl('/login');
-          } else {
-            this.failed.set(true);
-          }
-        },
-      });
+    this.loading.set(true);
+    this.errorMessage.set(null);
+
+    this.dashboardService.loadSnapshot().subscribe({
+      next: (data) => {
+        this.snapshot.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.errorMessage.set(extractProblemMessage(err, 'Error al cargar dashboard.'));
+        this.loading.set(false);
+      },
+    });
   }
 }

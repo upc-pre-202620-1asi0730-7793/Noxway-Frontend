@@ -15,32 +15,52 @@
       </div>
     </div>
 
+    <!-- Active Demo Persona Switcher (IAM structured / open access) -->
+    <div class="nx-persona-box">
+      <label class="nx-persona-label" for="sidebar-persona-select">
+        {{ languageService.t('sidebar.persona') }}
+      </label>
+      <select
+        id="sidebar-persona-select"
+        class="nx-persona-select"
+        [value]="actorContext.activeActorId()"
+        (change)="onActorChange($event)">
+        @for (persona of actorContext.personas; track persona.id) {
+          <option [value]="persona.id">
+            {{ languageService.currentLang() === 'en' ? persona.labelEn : persona.labelEs }}
+          </option>
+        }
+      </select>
+    </div>
+
     @if (isCompanion()) {
       <!-- Companion User Identity Card -->
       <div class="user-card companion-user">
         <div class="avatar avatar-companion">
-          RP
+          {{ userInitials() }}
         </div>
         <div class="user-info">
-          <strong>Rosa Elena Paredes</strong>
-          <span class="user-badge companion-badge">{{ languageService.translate('sidebar.companionRole') }}</span>
+          <strong>{{ session.profile()?.fullName ?? actorContext.activePersona().name }}</strong>
+          <span class="user-badge companion-badge">{{ roleLabel() }}</span>
         </div>
       </div>
 
-      <!-- Accompanied Worker Telemetry Status Box -->
+      <!-- Accompanied Worker Live Summary -->
       <div class="accompanied-card">
-        <div class="accompanied-label">{{ languageService.translate('sidebar.accompaniedBy') }}</div>
+        <div class="accompanied-label">{{ languageService.t('sidebar.accompaniedBy') }}</div>
         <div class="accompanied-worker">
-          <span class="worker-name">Jorge Luis Huamán</span>
+          <span class="worker-name">
+            {{ liveMonitoredName() ?? languageService.ui('Red de confianza') }}
+          </span>
           <span class="worker-status">
             <span class="dot-online"></span>
-            {{ languageService.translate('sidebar.onMotorcycle') }}
+            {{ liveMonitoredTransport() ?? languageService.t('sidebar.onMotorcycle') }}
           </span>
         </div>
       </div>
 
       <p class="menu-title">
-        {{ languageService.translate('sidebar.contactPanel') }}
+        {{ languageService.t('sidebar.contactPanel') }}
       </p>
 
       <nav class="navigation">
@@ -49,13 +69,8 @@
             [routerLink]="option.link"
             routerLinkActive="active"
             class="nav-item">
-
             <span class="nav-bullet"></span>
-
-            <span class="nav-label">
-              {{ option.label }}
-            </span>
-
+            <span class="nav-label">{{ option.label }}</span>
             @if (option.badge) {
               <span
                 class="nav-badge"
@@ -64,7 +79,6 @@
                 {{ option.badge }}
               </span>
             }
-
           </a>
         }
       </nav>
@@ -72,28 +86,29 @@
       <div class="sidebar-footer">
         <button
           mat-flat-button
+          type="button"
           class="call-worker-button"
-          (click)="onCallJorgeClick()">
-          <mat-icon class="btn-icon">phone</mat-icon>
-          {{ languageService.translate('sidebar.callJorge') }}
+          (click)="onCallWorkerClick()">
+          <mat-icon class="btn-icon">visibility</mat-icon>
+          {{ languageService.t('nav.companion.live') }}
         </button>
       </div>
 
     } @else {
-      <!-- Worker User Identity Card -->
+      <!-- Worker / Admin Identity Card -->
       <div class="user-card">
         <div class="avatar">
-          {{ session.profile()?.avatar ?? 'JL' }}
+          {{ userInitials() }}
         </div>
 
         <div class="user-info">
-          <strong>{{ session.profile()?.fullName ?? 'Jorge Luis Huamán' }}</strong>
-          <span class="user-badge">{{ session.profile() ? languageService.ui(session.profile()!.role) : languageService.translate('sidebar.workerRole') }}</span>
+          <strong>{{ session.profile()?.fullName ?? actorContext.activePersona().name }}</strong>
+          <span class="user-badge">{{ roleLabel() }}</span>
         </div>
       </div>
 
       <p class="menu-title">
-        {{ languageService.translate('sidebar.workerModules') }}
+        {{ languageService.t('sidebar.workerModules') }}
       </p>
 
       <nav class="navigation">
@@ -102,13 +117,8 @@
             [routerLink]="option.link"
             routerLinkActive="active"
             class="nav-item">
-
             <span class="nav-bullet"></span>
-
-            <span class="nav-label">
-              {{ option.label }}
-            </span>
-
+            <span class="nav-label">{{ option.label }}</span>
             @if (option.badge) {
               <span
                 class="nav-badge"
@@ -117,22 +127,20 @@
                 {{ option.badge }}
               </span>
             }
-
           </a>
         }
       </nav>
 
-      @if (session.demo()) {
       <div class="sidebar-footer">
         <button
           mat-flat-button
+          type="button"
           class="sos-button"
           (click)="onSosClick()">
           <mat-icon class="sos-icon">warning</mat-icon>
-          {{ languageService.translate('sidebar.sosAlert') }}
+          {{ languageService.t('sidebar.sosAlert') }}
         </button>
       </div>
-      }
     }
 
   </aside>
@@ -145,84 +153,51 @@
         {{ currentPageTitle() }}
       </div>
 
-      @if (isCompanion()) {
-        <!-- Companion Active Commute Pill in Topbar -->
-        <div class="companion-header-status">
-          <span class="status-dot"></span>
-          <span>{{ languageService.translate('topbar.activeJourney') }}</span>
-        </div>
+      <div class="network-status">
+        <span class="status-dot"></span>
+        <span>{{ languageService.t('topbar.activeNetwork') }}</span>
+      </div>
 
-        <div class="topbar-actions">
-          <!-- Language Switcher Component -->
-          <app-language-switcher/>
+      <a routerLink="/access" class="nx-iam-chip">
+        <span>{{ languageService.t('sidebar.iamBanner') }}</span>
+      </a>
 
+      <div class="topbar-actions">
+        <app-language-switcher />
+
+        @if (isCompanion()) {
           <div class="clock companion-clock">
             <span>{{ companionTime() }}</span>
           </div>
-
-          <a
-            mat-flat-button
-            routerLink="/dashboard"
-            class="hub-button">
-            {{ languageService.translate('topbar.hubScreens') }}
+          <a mat-flat-button routerLink="/dashboard" class="hub-button">
+            {{ languageService.ui('Portal Trabajador') }}
           </a>
-
-          <button
-            mat-icon-button
-            class="icon-action-btn"
-            aria-label="Refresh view"
-            (click)="onRefreshClick()">
-            <mat-icon>refresh</mat-icon>
-          </button>
-        </div>
-
-      } @else {
-        <!-- Worker Network Indicator in Topbar -->
-        <div class="network-status">
-          <span class="status-dot"></span>
-          <span>{{ session.demo() ? languageService.ui('Demostración · Datos de ejemplo') : languageService.ui('Prueba local') }}</span>
-        </div>
-
-        <div class="topbar-actions">
-          <!-- Language Switcher Component -->
-          <app-language-switcher/>
-
-          @if (session.demo()) {
-          <a
-            mat-stroked-button
-            routerLink="/companion/live"
-            class="switch-portal-btn"
-            title="Open trusted companion view">
+        } @else {
+          <a mat-stroked-button routerLink="/companion/live" class="switch-portal-btn">
             <mat-icon class="portal-icon">visibility</mat-icon>
-            <span>{{ languageService.translate('sidebar.switchPortal') }}</span>
+            <span>{{ languageService.t('sidebar.switchPortal') }}</span>
           </a>
-          }
-
           <div class="clock">
             <mat-icon class="clock-icon">schedule</mat-icon>
             <span>{{ currentTime() }}</span>
           </div>
+        }
 
-          @if (session.demo()) {
-          <button
-            class="alert-dot-button"
-            aria-label="Network activity indicator">
-            <span class="red-ping"></span>
-          </button>
-          }
-
-          <button mat-stroked-button class="logout-btn" (click)="logout()">
-            <span>{{ languageService.translate('sidebar.logout') }}</span>
-            <mat-icon class="logout-icon">open_in_new</mat-icon>
-          </button>
-        </div>
-      }
+        <button
+          mat-icon-button
+          type="button"
+          class="icon-action-btn"
+          aria-label="Refresh view"
+          (click)="onRefreshClick()">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
 
     </header>
 
     <main class="content">
       <div class="content-wrapper" [class.wide-content]="wideContent()">
-        <router-outlet/>
+        <router-outlet />
       </div>
     </main>
 

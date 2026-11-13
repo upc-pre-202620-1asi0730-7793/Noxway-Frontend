@@ -1,4 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global Noxway styles and shared dark-theme component utilities */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #060b17;
+  color: #e2e8f0;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
 
 /* Follow the outline of the day-and-night shield, preserving its white interior. */
 img[src="LogoNovctiva.png"] {
@@ -10,4 +23,464 @@ img[src="LogoNovctiva.png"] {
   );
 }
 
-app-nearby-services .leaflet-tile-pane { filter: invert(.93) hue-rotate(180deg) saturate(.6) brightness(.86); }
+app-nearby-services .leaflet-tile-pane {
+  filter: invert(.93) hue-rotate(180deg) saturate(.6) brightness(.86);
+}
+
+/* Shared Noxway UI System */
+.nx-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.nx-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nx-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.nx-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.nx-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.nx-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.nx-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.nx-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.nx-card {
+  background: #0d1527;
+  border: 1px solid #1c2a47;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.nx-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.nx-card-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-kpi-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.nx-kpi-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.15;
+}
+
+.nx-kpi-meta {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.nx-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.nx-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nx-field-full {
+  grid-column: 1 / -1;
+}
+
+.nx-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.nx-input,
+.nx-select,
+.nx-textarea {
+  width: 100%;
+  background: #060b17;
+  border: 1px solid #263656;
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: #f8fafc;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 140ms ease;
+}
+
+.nx-input:focus,
+.nx-select:focus,
+.nx-textarea:focus {
+  border-color: #3b82f6;
+}
+
+.nx-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #e2e8f0;
+  cursor: pointer;
+}
+
+.nx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.nx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 140ms ease, border-color 140ms ease, opacity 140ms ease;
+  text-decoration: none;
+}
+
+.nx-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.nx-btn-primary {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.nx-btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.nx-btn-success {
+  background: #059669;
+  color: #ffffff;
+}
+
+.nx-btn-success:hover:not(:disabled) {
+  background: #047857;
+}
+
+.nx-btn-danger {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.nx-btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.nx-btn-secondary {
+  background: #111c34;
+  border-color: #263656;
+  color: #e2e8f0;
+}
+
+.nx-btn-secondary:hover:not(:disabled) {
+  background: #1c2a47;
+}
+
+.nx-btn-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.nx-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.nx-badge-emerald {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #34d399;
+}
+
+.nx-badge-amber {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+}
+
+.nx-badge-red {
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #f87171;
+}
+
+.nx-badge-blue {
+  background: rgba(59, 130, 246, 0.14);
+  border-color: rgba(59, 130, 246, 0.45);
+  color: #93c5fd;
+}
+
+.nx-badge-slate {
+  background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.35);
+  color: #cbd5e1;
+}
+
+.nx-banner {
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: #dbeafe;
+}
+
+.nx-error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #fecaca;
+  font-size: 13px;
+}
+
+.nx-empty {
+  border: 1px dashed #263656;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.nx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nx-list-item {
+  background: #0a1120;
+  border: 1px solid #1c2a47;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nx-muted {
+  color: #94a3b8;
+  font-size: 12.5px;
+}
+
+.nx-mono {
+  font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+.nx-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nx-tab {
+  background: #0d1527;
+  border: 1px solid #1c2a47;
+  color: #94a3b8;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nx-tab-active {
+  background: #1d4ed8;
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+.nx-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.nx-table th,
+.nx-table td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid #1c2a47;
+}
+
+.nx-table th {
+  color: #94a3b8;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.nx-bar-chart {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  align-items: end;
+  height: 140px;
+  padding-top: 12px;
+}
+
+.nx-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.nx-bar-fill {
+  width: 100%;
+  max-width: 36px;
+  min-height: 6px;
+  border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+/* Persona Switcher & IAM Pill in Layout */
+.nx-persona-box {
+  margin: 0 18px 14px;
+  padding: 10px 12px;
+  background: #111c34;
+  border: 1px solid #1c2a47;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nx-persona-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #93c5fd;
+}
+
+.nx-persona-select {
+  background: #060b17;
+  color: #f8fafc;
+  border: 1px solid #263656;
+  border-radius: 7px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.nx-iam-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #1d4ed8;
+  background: rgba(37, 99, 235, 0.14);
+  color: #93c5fd;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nx-iam-chip:hover {
+  background: rgba(37, 99, 235, 0.25);
+}
+
+/* Material SnackBar variants */
+.nx-toast-success .mdc-snackbar__surface {
+  background-color: #064e3b !important;
+  color: #ecfdf5 !important;
+  border: 1px solid #10b981;
+}
+
+.nx-toast-error .mdc-snackbar__surface {
+  background-color: #7f1d1d !important;
+  color: #fef2f2 !important;
+  border: 1px solid #ef4444;
+}
+
+.nx-toast-info .mdc-snackbar__surface {
+  background-color: #111c34 !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #3b82f6;
+}
