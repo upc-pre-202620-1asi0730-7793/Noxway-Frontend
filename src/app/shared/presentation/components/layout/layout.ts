@@ -19,6 +19,7 @@ import { SessionService } from '../../../../iam/infrastructure/session.service';
 import { UserProfileService } from '../../../../iam/infrastructure/user-profile.service';
 import { ActorContextService } from '../../../infrastructure/actor-context.service';
 import { LanguageService } from '../../../infrastructure/language.service';
+import { ThemeService } from '../../../infrastructure/theme.service';
 import { LanguageSwitcher } from '../language-switcher/language-switcher';
 
 interface NavOption {
@@ -58,6 +59,7 @@ export class Layout implements OnInit, OnDestroy {
   readonly session = inject(SessionService);
   readonly actorContext = inject(ActorContextService);
   readonly languageService = inject(LanguageService);
+  readonly themeService = inject(ThemeService);
   private readonly commuteService = inject(CommuteService);
   private readonly companionService = inject(CompanionService);
   private readonly profileService = inject(UserProfileService);

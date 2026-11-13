@@ -353,8 +353,8 @@
   height: 74px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 0 36px;
+  gap: 14px;
+  padding: 0 28px;
   background: var(--nx-surface);
   border-bottom: 1px solid var(--nx-border);
   position: sticky;
@@ -364,11 +364,14 @@
 }
 
 .page-title {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--nx-text);
   letter-spacing: -0.3px;
   white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .network-status {
@@ -398,6 +401,75 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
+}
+
+.nx-theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 36px;
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--nx-surface-elevated);
+  border: 1px solid var(--nx-border);
+  box-shadow: var(--nx-shadow-control);
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.nx-theme-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--nx-text-muted);
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+}
+
+.nx-theme-btn:hover:not(.active) {
+  background: var(--nx-surface-hover);
+  color: var(--nx-text);
+}
+
+.nx-theme-day.active {
+  background: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(245, 158, 11, 0.35);
+}
+
+.nx-theme-night.active {
+  background: var(--nx-primary);
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35);
+}
+
+.nx-theme-btn:focus-visible {
+  outline: 2px solid var(--nx-primary-focus);
+  outline-offset: 1px;
+}
+
+.theme-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+  line-height: 15px;
+}
+
+@media (max-width: 1180px) {
+  .network-status {
+    display: none;
+  }
 }
 
 .clock {

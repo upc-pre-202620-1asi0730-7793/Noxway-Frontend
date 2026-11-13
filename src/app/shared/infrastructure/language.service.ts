@@ -60,6 +60,9 @@ export class LanguageService {
       'topbar.activeJourney': 'Monitoreo conectado a API v1',
       'topbar.activeNetwork': 'Red Activa · Día y Noche',
       'topbar.iamStatus': 'Estado IAM',
+      'topbar.dayMode': 'Día',
+      'topbar.nightMode': 'Noche',
+      'topbar.themeSelector': 'Modo de apariencia',
 
       // Page Titles
       'title.home': 'Inicio',
@@ -117,6 +120,9 @@ export class LanguageService {
       'topbar.activeJourney': 'Connected to API v1',
       'topbar.activeNetwork': 'Active Network · Day & Night',
       'topbar.iamStatus': 'IAM Status',
+      'topbar.dayMode': 'Day',
+      'topbar.nightMode': 'Night',
+      'topbar.themeSelector': 'Appearance mode',
 
       // Page Titles
       'title.home': 'Home',

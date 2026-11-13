@@ -163,6 +163,30 @@
       </a>
 
       <div class="topbar-actions">
+        <div
+          class="nx-theme-switch"
+          role="group"
+          [attr.aria-label]="languageService.t('topbar.themeSelector')">
+          <button
+            type="button"
+            class="nx-theme-btn nx-theme-day"
+            [class.active]="themeService.isLight()"
+            [attr.aria-pressed]="themeService.isLight()"
+            (click)="themeService.setTheme('light')">
+            <mat-icon class="theme-icon">light_mode</mat-icon>
+            <span>{{ languageService.t('topbar.dayMode') }}</span>
+          </button>
+          <button
+            type="button"
+            class="nx-theme-btn nx-theme-night"
+            [class.active]="themeService.isDark()"
+            [attr.aria-pressed]="themeService.isDark()"
+            (click)="themeService.setTheme('dark')">
+            <mat-icon class="theme-icon">dark_mode</mat-icon>
+            <span>{{ languageService.t('topbar.nightMode') }}</span>
+          </button>
+        </div>
+
         <app-language-switcher />
 
         @if (isCompanion()) {
