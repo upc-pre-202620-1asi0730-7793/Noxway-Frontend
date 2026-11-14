@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiBaseUrl: '/api/v1',
+  apiBaseUrl: 'https://noxway-backend.onrender.com/api/v1',
   iamEnabled: false,
 };
