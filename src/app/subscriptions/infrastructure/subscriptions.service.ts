@@ -1,85 +1,133 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { UserSubscription } from '../domain/model/collective-benefit.entity';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { PagedResource } from '../../shared/domain/model/paged-resource';
+import {
+  BenefitClaimResource,
+  CollectiveBenefitResource,
+  PaymentTransactionResource,
+  PlanResource,
+  ReferralCodeResource,
+  ReferralRewardResource,
+  ReferralUseResource,
+  SubscriptionInvitationResource,
+  SubscriptionMemberResource,
+  SubscriptionResource,
+} from '../domain/model/collective-benefit.entity';
 
-/**
- * Fallback static subscription plan and collective benefits data.
- */
-const DEFAULT_SUBSCRIPTION: UserSubscription = {
-  id: 1,
-  planName: 'Plan Centinela Pro',
-  price: 'S/. 12.00 / mes',
-  status: 'MEMBRESÍA ACTIVA',
-  billingDetails: 'Facturación mensual recurrente. Próxima renovación: 15 de Octubre, 2026',
-  referralBonus: 'Invita a un compañero de turno y ambos reciben 1 mes gratis',
-  referralDesc:
-    'Comparte tu código único con otros vigilantes o enfermeros para bonificar tu mensualidad.',
-  referralCode: 'JORGE-NOX26',
-  benefits: [
-    {
-      id: 1,
-      name: 'Grifos Primax & Repsol Nocturnos',
-      subtitle: 'S/. 1.50 menos por galón entre 10:00 PM y 06:00 AM',
-      description:
-        'Aplica en todas las estaciones de Lima Metropolitana mostrando tu credencial digital.',
-      code: 'NX-GAS2026',
-      codeLabel: 'Código',
-      icon: 'local_gas_station',
-      actionLabel: 'Ver Cupón QR',
-    },
-    {
-      id: 2,
-      name: 'Boticas Inkafarma & Mifarma 24h',
-      subtitle: '15% de descuento en botiquín y vitaminas',
-      description: 'Descuento en bebidas rehidratantes y suplementos para el turno noche.',
-      code: 'BOTICAS-NOX',
-      codeLabel: 'Convenio',
-      icon: 'medication',
-      actionLabel: 'Ver Cupón QR',
-    },
-    {
-      id: 3,
-      name: 'Seguro Colectivo de Accidentes en Ruta',
-      subtitle: 'Cobertura hasta por S/. 20,000 en convenio con Mapfre',
-      description: 'Gastos médicos hospitalarios durante desplazamientos con check-in activo.',
-      code: 'POL-849201-NOX',
-      codeLabel: 'Póliza',
-      icon: 'shield',
-      actionLabel: 'Certificado',
-    },
-    {
-      id: 4,
-      name: 'Asesoría Legal Laboral Nocturna',
-      subtitle: 'Consultas sin costo sobre sobretasa nocturna (35%)',
-      description: 'Atención remota 24 horas sobre derechos y compensaciones laborales.',
-      code: 'Canal WhatsApp Jurídico',
-      codeLabel: 'Canal',
-      icon: 'gavel',
-      actionLabel: 'Contactar',
-    },
-  ],
-};
-
-/**
- * Service managing user subscriptions, membership tiers, and partner benefits.
- */
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class SubscriptionsService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/subscriptions`;
+  private readonly baseUrl = environment.apiBaseUrl;
 
-  /**
-   * Retrieves active plan subscription information and partner benefits.
-   */
-  getSubscriptionInfo(): Observable<UserSubscription> {
-    return this.http.get<UserSubscription[]>(this.baseUrl).pipe(
-      map((list) => (list && list.length > 0 ? list[0] : DEFAULT_SUBSCRIPTION)),
-      catchError(() => of(DEFAULT_SUBSCRIPTION)),
+  getPlans(): Observable<PlanResource[]> {
+    return this.http.get<PlanResource[]>(`${this.baseUrl}/plans`);
+  }
+
+  getMySubscriptions(): Observable<SubscriptionResource[]> {
+    return this.http.get<SubscriptionResource[]>(`${this.baseUrl}/subscriptions`);
+  }
+
+  subscribe(planId: string): Observable<SubscriptionResource> {
+    return this.http.post<SubscriptionResource>(`${this.baseUrl}/subscriptions`, { planId });
+  }
+
+  cancelSubscription(id: string): Observable<SubscriptionResource> {
+    return this.http.post<SubscriptionResource>(`${this.baseUrl}/subscriptions/${id}/cancel`, {});
+  }
+
+  requestPayment(subscriptionId: string): Observable<PaymentTransactionResource> {
+    return this.http.post<PaymentTransactionResource>(
+      `${this.baseUrl}/subscriptions/${subscriptionId}/payments`,
+      {},
     );
+  }
+
+  getPayments(
+    page = 0,
+    size = 20,
+    all = false,
+  ): Observable<PagedResource<PaymentTransactionResource>> {
+    const params = new HttpParams().set('page', page).set('size', size).set('all', all);
+    return this.http.get<PagedResource<PaymentTransactionResource>>(`${this.baseUrl}/payments`, {
+      params,
+    });
+  }
+
+  confirmOfflinePayment(paymentId: string, reference: string): Observable<PaymentTransactionResource> {
+    return this.http.post<PaymentTransactionResource>(
+      `${this.baseUrl}/payments/${paymentId}/confirm-offline`,
+      { reference },
+    );
+  }
+
+  rejectPayment(paymentId: string): Observable<PaymentTransactionResource> {
+    return this.http.post<PaymentTransactionResource>(`${this.baseUrl}/payments/${paymentId}/reject`, {});
+  }
+
+  getBenefits(): Observable<CollectiveBenefitResource[]> {
+    return this.http.get<CollectiveBenefitResource[]>(`${this.baseUrl}/benefits`);
+  }
+
+  claimBenefit(benefitId: string): Observable<BenefitClaimResource> {
+    return this.http.post<BenefitClaimResource>(`${this.baseUrl}/benefits/${benefitId}/claims`, {});
+  }
+
+  getMyClaims(): Observable<BenefitClaimResource[]> {
+    return this.http.get<BenefitClaimResource[]>(`${this.baseUrl}/benefit-claims`);
+  }
+
+  getReferralCode(): Observable<ReferralCodeResource> {
+    return this.http.get<ReferralCodeResource>(`${this.baseUrl}/referral-code`);
+  }
+
+  useReferralCode(code: string): Observable<ReferralUseResource> {
+    return this.http.post<ReferralUseResource>(`${this.baseUrl}/referrals`, { code });
+  }
+
+  getReferralRewards(): Observable<ReferralRewardResource[]> {
+    return this.http.get<ReferralRewardResource[]>(`${this.baseUrl}/referral-rewards`);
+  }
+
+  redeemReward(id: string): Observable<ReferralRewardResource> {
+    return this.http.post<ReferralRewardResource>(`${this.baseUrl}/referral-rewards/${id}/redeem`, {});
+  }
+
+  inviteMember(subscriptionId: string, workerEmail: string): Observable<SubscriptionMemberResource> {
+    return this.http.post<SubscriptionMemberResource>(
+      `${this.baseUrl}/subscriptions/${subscriptionId}/members`,
+      { workerEmail },
+    );
+  }
+
+  getMembers(subscriptionId: string): Observable<SubscriptionMemberResource[]> {
+    return this.http.get<SubscriptionMemberResource[]>(
+      `${this.baseUrl}/subscriptions/${subscriptionId}/members`,
+    );
+  }
+
+  getInvitations(): Observable<SubscriptionInvitationResource[]> {
+    return this.http.get<SubscriptionInvitationResource[]>(
+      `${this.baseUrl}/subscription-invitations`,
+    );
+  }
+
+  acceptInvitation(id: string): Observable<SubscriptionMemberResource> {
+    return this.http.post<SubscriptionMemberResource>(
+      `${this.baseUrl}/subscription-invitations/${id}/accept`,
+      {},
+    );
+  }
+
+  rejectInvitation(id: string): Observable<SubscriptionMemberResource> {
+    return this.http.post<SubscriptionMemberResource>(
+      `${this.baseUrl}/subscription-invitations/${id}/reject`,
+      {},
+    );
+  }
+
+  removeMember(memberId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/subscription-members/${memberId}`);
   }
 }

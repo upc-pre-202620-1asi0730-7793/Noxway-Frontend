@@ -1,122 +1,126 @@
-<div class="alerts-container">
-
-  <!-- Top 2-Column Section -->
-  <div class="alerts-top-grid">
-
-    <!-- Column 1: Reception Channels -->
-    <mat-card class="alerts-card">
-      <div class="card-header">
-        <h3 class="card-title">Canales de Recepción de Rosa Elena</h3>
-        <p class="card-subtitle">
-          Configura dónde y cómo recibirás las alertas nocturnas de Jorge
-        </p>
-      </div>
-
-      <div class="channels-list">
-        @for (channel of channels(); track channel.id) {
-          <div class="channel-row">
-            <div class="channel-info">
-              <h4 class="channel-title">{{ channel.title }}</h4>
-              <p class="channel-subtitle">{{ channel.subtitle }}</p>
-            </div>
-            <div class="channel-toggle">
-              <mat-slide-toggle
-                [checked]="channel.enabled"
-                (change)="onToggleChannel(channel, $event.checked)"
-                color="primary"
-                aria-label="{{ channel.title }}">
-              </mat-slide-toggle>
-            </div>
-          </div>
-        }
-      </div>
-    </mat-card>
-
-    <!-- Column 2: Sound & Siren Tests -->
-    <mat-card class="alerts-card">
-      <div class="card-header">
-        <h3 class="card-title">Prueba de Sonido &amp; Notificación</h3>
-        <p class="card-subtitle">
-          Verifica que tu teléfono responda con volumen alto ante una alarma crítica
-        </p>
-      </div>
-
-      <div class="sound-tests-list">
-        <button
-          mat-stroked-button
-          class="test-btn-regular"
-          (click)="onTestSound('regular')">
-          <mat-icon class="btn-icon">volume_up</mat-icon>
-          <span>Probar Notificación Ordinaria (Checkpoint Superado)</span>
-        </button>
-
-        <button
-          mat-stroked-button
-          class="test-btn-warning"
-          (click)="onTestSound('warning')">
-          <mat-icon class="btn-icon">notifications_active</mat-icon>
-          <span>Probar Alerta Preventiva de Desvío / Demora</span>
-        </button>
-
-        <button
-          mat-flat-button
-          class="test-btn-sos"
-          (click)="onTestSound('sos')">
-          <mat-icon class="btn-icon">warning</mat-icon>
-          <span>PROBAR ALARMA CRÍTICA SOS (SIRENA MÁXIMA)</span>
-        </button>
-      </div>
-
-      @if (soundTesting()) {
-        <div class="sound-active-banner">
-          <mat-icon class="pulse-icon">graphic_eq</mat-icon>
-          <span>{{ soundTesting() }}</span>
-        </div>
-      }
-
-      <div class="test-footer-notice">
-        Protocolo certificado conforme a las especificaciones de seguridad nocturna del Capítulo III.
-      </div>
-    </mat-card>
-
+<div class="nx-page">
+  <div class="nx-header">
+    <div>
+      <h2 class="nx-title">{{ languageService.ui('Centro de Avisos & Cola de Entregas') }}</h2>
+      <p class="nx-subtitle">
+        {{
+          languageService.ui(
+            'Notificaciones recibidas por canal, preferencias de horario y reintento de despacho.'
+          )
+        }}
+      </p>
+    </div>
+    <div class="nx-actions">
+      <button type="button" class="nx-btn nx-btn-primary nx-btn-sm" (click)="dispatchPending()">
+        {{ languageService.ui('Despachar Pendientes') }}
+      </button>
+      <button type="button" class="nx-btn nx-btn-secondary nx-btn-sm" (click)="loadAll()">
+        {{ languageService.ui('Actualizar') }}
+      </button>
+    </div>
   </div>
 
-  <!-- Bottom Section: Historical Notification Logs -->
-  <mat-card class="history-log-card">
-    <div class="card-header">
-      <h3 class="card-title">Registro Histórico de Avisos Recibidos</h3>
+  @if (loading()) {
+    <div class="nx-card">
+      <p class="nx-muted">{{ languageService.ui('Cargando alertas...') }}</p>
     </div>
+  } @else {
+    <div class="nx-grid-2">
+      <!-- Alerts Feed -->
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Alertas Recibidas') }}</h3>
+          <span class="nx-badge nx-badge-red">{{ alerts().length }}</span>
+        </div>
 
-    <div class="logs-list">
-      @for (log of logs(); track log.id) {
-        <div class="log-item">
-
-          <div class="log-icon-circle"
-               [class.icon-check]="log.type === 'check'"
-               [class.icon-play]="log.type === 'play'"
-               [class.icon-home]="log.type === 'home'"
-               [class.icon-warning]="log.type === 'warning'">
-            <mat-icon class="log-mat-icon">
-              @if (log.type === 'check') { check }
-              @else if (log.type === 'play') { play_arrow }
-              @else if (log.type === 'home') { home }
-              @else if (log.type === 'warning') { priority_high }
-            </mat-icon>
-          </div>
-
-          <div class="log-content">
-            <div class="log-header-row">
-              <h4 class="log-title">{{ log.title }}</h4>
-              <span class="log-time" [class.time-recent]="log.type === 'check'">
-                {{ log.time }}
+        <div class="nx-list">
+          @for (alert of alerts(); track alert.id) {
+            <div class="nx-list-item">
+              <div>
+                <strong>{{ alert.workerName }}</strong>
+                <span class="nx-badge nx-badge-slate" style="margin-left: 8px">{{ languageService.code(alert.channel) }}</span>
+                <div class="nx-muted">{{ alert.message }}</div>
+                <div class="nx-muted">{{ alert.createdAt | date: 'short' }}</div>
+              </div>
+              <span
+                class="nx-badge"
+                [class.nx-badge-emerald]="alert.status === 'DELIVERED'"
+                [class.nx-badge-amber]="alert.status === 'PENDING' || alert.status === 'PENDING_PROVIDER'"
+                [class.nx-badge-red]="alert.status === 'FAILED'">
+                {{ languageService.code(alert.status) }}
               </span>
             </div>
-            <p class="log-description">{{ log.description }}</p>
-          </div>
-
+          } @empty {
+            <div class="nx-empty">{{ languageService.ui('No hay alertas registradas.') }}</div>
+          }
         </div>
-      }
-    </div>
-  </mat-card>
+      </section>
 
+      <!-- Channels & Outbound Delivery Queue -->
+      <div class="nx-grid">
+        <section class="nx-card">
+          <div class="nx-card-header">
+            <h3 class="nx-card-title">{{ languageService.ui('Mis Canales Habilitados') }}</h3>
+          </div>
+          @if (missingChannels().length > 0) {
+            <div class="nx-actions" style="margin-bottom: 12px">
+              @for (channel of missingChannels(); track channel) {
+                <button
+                  type="button"
+                  class="nx-btn nx-btn-secondary nx-btn-sm"
+                  (click)="configureChannel(channel)">
+                  + {{ languageService.ui('Activar') }} {{ languageService.code(channel) }}
+                </button>
+              }
+            </div>
+          }
+          <div class="nx-list">
+            @for (pref of preferences(); track pref.channel) {
+              <div class="nx-list-item">
+                <div>
+                  <strong>{{ languageService.code(pref.channel) }}</strong>
+                  <div class="nx-muted">{{ pref.priorityStart }} - {{ pref.priorityEnd }}</div>
+                </div>
+                <label class="nx-checkbox-row">
+                  <input
+                    type="checkbox"
+                    [checked]="pref.enabled"
+                    (change)="toggleChannel(pref, $any($event.target).checked)" />
+                  <span>{{ pref.enabled ? languageService.ui('Activo') : languageService.ui('Pausado') }}</span>
+                </label>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="nx-card">
+          <div class="nx-card-header">
+            <h3 class="nx-card-title">{{ languageService.ui('Cola de Entregas') }}</h3>
+            <span class="nx-badge nx-badge-blue">{{ deliveries().length }}</span>
+          </div>
+          <div class="nx-list">
+            @for (item of deliveries(); track item.id) {
+              <div class="nx-list-item">
+                <div>
+                  <strong>{{ languageService.code(item.channel) }} · {{ item.workerName }}</strong>
+                  <div class="nx-muted">{{ item.message }}</div>
+                </div>
+                <div class="nx-actions">
+                  <span class="nx-badge nx-badge-amber">{{ languageService.code(item.status) }}</span>
+                  <button
+                    type="button"
+                    class="nx-btn nx-btn-secondary nx-btn-sm"
+                    (click)="retryDelivery(item.id)">
+                    Reintentar
+                  </button>
+                </div>
+              </div>
+            } @empty {
+              <div class="nx-empty">{{ languageService.ui('Cola de entregas vacía.') }}</div>
+            }
+          </div>
+        </section>
+      </div>
+    </div>
+  }
 </div>

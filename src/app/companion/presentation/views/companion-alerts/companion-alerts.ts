@@ -1,52 +1,116 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
+import { CommonModule } from '@angular/common';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { catchError, forkJoin, of } from 'rxjs';
+import {
+  getMissingNotificationChannels,
+  NotificationChannel,
+  NotificationPreferenceResource,
+} from '../../../../iam/domain/model/user-profile.entity';
+import { UserProfileService } from '../../../../iam/infrastructure/user-profile.service';
+import { AlertResource } from '../../../domain/model/companion.entity';
 import { CompanionService } from '../../../infrastructure/companion.service';
-import { CompanionAlertChannel, CompanionAlertLog } from '../../../domain/model/companion.entity';
+import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
+import { LanguageService } from '../../../../shared/infrastructure/language.service';
+import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
+import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
 
 @Component({
   selector: 'app-companion-alerts',
-  imports: [MatCardModule, MatSlideToggleModule, MatButtonModule, MatIconModule, MatDividerModule],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './companion-alerts.html',
   styleUrl: './companion-alerts.css',
 })
-export class CompanionAlerts implements OnInit {
+export class CompanionAlerts {
   private readonly companionService = inject(CompanionService);
+  private readonly profileService = inject(UserProfileService);
+  private readonly toast = inject(NotificationToastService);
+  readonly actorContext = inject(ActorContextService);
+  readonly languageService = inject(LanguageService);
 
-  readonly channels = signal<CompanionAlertChannel[]>([]);
-  readonly logs = signal<CompanionAlertLog[]>([]);
-  readonly soundTesting = signal<string | null>(null);
+  readonly loading = signal(true);
+  readonly alerts = signal<AlertResource[]>([]);
+  readonly deliveries = signal<AlertResource[]>([]);
+  readonly preferences = signal<NotificationPreferenceResource[]>([]);
+  readonly missingChannels = computed(() => getMissingNotificationChannels(this.preferences()));
 
-  ngOnInit(): void {
-    this.companionService.getAlerts().subscribe((data) => {
-      this.channels.set(data.channels);
-      this.logs.set(data.logs);
+  constructor() {
+    effect(() => {
+      this.actorContext.revision();
+      untracked(() => this.loadAll());
     });
   }
 
-  onToggleChannel(channel: CompanionAlertChannel, newValue: boolean): void {
-    channel.enabled = newValue;
-    const current = this.channels();
-    this.channels.set([...current]);
+  loadAll(): void {
+    this.loading.set(true);
+
+    forkJoin({
+      alerts: this.companionService.getAlerts(0, 30).pipe(catchError(() => of(null))),
+      deliveries: this.companionService.getDeliveryQueue().pipe(catchError(() => of([]))),
+      prefs: this.profileService.getNotificationPreferences().pipe(catchError(() => of([]))),
+    }).subscribe(({ alerts, deliveries, prefs }) => {
+      this.alerts.set(alerts?.items ?? []);
+      this.deliveries.set(deliveries);
+      this.preferences.set(prefs);
+      this.loading.set(false);
+    });
   }
 
-  onTestSound(type: 'regular' | 'warning' | 'sos'): void {
-    if (type === 'regular') {
-      this.soundTesting.set('Notificación de checkpoint emitida (Tono suave)');
-      alert('Tono de notificación ordinaria reproducido en el dispositivo de Rosa Elena.');
-    } else if (type === 'warning') {
-      this.soundTesting.set('Alerta preventiva emitida (Tono moderado)');
-      alert('Alerta preventiva sonora y vibración probadas con éxito.');
-    } else {
-      this.soundTesting.set('Alarma SOS activa');
-      alert('SIRENA CRÍTICA SOS DE SEGURIDAD EMITIDA A VOLUMEN MÁXIMO.');
-    }
+  configureChannel(channel: NotificationChannel): void {
+    this.toggleChannel(
+      {
+        id: '',
+        accountId: this.actorContext.activeActorId(),
+        channel,
+        enabled: true,
+        priorityStart: '20:00',
+        priorityEnd: '07:00',
+        timeZone: 'America/Lima',
+      },
+      true,
+    );
+  }
 
-    setTimeout(() => {
-      this.soundTesting.set(null);
-    }, 3500);
+  toggleChannel(pref: NotificationPreferenceResource, enabled: boolean): void {
+    this.profileService
+      .updateNotificationPreference({
+        channel: pref.channel,
+        enabled,
+        priorityStart: (pref.priorityStart || '20:00').slice(0, 5),
+        priorityEnd: (pref.priorityEnd || '07:00').slice(0, 5),
+        timeZone: pref.timeZone || 'America/Lima',
+      })
+      .subscribe({
+        next: (updated) => {
+          this.preferences.update((items) =>
+            items.some((item) => item.channel === updated.channel)
+              ? items.map((item) => (item.channel === updated.channel ? updated : item))
+              : [...items, updated],
+          );
+          this.toast.success(`${updated.channel} actualizado`);
+        },
+        error: (err) => this.toast.error(extractProblemMessage(err, 'Error al actualizar canal.')),
+      });
+  }
+
+  dispatchPending(): void {
+    this.companionService.dispatchPendingDeliveries().subscribe({
+      next: (res) => {
+        const count = res?.['processed'] ?? 0;
+        this.toast.success(`Despacho ejecutado (${count} alertas procesadas)`);
+        this.loadAll();
+      },
+      error: (err) => this.toast.error(extractProblemMessage(err, 'Error al despachar cola.')),
+    });
+  }
+
+  retryDelivery(id: string): void {
+    this.companionService.retryDelivery(id).subscribe({
+      next: () => {
+        this.toast.info('Reintento programado');
+        this.loadAll();
+      },
+      error: (err) => this.toast.error(extractProblemMessage(err, 'Error al reintentar.')),
+    });
   }
 }

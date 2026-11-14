@@ -1,246 +1,192 @@
-<section class="dashboard-container">
-
-  <!-- Welcome / Active Shift Card -->
-  <mat-card class="welcome-card">
-    <div class="welcome-content">
-      <span class="shift-badge">
-        <mat-icon class="badge-icon">bedtime</mat-icon>
-        <span>Turno Noche 22:00 - 06:00</span>
-      </span>
-
-      <h1 class="welcome-title">Buenas noches, Jorge Luis</h1>
-
-      <p class="welcome-desc">
-        Acompañamiento pasivo listo. Inicia tu check-in al salir de Planta San Martín para que Rosa Elena te acompañe.
+<div class="nx-page">
+  <div class="nx-header">
+    <div>
+      <h2 class="nx-title">
+        {{ languageService.ui('Resumen Operativo') }} ·
+        {{ snapshot()?.profile?.fullName ?? actorContext.activePersona().name }}
+      </h2>
+      <p class="nx-subtitle">
+        {{ snapshot()?.profile?.email ?? actorContext.activePersona().email }} ·
+        {{ snapshot()?.profile?.timeZone ?? 'America/Lima' }}
       </p>
     </div>
 
-    <button
-      mat-flat-button
-      class="primary-btn check-in-btn"
-      routerLink="/journey">
-      <mat-icon class="btn-icon">play_arrow</mat-icon>
-      <span>Iniciar Check-In</span>
-    </button>
-  </mat-card>
+    <div class="nx-actions">
+      <button type="button" class="nx-btn nx-btn-secondary" (click)="load()">
+        {{ languageService.ui('Actualizar') }}
+      </button>
+      <a routerLink="/journey" class="nx-btn nx-btn-primary">
+        {{
+          snapshot()?.activeCommute
+            ? languageService.ui('Ver Trayecto Activo')
+            : languageService.ui('Iniciar Trayecto Seguro')
+        }}
+      </a>
+    </div>
+  </div>
 
-  <!-- Quick Stats Grid -->
-  <section class="stats-grid">
+  @if (actorContext.isCompanionRole()) {
+    <div class="nx-banner">
+      <span>
+        {{
+          languageService.ui(
+            'Estás usando un perfil de Contacto de Confianza. Puedes abrir el Companion Portal para ver alertas y monitoreo en vivo.'
+          )
+        }}
+      </span>
+      <a routerLink="/companion/live" class="nx-btn nx-btn-success nx-btn-sm">
+        {{ languageService.ui('Abrir Companion Portal') }}
+      </a>
+    </div>
+  }
 
-    <mat-card class="stat-card">
-      <div class="stat-icon-wrapper green-bg">
-        <mat-icon class="stat-mat-icon green-icon">verified_user</mat-icon>
+  @if (actorContext.isAdmin()) {
+    <div class="nx-banner">
+      <span>
+        {{
+          languageService.ui(
+            'Modo Administrador / Moderador activo: puedes aprobar reportes comunitarios y confirmar pagos offline.'
+          )
+        }}
+      </span>
+      <div class="nx-actions">
+        <a routerLink="/community" class="nx-btn nx-btn-primary nx-btn-sm">
+          {{ languageService.ui('Cola de Moderación') }}
+        </a>
+        <a routerLink="/benefits" class="nx-btn nx-btn-secondary nx-btn-sm">
+          {{ languageService.ui('Validar Pagos Offline') }}
+        </a>
       </div>
-      <div class="stat-info">
-        <strong class="stat-value">{{ dashboardData()?.safeTripsPercentage }}%</strong>
-        <span class="stat-label">Trayectos Seguros</span>
-        <div class="stat-sub green-text">
-          <mat-icon class="mini-check">check</mat-icon>
-          <span>{{ dashboardData()?.confirmedTrips }}</span>
-        </div>
-      </div>
-    </mat-card>
+    </div>
+  }
 
-    <mat-card class="stat-card">
-      <div class="stat-icon-wrapper blue-bg">
-        <mat-icon class="stat-mat-icon blue-icon">people</mat-icon>
-      </div>
-      <div class="stat-info">
-        <strong class="stat-value">{{ dashboardData()?.trustedContactName }}</strong>
-        <span class="stat-label">Contacto Vinculado</span>
-        <div class="stat-sub blue-text">
-          <mat-icon class="mini-check">check</mat-icon>
-          <span>{{ dashboardData()?.trustedContactStatus }}</span>
-        </div>
-      </div>
-    </mat-card>
+  @if (errorMessage()) {
+    <div class="nx-error">{{ errorMessage() }}</div>
+  }
 
-    <mat-card class="stat-card">
-      <div class="stat-icon-wrapper amber-bg">
-        <mat-icon class="stat-mat-icon amber-icon">bedtime</mat-icon>
-      </div>
-      <div class="stat-info">
-        <strong class="stat-value">{{ dashboardData()?.restDuration }}</strong>
-        <span class="stat-label">Descanso Diurno</span>
-        <div class="stat-sub amber-text">
-          <mat-icon class="mini-check">check</mat-icon>
-          <span>{{ dashboardData()?.restComparison }}</span>
-        </div>
-      </div>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <div class="stat-icon-wrapper teal-bg">
-        <mat-icon class="stat-mat-icon teal-icon">storefront</mat-icon>
-      </div>
-      <div class="stat-info">
-        <strong class="stat-value">{{ dashboardData()?.servicesCount }} Locales</strong>
-        <span class="stat-label">Servicios 24h en ruta</span>
-        <div class="stat-sub teal-text">
-          <mat-icon class="mini-check">check</mat-icon>
-          <span>{{ dashboardData()?.servicesStatus }}</span>
-        </div>
-      </div>
-    </mat-card>
-
-  </section>
-
-  <!-- Main Grid: Route Card + Aside -->
-  <section class="dashboard-body">
-
-    <!-- Routine Commute Monitor -->
-    <mat-card class="route-card">
-
-      <div class="card-header-row">
-        <div>
-          <h2 class="section-title">Monitoreo de Trayecto Habitual</h2>
-          <p class="section-subtitle">Ruta preconfigurada: Los Olivos a Cercado de Lima</p>
-        </div>
-        <span class="status-pill waiting">
-          {{ dashboardData()?.journeyStatus }}
+  @if (loading()) {
+    <div class="nx-card">
+      <p class="nx-muted">{{ languageService.ui('Cargando métricas en vivo desde /api/v1...') }}</p>
+    </div>
+  } @else if (snapshot(); as data) {
+    <!-- KPI Cards -->
+    <div class="nx-grid-4">
+      <div class="nx-card">
+        <span class="nx-kpi-label">{{ languageService.ui('Jornada Nocturna') }}</span>
+        <span class="nx-kpi-value">{{ languageService.code(data.profile?.shiftType ?? data.profile?.role ?? 'NIGHT') }}</span>
+        <span class="nx-kpi-meta">
+          {{
+            data.profile?.shiftStart
+              ? (data.profile!.shiftStart + ' - ' + data.profile!.shiftEnd)
+              : languageService.ui('Rol de supervisión / contacto')
+          }}
         </span>
       </div>
 
-      <div class="route-path-box">
-
-        <div class="route-endpoint">
-          <small class="endpoint-type">ORIGEN (SALIDA 06:00 AM)</small>
-          <strong class="endpoint-name">{{ dashboardData()?.origin }}</strong>
-          <span class="endpoint-address">{{ dashboardData()?.originAddress }}</span>
-        </div>
-
-        <div class="route-connector">
-          <div class="connector-line"></div>
-          <mat-icon class="arrow-icon">arrow_forward</mat-icon>
-        </div>
-
-        <div class="route-endpoint">
-          <small class="endpoint-type">DESTINO SEGURO</small>
-          <strong class="endpoint-name">{{ dashboardData()?.destination }}</strong>
-          <span class="endpoint-address">{{ dashboardData()?.destinationAddress }}</span>
-        </div>
-
+      <div class="nx-card">
+        <span class="nx-kpi-label">{{ languageService.ui('Trayectos Completados') }}</span>
+        <span class="nx-kpi-value">{{ data.completedTrips }}</span>
+        <span class="nx-kpi-meta">
+          {{
+            data.activeCommute
+              ? (languageService.ui('En curso') + ': ' + data.activeCommute.destination)
+              : languageService.ui('Sin trayecto abierto')
+          }}
+        </span>
       </div>
 
-      <div class="route-meta-bar">
-        <span>Distancia: <strong>{{ dashboardData()?.distance }}</strong></span>
-        <span class="separator">|</span>
-        <span>Tiempo Est.: <strong>{{ dashboardData()?.estimatedTime }}</strong></span>
-        <span class="separator">|</span>
-        <span>Tolerancia: <strong>{{ dashboardData()?.tolerance }}</strong></span>
-        <span class="separator">|</span>
-        <span>Medio: <strong>{{ dashboardData()?.transport }}</strong></span>
+      <div class="nx-card">
+        <span class="nx-kpi-label">{{ languageService.ui('Red de Confianza') }}</span>
+        <span class="nx-kpi-value">{{ data.activeContactsCount }}</span>
+        <span class="nx-kpi-meta">
+          {{ data.pendingContactsCount }} {{ languageService.ui('invitación(es) pendiente(s)') }}
+        </span>
       </div>
 
-      <!-- Vector Preview Map -->
-      <div class="route-preview-map">
-        <svg class="map-svg" viewBox="0 0 700 200" preserveAspectRatio="none">
-          <!-- Grid lines -->
-          <line x1="0" y1="100" x2="700" y2="100" stroke="#1e293b" stroke-width="2" />
-          <line x1="160" y1="0" x2="160" y2="200" stroke="#1e293b" stroke-width="2" />
-          <line x1="440" y1="0" x2="440" y2="200" stroke="#1e293b" stroke-width="2" />
-
-          <!-- Commute path: starts at green dot, peaks, goes to red dot -->
-          <path d="M 60 130 L 160 130 L 360 65 L 620 150" fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="6,4" />
-
-          <!-- Start circle (green) -->
-          <circle cx="60" cy="130" r="8" fill="#10b981" />
-          <circle cx="60" cy="130" r="14" fill="none" stroke="#10b981" stroke-opacity="0.35" stroke-width="3" />
-
-          <!-- End circle (red) -->
-          <circle cx="620" cy="150" r="8" fill="#ef4444" />
-          <circle cx="620" cy="150" r="14" fill="none" stroke="#ef4444" stroke-opacity="0.35" stroke-width="3" />
-        </svg>
-
-        <span class="map-label">[Mapa 24h: Corredor Iluminado Universitario]</span>
+      <div class="nx-card">
+        <span class="nx-kpi-label">{{ languageService.ui('Promedio Descanso (7d)') }}</span>
+        <span class="nx-kpi-value">{{ sleepHoursLabel() }}</span>
+        <span class="nx-kpi-meta">
+          {{ languageService.ui('Meta') }}: {{ targetHoursLabel() }} · {{ languageService.ui('Plan') }}: {{ languageService.code(data.activeSubscriptionPlan) }}
+        </span>
       </div>
+    </div>
 
-      <div class="route-actions-row">
-        <button
-          mat-flat-button
-          class="primary-btn"
-          routerLink="/journey">
-          <mat-icon class="btn-icon">navigation</mat-icon>
-          <span>Abrir Pantalla de Trayecto Activo</span>
-        </button>
-
-        <button
-          mat-stroked-button
-          class="secondary-btn"
-          routerLink="/map">
-          <mat-icon class="btn-icon">map</mat-icon>
-          <span>Explorar Servicios en Mapa 24h</span>
-        </button>
-      </div>
-
-    </mat-card>
-
-    <!-- Aside column -->
-    <aside class="dashboard-aside">
-
-      <!-- Trusted contact -->
-      <mat-card class="aside-card">
-        <h3 class="aside-title">Contacto de Confianza</h3>
-
-        <div class="contact-row">
-          <div class="contact-avatar">RP</div>
-          <div class="contact-details">
-            <strong class="contact-name">Rosa Elena Paredes</strong>
-            <span class="contact-sub">Madre · Vinculada</span>
-          </div>
+    <div class="nx-grid-2">
+      <!-- Active Commute Highlight -->
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Estado del Trayecto') }}</h3>
+          <span
+            class="nx-badge"
+            [class.nx-badge-emerald]="!data.activeCommute"
+            [class.nx-badge-amber]="data.activeCommute?.status === 'DELAYED'"
+            [class.nx-badge-red]="data.activeCommute?.status === 'OVERDUE'"
+            [class.nx-badge-blue]="data.activeCommute?.status === 'ACTIVE'">
+            {{ languageService.code(data.activeCommute?.status ?? 'STANDBY') }}
+          </span>
         </div>
 
-        <div class="notification-alert-box">
-          <mat-icon class="notif-mat-icon">sms</mat-icon>
-          <div>
-            <strong>Notificaciones configuradas:</strong>
-            <p>WhatsApp y SMS automáticos al salir y llegar.</p>
+        @if (data.activeCommute; as commute) {
+          <div class="nx-list-item">
+            <div>
+              <strong>{{ commute.origin }} -> {{ commute.destination }}</strong>
+              <div class="nx-muted">
+                {{ commute.transport }} · ETA: {{ commute.estimatedArrivalTime | date: 'short' }}
+              </div>
+            </div>
+            <a routerLink="/journey" class="nx-btn nx-btn-primary nx-btn-sm">
+              {{ languageService.ui('Gestionar Trayecto') }}
+            </a>
           </div>
+        } @else {
+          <div class="nx-empty">
+            {{ languageService.ui('No tienes ningún desplazamiento activo en este momento.') }}
+          </div>
+        }
+
+        <div class="nx-actions">
+          <a routerLink="/map" class="nx-btn nx-btn-secondary nx-btn-sm">
+            {{ languageService.ui('Explorar Servicios 24h') }} ({{ data.approvedServicesCount }})
+          </a>
+          <a routerLink="/community" class="nx-btn nx-btn-secondary nx-btn-sm">
+            {{ languageService.ui('Ver Avisos') }} ({{ data.communityPostsCount }})
+          </a>
+        </div>
+      </section>
+
+      <!-- Recent Commutes & Plan -->
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Últimos Desplazamientos') }}</h3>
+          <a routerLink="/benefits" class="nx-badge nx-badge-blue">{{ languageService.code(data.activeSubscriptionPlan) }}</a>
         </div>
 
-        <button
-          mat-stroked-button
-          class="full-width-btn"
-          routerLink="/trusted-contacts">
-          <span>Administrar Vínculo</span>
-          <mat-icon class="mini-arrow">arrow_forward</mat-icon>
-        </button>
-      </mat-card>
-
-      <!-- Night Notices -->
-      <mat-card class="aside-card">
-        <h3 class="aside-title">Avisos de la Noche</h3>
-
-        <div class="notice-item">
-          <div class="notice-badge green-badge">
-            <mat-icon class="notice-icon">verified</mat-icon>
-            <span>COMERCIO VALIDADO</span>
+        @if (data.recentCommutes.length === 0) {
+          <div class="nx-empty">{{ languageService.ui('Aún no registras trayectos.') }}</div>
+        } @else {
+          <div class="nx-list">
+            @for (item of data.recentCommutes; track item.id) {
+              <div class="nx-list-item">
+                <div>
+                  <strong>{{ item.origin }} -> {{ item.destination }}</strong>
+                  <div class="nx-muted">
+                    {{ item.transport }} · {{ item.startTime | date: 'short' }}
+                  </div>
+                </div>
+                <span
+                  class="nx-badge"
+                  [class.nx-badge-emerald]="item.status === 'ARRIVED'"
+                  [class.nx-badge-amber]="item.status === 'DELAYED'"
+                  [class.nx-badge-red]="item.status === 'OVERDUE'"
+                  [class.nx-badge-blue]="item.status === 'ACTIVE'">
+                  {{ languageService.code(item.status) }}
+                </span>
+              </div>
+            }
           </div>
-          <strong class="notice-name">Grifo Primax Av. Universitaria</strong>
-          <p class="notice-text">Abierto con reja y vigilancia 24h.</p>
-        </div>
-
-        <div class="notice-item">
-          <div class="notice-badge amber-badge">
-            <mat-icon class="notice-icon">warning</mat-icon>
-            <span>TRAMO OSCURO</span>
-          </div>
-          <strong class="notice-name">Cruce Av. Perú con Dueñas</strong>
-          <p class="notice-text">Tres postes apagados. Desviar por Lima.</p>
-        </div>
-
-        <div class="notice-item">
-          <div class="notice-badge blue-badge">
-            <mat-icon class="notice-icon">local_police</mat-icon>
-            <span>PATRULLAJE ACTIVO</span>
-          </div>
-          <strong class="notice-name">Serenazgo fijo en paradero Pilas</strong>
-        </div>
-
-      </mat-card>
-
-    </aside>
-
-  </section>
-
-</section>
+        }
+      </section>
+    </div>
+  }
+</div>

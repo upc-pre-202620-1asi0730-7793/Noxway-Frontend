@@ -1,151 +1,487 @@
-﻿<section class="community-container">
-
-  <!-- Top Filter & Action Bar -->
-  <div class="community-top-bar">
-    <div class="district-filters">
+<section class="nx-community-page">
+  <header class="nx-community-topbar">
+    <nav class="nx-tabs" [attr.aria-label]="languageService.ui('Filtrar por distrito')">
       <button
         type="button"
-        class="filter-pill"
-        [class.active]="selectedDistrict() === 'all'"
-        (click)="setDistrict('all')">
-        Todos los Distritos
+        class="nx-tab"
+        [class.nx-tab-active]="district() === 'all'"
+        [attr.aria-pressed]="district() === 'all'"
+        (click)="changeDistrict('all')">
+        {{ languageService.ui('Todos los Distritos') }}
       </button>
+      @for (d of knownDistricts(); track d) {
+        <button
+          type="button"
+          class="nx-tab"
+          [class.nx-tab-active]="district() === d"
+          [attr.aria-pressed]="district() === d"
+          (click)="changeDistrict(d)">
+          {{ d }}
+        </button>
+      }
+    </nav>
 
+    <div class="nx-actions">
       <button
         type="button"
-        class="filter-pill"
-        [class.active]="selectedDistrict() === 'los-olivos'"
-        (click)="setDistrict('los-olivos')">
-        Los Olivos
+        class="nx-btn nx-btn-secondary nx-btn-sm"
+        (click)="openComposer('service')">
+        {{ languageService.ui('Sugerir local 24h') }}
       </button>
-
       <button
         type="button"
-        class="filter-pill"
-        [class.active]="selectedDistrict() === 'cercado'"
-        (click)="setDistrict('cercado')">
-        Cercado de Lima
+        class="nx-btn nx-btn-secondary nx-btn-sm nx-risk-trigger"
+        (click)="openComposer('risk')">
+        {{ languageService.ui('Reportar peligro') }}
       </button>
-
-      <button
-        type="button"
-        class="filter-pill"
-        [class.active]="selectedDistrict() === 'callao'"
-        (click)="setDistrict('callao')">
-        Callao / Faucett
+      <button type="button" class="nx-btn nx-btn-primary nx-btn-sm" (click)="openComposer('post')">
+        <mat-icon class="nx-inline-icon">add</mat-icon>
+        {{ languageService.ui('Publicar aviso') }}
       </button>
     </div>
+  </header>
 
-    <button
-      mat-flat-button
-      class="publish-btn"
-      (click)="onPublishNotice()">
-      <mat-icon class="btn-icon">campaign</mat-icon>
-      <span>Publicar Aviso</span>
-    </button>
+  <div class="nx-community-grid">
+    <section class="nx-feed-column" [attr.aria-label]="languageService.ui('Publicaciones de la Comunidad')">
+      @if (loading()) {
+        <div class="nx-card">
+          <p class="nx-muted" role="status">{{ languageService.ui('Cargando feed comunitario...') }}</p>
+        </div>
+      } @else {
+        @for (post of posts(); track post.id) {
+          <article class="nx-card nx-post-card" [class.nx-post-danger]="isSecurityPost(post)">
+            <div class="nx-post-header">
+              <div class="nx-post-author">
+                <span class="nx-post-avatar">
+                  {{ (post.authorName || 'N').charAt(0).toUpperCase() }}
+                </span>
+                <div>
+                  <strong class="nx-post-author-name">{{ post.authorName || 'Trabajador Noxway' }}</strong>
+                  <div class="nx-muted">
+                    {{ post.district }} · {{ post.createdAt | date: 'short' }}
+                  </div>
+                </div>
+              </div>
+
+              @if (post.category) {
+                <span
+                  class="nx-badge"
+                  [class.nx-badge-red]="isSecurityPost(post)"
+                  [class.nx-badge-blue]="!isSecurityPost(post)">
+                  {{ languageService.ui(post.category) }}
+                </span>
+              }
+            </div>
+
+            <h3 class="nx-post-title">{{ post.title }}</h3>
+            <p class="nx-post-content">{{ post.content }}</p>
+
+            @if ((post.latitude != null && post.longitude != null) || canDeletePost(post)) {
+              <div class="nx-post-footer">
+                @if (post.latitude != null && post.longitude != null) {
+                  <a
+                    class="nx-btn nx-btn-secondary nx-btn-sm nx-post-map-link"
+                    [href]="osmUrl(post.latitude, post.longitude)"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    <mat-icon class="nx-inline-icon">location_on</mat-icon>
+                    {{ languageService.ui('Ver ubicación del aviso') }}
+                  </a>
+                }
+                @if (canDeletePost(post)) {
+                  <button
+                    type="button"
+                    class="nx-btn nx-btn-danger nx-btn-sm"
+                    (click)="deletePost(post.id)">
+                    {{ languageService.ui('Eliminar') }}
+                  </button>
+                }
+              </div>
+            }
+          </article>
+        } @empty {
+          <div class="nx-card">
+            <h3 class="nx-card-title">{{ languageService.ui('Publicaciones de la Comunidad') }}</h3>
+            <p class="nx-muted" style="margin: 0">
+              {{
+                languageService.ui(
+                  district() === 'all'
+                    ? 'Aún no hay publicaciones en este distrito.'
+                    : 'Aún no hay avisos en este distrito.'
+                )
+              }}
+            </p>
+          </div>
+        }
+      }
+    </section>
+
+    <aside class="nx-community-aside">
+      <section class="nx-card">
+        <h3 class="nx-card-title">{{ languageService.ui('Código de la Comunidad') }}</h3>
+        <div class="nx-code-list">
+          <div class="nx-code-item">
+            <mat-icon class="nx-code-icon nx-code-blue">verified</mat-icon>
+            <p>{{ languageService.ui('Describe el hecho con precisión.') }}</p>
+          </div>
+          <div class="nx-code-item">
+            <mat-icon class="nx-code-icon nx-code-amber">lock</mat-icon>
+            <p>{{ languageService.ui('Evita incluir datos privados.') }}</p>
+          </div>
+          <div class="nx-code-item">
+            <mat-icon class="nx-code-icon nx-code-emerald">location_on</mat-icon>
+            <p>{{ languageService.ui('Verifica el punto antes de guardar.') }}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="nx-card">
+        <h3 class="nx-card-title">{{ languageService.ui('Mis aportes') }}</h3>
+        <div class="nx-contrib-row">
+          <span>{{ languageService.ui('Avisos guardados en la comunidad') }}</span>
+          <strong>{{ posts().length }}</strong>
+        </div>
+        <div class="nx-contrib-row">
+          <span>{{ languageService.ui('Avisos con ubicación') }}</span>
+          <strong class="nx-contrib-emerald">{{ locatedPostCount() }}</strong>
+        </div>
+      </section>
+
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Moderación y reportes') }}</h3>
+          <span class="nx-badge nx-badge-amber">{{ reports().length }}</span>
+        </div>
+        <button
+          type="button"
+          class="nx-btn nx-btn-secondary nx-btn-sm"
+          (click)="moderationExpanded.update((v) => !v)">
+          {{
+            moderationExpanded()
+              ? languageService.ui('Cerrar')
+              : languageService.ui('Cola de Moderación Comunitaria')
+          }}
+        </button>
+      </section>
+    </aside>
   </div>
 
-  <!-- Main Feed & Side Layout -->
-  <div class="community-main-grid">
-
-    <!-- Left Column: Posts Feed -->
-    <div class="feed-column">
-      @for (post of filteredPosts(); track post.id) {
-        <mat-card class="post-card" [class.danger-border]="post.badgeType === 'danger'">
-
-          <div class="post-header">
-            <div class="author-avatar" [class.danger-avatar]="post.badgeType === 'danger'">
-              {{ post.avatar }}
-            </div>
-
-            <div class="author-info">
-              <strong class="author-name">
-                {{ post.authorName }} · <span class="author-role">{{ post.authorRole }}</span>
-              </strong>
-              <span class="post-meta">{{ post.timeAgo }} · {{ post.location }}</span>
-            </div>
-
-            <span
-              class="post-badge"
-              [class.verified-badge]="post.badgeType === 'verified'"
-              [class.danger-badge]="post.badgeType === 'danger'">
-              <mat-icon class="post-badge-icon">
-                {{ post.badgeType === 'verified' ? 'verified' : 'warning' }}
-              </mat-icon>
-              <span>{{ post.badge }}</span>
-            </span>
-          </div>
-
-          <h3 class="post-title">{{ post.title }}</h3>
-          <p class="post-content">{{ post.content }}</p>
-
-          <div class="post-actions">
+  @if (moderationExpanded()) {
+    <section class="nx-card">
+      <div class="nx-card-header">
+        <h3 class="nx-card-title">{{ languageService.ui('Cola de Moderación Comunitaria') }}</h3>
+        <div class="nx-actions">
+          @for (status of ['PENDING', 'APPROVED', 'REJECTED', 'ALL']; track status) {
             <button
-              mat-stroked-button
-              class="vote-btn"
-              [class.danger-vote]="post.badgeType === 'danger'"
-              (click)="toggleVote(post)">
-              <mat-icon class="vote-icon">
-                {{ post.badgeType === 'verified' ? 'thumb_up' : 'priority_high' }}
-              </mat-icon>
-              <span>{{ post.actionLabel }} (+{{ post.upvotes }})</span>
+              type="button"
+              class="nx-tab"
+              [class.nx-tab-active]="reportFilter() === status"
+              (click)="changeReportFilter(status)">
+              {{ languageService.code(status) }}
             </button>
-          </div>
-
-        </mat-card>
-      }
-    </div>
-
-    <!-- Right Column: Rules & Leaderboard -->
-    <aside class="community-aside">
-
-      <!-- Community Rules Card -->
-      <mat-card class="aside-card">
-        <h3 class="aside-heading">Código de la Comunidad</h3>
-
-        <div class="code-item">
-          <mat-icon class="code-mat-icon blue-icon">shield</mat-icon>
-          <div>
-            <strong>Veracidad:</strong>
-            <p>Los reportes salvan vidas.</p>
-          </div>
-        </div>
-
-        <div class="code-item">
-          <mat-icon class="code-mat-icon amber-icon">lock</mat-icon>
-          <div>
-            <strong>Privacidad:</strong>
-            <p>No publiques datos privados.</p>
-          </div>
-        </div>
-
-        <div class="code-item">
-          <mat-icon class="code-mat-icon green-icon">handshake</mat-icon>
-          <div>
-            <strong>Respaldo:</strong>
-            <p>Valida locales 24h activos.</p>
-          </div>
-        </div>
-      </mat-card>
-
-      <!-- Leaders of the 24h Network -->
-      <mat-card class="aside-card">
-        <h3 class="aside-heading">Líderes de la Red 24h</h3>
-
-        <div class="leaders-list">
-          @for (leader of leaders(); track leader.rank) {
-            <div class="leader-item" [class.highlight]="leader.isCurrentUser">
-              <span class="leader-rank">{{ leader.rank }}º</span>
-              <strong class="leader-name">{{ leader.name }}</strong>
-              <span class="leader-dots">·</span>
-              <span class="leader-score">{{ leader.contributions }} aportes</span>
-            </div>
           }
         </div>
-      </mat-card>
+      </div>
 
-    </aside>
+      <div class="nx-field">
+        <label class="nx-label" for="mod-notes">{{ languageService.ui('Notas de moderación') }}</label>
+        <input
+          id="mod-notes"
+          class="nx-input"
+          [(ngModel)]="decisionNotes"
+          placeholder="Ej. Verificado y validado por moderación Noxway" />
+      </div>
 
-  </div>
+      <div class="nx-list">
+        @for (report of reports(); track report.id) {
+          <div class="nx-list-item">
+            <div>
+              <strong>[{{ languageService.code(report.targetType) }}] {{ report.targetTitle }}</strong>
+              <div class="nx-muted">
+                {{ report.reason }} · {{ report.reporterName }}
+              </div>
+            </div>
 
+            <div class="nx-actions">
+              <span
+                class="nx-badge"
+                [class.nx-badge-amber]="report.status === 'PENDING'"
+                [class.nx-badge-emerald]="report.status === 'APPROVED'"
+                [class.nx-badge-red]="report.status === 'REJECTED'">
+                {{ languageService.code(report.status) }}
+              </span>
+
+              @if (actorContext.isAdmin() && report.status === 'PENDING') {
+                <button
+                  type="button"
+                  class="nx-btn nx-btn-success nx-btn-sm"
+                  (click)="decideReport(report.id, 'APPROVE')">
+                  Aprobar
+                </button>
+                <button
+                  type="button"
+                  class="nx-btn nx-btn-danger nx-btn-sm"
+                  (click)="decideReport(report.id, 'REJECT')">
+                  Rechazar
+                </button>
+              }
+
+              <button
+                type="button"
+                class="nx-btn nx-btn-secondary nx-btn-sm"
+                (click)="loadAuditActions(report.id)">
+                Auditoría
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <div class="nx-empty">{{ languageService.ui('No hay reportes en esta cola.') }}</div>
+        }
+      </div>
+
+      @if (selectedReportId()) {
+        <div class="nx-list">
+          <div class="nx-kpi-label">Auditoría reporte {{ selectedReportId() }}</div>
+          @for (action of selectedActions(); track action.id) {
+            <div class="nx-list-item">
+              <span>{{ action.moderatorName }} · <strong>{{ languageService.code(action.decision) }}</strong></span>
+              <span class="nx-muted">{{ action.notes }} · {{ action.createdAt | date: 'short' }}</span>
+            </div>
+          } @empty {
+            <div class="nx-empty">Sin decisiones registradas aún.</div>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <dialog
+    #composer
+    class="nx-dialog"
+    aria-labelledby="nx-community-dialog-title"
+    (close)="composing.set(false)">
+    <div class="nx-dialog-header">
+      <h2 id="nx-community-dialog-title" class="nx-dialog-title">
+        @switch (composerMode()) {
+          @case ('post') {
+            {{ languageService.ui('Crear aviso') }}
+          }
+          @case ('service') {
+            {{ languageService.ui('Sugerir local 24h') }}
+          }
+          @case ('risk') {
+            {{ languageService.ui('Reportar zona de riesgo') }}
+          }
+        }
+      </h2>
+      <button type="button" class="nx-btn nx-btn-secondary nx-btn-sm" (click)="closeComposer()">
+        {{ languageService.ui('Cerrar') }}
+      </button>
+    </div>
+
+    <p class="nx-muted" style="margin: 0 0 12px">
+      {{ languageService.ui('El aviso se publicará en la red comunitaria de Noxway.') }}
+    </p>
+
+    <div class="nx-tabs" style="margin-bottom: 14px">
+      <button
+        type="button"
+        class="nx-tab"
+        [class.nx-tab-active]="composerMode() === 'post'"
+        (click)="switchComposerMode('post')">
+        {{ languageService.ui('Aviso') }}
+      </button>
+      <button
+        type="button"
+        class="nx-tab"
+        [class.nx-tab-active]="composerMode() === 'service'"
+        (click)="switchComposerMode('service')">
+        {{ languageService.ui('Local 24h') }}
+      </button>
+      <button
+        type="button"
+        class="nx-tab"
+        [class.nx-tab-active]="composerMode() === 'risk'"
+        (click)="switchComposerMode('risk')">
+        {{ languageService.ui('Zona de riesgo') }}
+      </button>
+    </div>
+
+    @if (dialogError()) {
+      <div class="nx-error" role="alert" style="margin-bottom: 12px">{{ dialogError() }}</div>
+    }
+
+    @if (composing()) {
+      @switch (composerMode()) {
+        @case ('post') {
+          <form class="nx-dialog-form" (ngSubmit)="publishPost()">
+            <div class="nx-field">
+              <label class="nx-label" for="cp-cat">{{ languageService.ui('Categoría') }}</label>
+              <select id="cp-cat" class="nx-select" name="postCategory" [(ngModel)]="postCategory">
+                @for (cat of noticeCategories; track cat) {
+                  <option [value]="cat">{{ languageService.ui(cat) }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="cp-title">{{ languageService.ui('Título del aviso') }}</label>
+              <input
+                id="cp-title"
+                class="nx-input"
+                name="postTitle"
+                [(ngModel)]="postTitle"
+                required />
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="cp-content">{{ languageService.ui('Descripción') }}</label>
+              <textarea
+                id="cp-content"
+                class="nx-textarea"
+                name="postContent"
+                [(ngModel)]="postContent"
+                required></textarea>
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="cp-district">{{ languageService.ui('Distrito (opcional)') }}</label>
+              <input
+                id="cp-district"
+                class="nx-input"
+                name="postDistrict"
+                [(ngModel)]="postDistrict"
+                list="nx-districts-list"
+                placeholder="Lima Centro" />
+              <datalist id="nx-districts-list">
+                @for (d of knownDistricts(); track d) {
+                  <option [value]="d"></option>
+                }
+              </datalist>
+            </div>
+
+            <fieldset class="nx-location-box">
+              <legend class="nx-label">{{ languageService.ui('Lugar del aviso') }}</legend>
+              <p class="nx-muted" style="margin: 0 0 8px">
+                {{ languageService.ui('Haz clic en el mapa para marcar dónde ocurrió.') }}
+              </p>
+              <app-report-location
+                [(location)]="selectedLocation"
+                [initialCenter]="modalMapCenter()" />
+            </fieldset>
+
+            <button type="submit" class="nx-btn nx-btn-primary" [disabled]="submitting()">
+              {{ languageService.ui('Guardar aviso') }}
+            </button>
+          </form>
+        }
+
+        @case ('service') {
+          <form class="nx-dialog-form" (ngSubmit)="submitService()">
+            <div class="nx-field">
+              <label class="nx-label" for="sv-name">{{ languageService.ui('Nombre del establecimiento') }}</label>
+              <input
+                id="sv-name"
+                class="nx-input"
+                name="serviceName"
+                [(ngModel)]="serviceName"
+                required />
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="sv-type">{{ languageService.ui('Tipo de establecimiento') }}</label>
+              <select id="sv-type" class="nx-select" name="serviceType" [(ngModel)]="serviceType">
+                <option value="PHARMACY">{{ languageService.ui('Farmacia') }}</option>
+                <option value="GAS_STATION">{{ languageService.ui('Grifo') }}</option>
+                <option value="HOSPITAL">{{ languageService.ui('Hospital / Clínica') }}</option>
+                <option value="POLICE_STATION">{{ languageService.ui('Comisaría / Serenazgo') }}</option>
+                <option value="OTHER">{{ languageService.ui('Otro servicio') }}</option>
+              </select>
+            </div>
+
+            <label class="nx-checkbox-row">
+              <input type="checkbox" name="serviceIs24h" [(ngModel)]="serviceIs24h" />
+              <span>{{ languageService.ui('Atención las 24 horas') }}</span>
+            </label>
+
+            @if (!serviceIs24h) {
+              <div class="nx-form-grid">
+                <div class="nx-field">
+                  <label class="nx-label" for="sv-open">{{ languageService.ui('Hora de apertura') }}</label>
+                  <input
+                    id="sv-open"
+                    class="nx-input"
+                    type="time"
+                    name="serviceOpensAt"
+                    [(ngModel)]="serviceOpensAt"
+                    (ngModelChange)="onServiceHoursChange()" />
+                </div>
+                <div class="nx-field">
+                  <label class="nx-label" for="sv-close">{{ languageService.ui('Hora de cierre') }}</label>
+                  <input
+                    id="sv-close"
+                    class="nx-input"
+                    type="time"
+                    name="serviceClosesAt"
+                    [(ngModel)]="serviceClosesAt"
+                    (ngModelChange)="onServiceHoursChange()" />
+                </div>
+              </div>
+            }
+
+            <fieldset class="nx-location-box">
+              <legend class="nx-label">{{ languageService.ui('Lugar del aviso') }}</legend>
+              <p class="nx-muted" style="margin: 0 0 8px">
+                {{ languageService.ui('Haz clic en el mapa para marcar dónde ocurrió.') }}
+              </p>
+              <app-report-location
+                [(location)]="selectedLocation"
+                [initialCenter]="modalMapCenter()" />
+            </fieldset>
+
+            <button type="submit" class="nx-btn nx-btn-primary" [disabled]="submitting()">
+              {{ languageService.ui('Enviar a Moderación') }}
+            </button>
+          </form>
+        }
+
+        @case ('risk') {
+          <form class="nx-dialog-form" (ngSubmit)="reportRisk()">
+            <div class="nx-field">
+              <label class="nx-label" for="rz-lvl">{{ languageService.ui('Nivel de riesgo') }}</label>
+              <select id="rz-lvl" class="nx-select" name="riskLevel" [(ngModel)]="riskLevel">
+                <option value="LOW">{{ languageService.code('LOW') }}</option>
+                <option value="MEDIUM">{{ languageService.code('MEDIUM') }}</option>
+                <option value="HIGH">{{ languageService.code('HIGH') }}</option>
+              </select>
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="rz-desc">{{ languageService.ui('Descripción') }}</label>
+              <textarea
+                id="rz-desc"
+                class="nx-textarea"
+                name="riskDesc"
+                [(ngModel)]="riskDesc"
+                required></textarea>
+            </div>
+
+            <fieldset class="nx-location-box">
+              <legend class="nx-label">{{ languageService.ui('Lugar del aviso') }}</legend>
+              <p class="nx-muted" style="margin: 0 0 8px">
+                {{ languageService.ui('Haz clic en el mapa para marcar dónde ocurrió.') }}
+              </p>
+              <app-report-location
+                [(location)]="selectedLocation"
+                [initialCenter]="modalMapCenter()" />
+            </fieldset>
+
+            <button type="submit" class="nx-btn nx-btn-danger" [disabled]="submitting()">
+              {{ languageService.ui('Reportar Riesgo') }}
+            </button>
+          </form>
+        }
+      }
+    }
+  </dialog>
 </section>

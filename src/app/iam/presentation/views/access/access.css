@@ -1,0 +1,8 @@
+.nx-persona-card {
+  gap: 8px;
+}
+
+.nx-persona-active {
+  border-color: var(--nx-primary-focus);
+  background: var(--nx-primary-soft-bg);
+}

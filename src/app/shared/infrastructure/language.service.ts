@@ -1,4 +1,5 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
+import { accountTranslations } from './account-translations';
 
 export type SupportedLanguage = 'es' | 'en';
 
@@ -8,23 +9,220 @@ export interface TranslationDictionary {
 
 /**
  * Service managing application internationalization and locale state.
- * Provides reactive signals for the current language and translation lookups.
  */
 @Injectable({
   providedIn: 'root',
 })
 export class LanguageService {
-  /**
-   * Reactive signal tracking the currently selected language ('es' or 'en').
-   */
   readonly currentLang = signal<SupportedLanguage>('es');
+
+  private readonly codeLabels: Record<SupportedLanguage, TranslationDictionary> = {
+    es: {
+      // Turnos / Shifts
+      DAY: 'Diurno',
+      NIGHT: 'Nocturno',
+      ROTATING: 'Rotativo',
+      FLEX: 'Flexible',
+      'N/A': 'No asignado',
+
+      // Roles
+      WORKER: 'Trabajador',
+      TRUSTED_CONTACT: 'Contacto de Confianza',
+      ADMIN: 'Administrador',
+      MODERATOR: 'Moderador',
+
+      // Planes / Plans
+      ESSENTIAL: 'Esencial',
+      SENTINEL_PRO: 'Sentinel Pro',
+      FAMILY_CREW: 'Cuadrilla Familiar',
+      NONE: 'Sin plan',
+      FREE: 'Gratuito',
+
+      // Estados / Statuses
+      STANDBY: 'En espera',
+      ACTIVE: 'Activo',
+      ARRIVED: 'Llegó a destino',
+      DELAYED: 'Demorado',
+      OVERDUE: 'Retraso crítico',
+      CANCELLED: 'Cancelado',
+      PENDING: 'Pendiente',
+      PENDING_PAYMENT: 'Pendiente de pago',
+      CONFIRMED: 'Confirmado',
+      REJECTED: 'Rechazado',
+      APPROVED: 'Aprobado',
+      REVOKED: 'Revocado',
+      AVAILABLE: 'Disponible',
+      REDEEMED: 'Canjeado',
+      CLAIMED: 'Canjeado',
+      EXPIRED: 'Vencido',
+      OPEN: 'Abierto',
+      RESOLVED: 'Resuelto',
+      'EN REPOSO': 'En reposo',
+      DELIVERED: 'Entregado',
+      PENDING_PROVIDER: 'En envío (proveedor)',
+      FAILED: 'Fallido',
+      SENT: 'Enviado',
+      INACTIVE: 'Inactivo',
+
+      // Canales de notificación / Notification channels
+      ALL: 'Todos',
+      IN_APP: 'En la app',
+      EMAIL: 'Correo',
+      SMS: 'SMS',
+      WHATSAPP: 'WhatsApp',
+      PUSH: 'Notificación push',
+
+      // Incidentes / Incidents
+      SOS: 'Emergencia SOS',
+      DELAY: 'Demora',
+      DEVIATION: 'Desvío de ruta',
+      OTHER: 'Otro',
+
+      // Niveles de riesgo / Risk levels
+      LOW: 'Bajo',
+      MEDIUM: 'Medio',
+      HIGH: 'Alto',
+      CRITICAL: 'Crítico',
+
+      // Moderación y tipos / Moderation & types
+      SERVICE: 'Servicio',
+      RISK: 'Zona de riesgo',
+      RISK_ZONE: 'Zona de riesgo',
+      REVIEW: 'Reseña',
+      COMMENT: 'Comentario',
+      APPROVE: 'Aprobar',
+      REJECT: 'Rechazar',
+      PHARMACY: 'Farmacia',
+      GAS_STATION: 'Grifo',
+      HOSPITAL: 'Hospital / Clínica',
+      POLICE: 'Comisaría / Serenazgo',
+      SUPERMARKET: 'Supermercado',
+      STORE: 'Tienda / Minimarket',
+    },
+    en: {
+      // Shifts
+      DAY: 'Day',
+      NIGHT: 'Night',
+      ROTATING: 'Rotating',
+      FLEX: 'Flexible',
+      'N/A': 'Unassigned',
+
+      // Roles
+      WORKER: 'Worker',
+      TRUSTED_CONTACT: 'Trusted Contact',
+      ADMIN: 'Administrator',
+      MODERATOR: 'Moderator',
+
+      // Plans
+      ESSENTIAL: 'Essential',
+      SENTINEL_PRO: 'Sentinel Pro',
+      FAMILY_CREW: 'Family Crew',
+      NONE: 'No plan',
+      FREE: 'Free',
+
+      // Statuses
+      STANDBY: 'Standby',
+      ACTIVE: 'Active',
+      ARRIVED: 'Arrived',
+      DELAYED: 'Delayed',
+      OVERDUE: 'Overdue',
+      CANCELLED: 'Cancelled',
+      PENDING: 'Pending',
+      PENDING_PAYMENT: 'Pending payment',
+      CONFIRMED: 'Confirmed',
+      REJECTED: 'Rejected',
+      APPROVED: 'Approved',
+      REVOKED: 'Revoked',
+      AVAILABLE: 'Available',
+      REDEEMED: 'Redeemed',
+      CLAIMED: 'Claimed',
+      EXPIRED: 'Expired',
+      OPEN: 'Open',
+      RESOLVED: 'Resolved',
+      'EN REPOSO': 'Resting',
+      DELIVERED: 'Delivered',
+      PENDING_PROVIDER: 'Pending provider',
+      FAILED: 'Failed',
+      SENT: 'Sent',
+      INACTIVE: 'Inactive',
+
+      // Notification channels
+      ALL: 'All',
+      IN_APP: 'In-App',
+      EMAIL: 'Email',
+      SMS: 'SMS',
+      WHATSAPP: 'WhatsApp',
+      PUSH: 'Push notification',
+
+      // Incidents
+      SOS: 'SOS Emergency',
+      DELAY: 'Delay',
+      DEVIATION: 'Route deviation',
+      OTHER: 'Other',
+
+      // Risk levels
+      LOW: 'Low',
+      MEDIUM: 'Medium',
+      HIGH: 'High',
+      CRITICAL: 'Critical',
+
+      // Moderation & types
+      SERVICE: 'Service',
+      RISK: 'Risk zone',
+      RISK_ZONE: 'Risk zone',
+      REVIEW: 'Review',
+      COMMENT: 'Comment',
+      APPROVE: 'Approve',
+      REJECT: 'Reject',
+      PHARMACY: 'Pharmacy',
+      GAS_STATION: 'Gas station',
+      HOSPITAL: 'Hospital / Clinic',
+      POLICE: 'Police / Security',
+      SUPERMARKET: 'Supermarket',
+      STORE: 'Store / Minimarket',
+    },
+  };
+
+  readonly ui = (text: string): string => {
+    const lang = this.currentLang();
+    if (lang === 'en' && Object.hasOwn(accountTranslations, text)) {
+      return accountTranslations[text];
+    }
+    if (Object.hasOwn(this.codeLabels[lang], text)) {
+      return this.codeLabels[lang][text];
+    }
+    return text;
+  };
+
+  readonly code = (value: string | null | undefined): string => {
+    if (!value) {
+      return '';
+    }
+    const normalized = value.trim();
+    if (!normalized) {
+      return '';
+    }
+    const lang = this.currentLang();
+    const mapped = this.codeLabels[lang];
+    if (Object.hasOwn(mapped, normalized)) {
+      return mapped[normalized];
+    }
+    const upper = normalized.toUpperCase();
+    if (Object.hasOwn(mapped, upper)) {
+      return mapped[upper];
+    }
+    if (lang === 'en' && Object.hasOwn(accountTranslations, normalized)) {
+      return accountTranslations[normalized];
+    }
+    return normalized.replace(/_/g, ' ');
+  };
 
   private readonly translations: Record<SupportedLanguage, TranslationDictionary> = {
     es: {
       // Worker Navigation
       'nav.dashboard': 'Dashboard',
       'nav.journey': 'Mi Trayecto',
-      'nav.map': 'Mapa 24 Horas',
+      'nav.map': 'Mapa 24h',
       'nav.community': 'Comunidad',
       'nav.wellness': 'Bienestar & Sueño',
       'nav.benefits': 'Beneficios & Planes',
@@ -42,42 +240,44 @@ export class LanguageService {
       // Section Titles
       'sidebar.workerModules': 'MÓDULOS DEL TRABAJADOR',
       'sidebar.contactPanel': 'PANEL DEL CONTACTO',
-      'sidebar.accompaniedBy': 'ACOMPAÑANDO A:',
-      'sidebar.onMotorcycle': 'En moto',
+      'sidebar.accompaniedBy': 'ACOMPAÑAMIENTO',
+      'sidebar.onMotorcycle': 'Red Activa',
       'sidebar.companionRole': 'Contacto de Confianza',
-      'sidebar.workerRole': 'Vigilante Nocturno',
-      'sidebar.callJorge': 'LLAMAR A JORGE',
-      'sidebar.sosAlert': 'ALERTA SOS',
-      'sidebar.switchPortal': 'Portal Contacto',
-      'sidebar.logout': 'Salir',
+      'sidebar.workerRole': 'Trabajador Nocturno',
+      'sidebar.adminRole': 'Moderador / Admin',
+      'sidebar.callJorge': 'LLAMAR AL TRABAJADOR',
+      'sidebar.sosAlert': 'ESTADO SOS',
+      'sidebar.switchPortal': 'Cambiar Portal',
 
       // Topbar
-      'topbar.activeJourney': 'Jorge en trayecto activo',
-      'topbar.activeNetwork': 'Red Nocturna Activa 24h',
-      'topbar.hubScreens': 'Ver Hub Pantallas',
+      'topbar.activeJourney': 'Monitoreo conectado a API v1',
+      'topbar.activeNetwork': 'Red Activa · Día y Noche',
+      'topbar.dayMode': 'Día',
+      'topbar.nightMode': 'Noche',
+      'topbar.themeSelector': 'Modo de apariencia',
 
       // Page Titles
       'title.home': 'Inicio',
       'title.dashboard': 'Dashboard del Trabajador',
       'title.journey': 'Mi Trayecto Activo y Check-In Seguro',
       'title.map': 'Mapa Comunitario 24h y Zonas de Riesgo',
-      'title.community': 'Comunidad Nocturna & Reportes Colaborativos',
+      'title.community': 'Comunidad, Reportes & Moderación',
       'title.wellness': 'Bitácora de Descanso & Salud del Sueño',
-      'title.benefits': 'Beneficios Colectivos & Membresía',
+      'title.benefits': 'Beneficios Colectivos, Planes & Referidos',
       'title.trustedContacts': 'Gestión de Contactos de Confianza',
-      'title.profile': 'Perfil del Usuario & Configuración',
-      'title.companion.live': 'Monitoreo en Vivo · Jorge Luis Huamán',
-      'title.companion.history': 'Historial de Desplazamientos de Jorge',
-      'title.companion.alerts': 'Centro de Avisos & Configuración de Alertas',
+      'title.profile': 'Perfil del Usuario & Preferencias',
+      'title.companion.live': 'Monitoreo en Vivo · Red Familiar',
+      'title.companion.history': 'Historial de Alertas y Desplazamientos',
+      'title.companion.alerts': 'Centro de Avisos & Canales de Alerta',
       'title.companion.emergency': 'Directorio de Auxilio & Central de Emergencias',
-      'title.companion.invitations': 'Gestión de Invitaciones & Vínculos de Confianza',
+      'title.companion.invitations': 'Invitaciones de Vínculos & Planes',
       'title.companion.profile': 'Mi Perfil de Contacto de Confianza',
     },
     en: {
       // Worker Navigation
       'nav.dashboard': 'Dashboard',
-      'nav.journey': 'My Route',
-      'nav.map': '24-Hour Map',
+      'nav.journey': 'My Commute',
+      'nav.map': '24h Map',
       'nav.community': 'Community',
       'nav.wellness': 'Wellness & Sleep',
       'nav.benefits': 'Benefits & Plans',
@@ -95,67 +295,61 @@ export class LanguageService {
       // Section Titles
       'sidebar.workerModules': 'WORKER MODULES',
       'sidebar.contactPanel': 'COMPANION PANEL',
-      'sidebar.accompaniedBy': 'ACCOMPANYING:',
-      'sidebar.onMotorcycle': 'On motorcycle',
+      'sidebar.accompaniedBy': 'MONITORING',
+      'sidebar.onMotorcycle': 'Live Network',
       'sidebar.companionRole': 'Trusted Contact',
-      'sidebar.workerRole': 'Night Security Guard',
-      'sidebar.callJorge': 'CALL JORGE',
-      'sidebar.sosAlert': 'SOS ALERT',
-      'sidebar.switchPortal': 'Companion View',
-      'sidebar.logout': 'Logout',
+      'sidebar.workerRole': 'Night Shift Worker',
+      'sidebar.adminRole': 'Moderator / Admin',
+      'sidebar.callJorge': 'CALL WORKER',
+      'sidebar.sosAlert': 'SOS STATUS',
+      'sidebar.switchPortal': 'Switch Portal',
 
       // Topbar
-      'topbar.activeJourney': 'Jorge on active commute',
-      'topbar.activeNetwork': 'Active Night Network 24h',
-      'topbar.hubScreens': 'View Screens Hub',
+      'topbar.activeJourney': 'Connected to API v1',
+      'topbar.activeNetwork': 'Active Network · Day & Night',
+      'topbar.dayMode': 'Day',
+      'topbar.nightMode': 'Night',
+      'topbar.themeSelector': 'Appearance mode',
 
       // Page Titles
       'title.home': 'Home',
-      'title.dashboard': 'Night Worker Dashboard',
-      'title.journey': 'Active Route & Safe Check-In',
-      'title.map': '24h Community Map & Risk Zones',
-      'title.community': 'Night Community & Collaborative Reports',
+      'title.dashboard': 'Worker Dashboard',
+      'title.journey': 'Active Commute & Safe Check-In',
+      'title.map': '24h Community Map and Risk Zones',
+      'title.community': 'Community, Reports & Moderation',
       'title.wellness': 'Rest Log & Sleep Health',
-      'title.benefits': 'Collective Benefits & Membership',
+      'title.benefits': 'Collective Benefits, Plans & Referrals',
       'title.trustedContacts': 'Trusted Contacts Management',
-      'title.profile': 'User Profile & Settings',
-      'title.companion.live': 'Live Monitoring · Jorge Luis Huamán',
-      'title.companion.history': 'Jorge Route Journey History',
-      'title.companion.alerts': 'Alerts Center & Notification Settings',
+      'title.profile': 'User Profile & Preferences',
+      'title.companion.live': 'Live Monitoring · Family Network',
+      'title.companion.history': 'Alerts & Commute History',
+      'title.companion.alerts': 'Alerts Center & Notification Channels',
       'title.companion.emergency': 'Emergency Directory & Security Central',
-      'title.companion.invitations': 'Invitations & Trusted Bonds',
+      'title.companion.invitations': 'Trust Link & Family Invitations',
       'title.companion.profile': 'Trusted Contact Profile',
     },
   };
 
-  /**
-   * Sets the active application language.
-   * @param lang The language code ('es' or 'en').
-   */
   setLanguage(lang: SupportedLanguage): void {
     if (this.currentLang() !== lang) {
       this.currentLang.set(lang);
       try {
         localStorage.setItem('noxway_lang', lang);
       } catch {
-        // LocalStorage fallback for restricted sandbox environments
+        // LocalStorage fallback
       }
     }
   }
 
-  /**
-   * Retrieves the translated string for a given key in the current language.
-   * Falls back to the key if translation is missing.
-   * @param key Translation token identifier.
-   */
   translate(key: string): string {
     const lang = this.currentLang();
     return this.translations[lang]?.[key] ?? this.translations['es']?.[key] ?? key;
   }
 
-  /**
-   * Initializes the language from stored preference if present.
-   */
+  t(key: string): string {
+    return this.translate(key);
+  }
+
   constructor() {
     try {
       const saved = localStorage.getItem('noxway_lang') as SupportedLanguage;

@@ -1,0 +1,227 @@
+<div class="nx-page">
+  <div class="nx-header">
+    <div>
+      <h2 class="nx-title">{{ languageService.ui('IAM Estructurado & Acceso Demo') }}</h2>
+      <p class="nx-subtitle">
+        {{
+          languageService.ui(
+            'El módulo IAM se mantiene desacoplado y desactivado temporalmente (app.security.enabled=false) para probar todos los flujos sin bloqueo.'
+          )
+        }}
+      </p>
+    </div>
+    <span class="nx-badge nx-badge-blue">
+      {{ status()?.mode ?? 'STRUCTURED_PENDING_IMPLEMENTATION' }}
+    </span>
+  </div>
+
+  <!-- Live Backend Security Status -->
+  <section class="nx-card">
+    <div class="nx-card-header">
+      <h3 class="nx-card-title">GET /api/v1/auth/status</h3>
+      <span class="nx-badge" [class.nx-badge-emerald]="!status()?.securityEnabled">
+        securityEnabled: {{ status()?.securityEnabled ?? false }}
+      </span>
+    </div>
+    @if (loadingStatus()) {
+      <p class="nx-muted">{{ languageService.ui('Consultando estado de seguridad...') }}</p>
+    } @else {
+      <p class="nx-muted">{{ status()?.message }}</p>
+    }
+    <div class="nx-grid-3">
+      <div class="nx-list-item">
+        <div>
+          <div class="nx-kpi-label">Backend Strategy</div>
+          <div><code>NoSecurityConfiguration</code> + <code>X-Actor-Id</code></div>
+        </div>
+      </div>
+      <div class="nx-list-item">
+        <div>
+          <div class="nx-kpi-label">Frontend Guard & Interceptor</div>
+          <div><code>authGuard</code> (open) + <code>actorContextInterceptor</code></div>
+        </div>
+      </div>
+      <div class="nx-list-item">
+        <div>
+          <div class="nx-kpi-label">Deferred Endpoints</div>
+          <div><code>POST /auth/sign-in</code>, <code>sign-up</code>, <code>password-reset</code></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Active Persona Switcher -->
+  <section class="nx-card">
+    <div class="nx-card-header">
+      <h3 class="nx-card-title">
+        {{ languageService.ui('Selector de Persona Activa (Header X-Actor-Id)') }}
+      </h3>
+      <span class="nx-badge nx-badge-slate nx-mono">
+        {{ actorContext.activeActorId() }}
+      </span>
+    </div>
+
+    <div class="nx-grid-3">
+      @for (persona of actorContext.personas; track persona.id) {
+        <div
+          class="nx-card nx-persona-card"
+          [class.nx-persona-active]="actorContext.activeActorId() === persona.id">
+          <div class="nx-card-header">
+            <strong>{{ persona.name }}</strong>
+            <span
+              class="nx-badge"
+              [class.nx-badge-emerald]="persona.role === 'TRUSTED_CONTACT'"
+              [class.nx-badge-blue]="persona.role === 'WORKER'"
+              [class.nx-badge-amber]="persona.role === 'ADMIN'">
+              {{ persona.role }}
+            </span>
+          </div>
+          <div class="nx-muted">{{ persona.email }}</div>
+          <div class="nx-muted">
+            {{ languageService.currentLang() === 'en' ? persona.labelEn : persona.labelEs }}
+          </div>
+          <button
+            type="button"
+            class="nx-btn"
+            [class.nx-btn-primary]="actorContext.activeActorId() === persona.id"
+            [class.nx-btn-secondary]="actorContext.activeActorId() !== persona.id"
+            (click)="selectPersona(persona)">
+            {{
+              actorContext.activeActorId() === persona.id
+                ? languageService.ui('Ir al portal activo')
+                : languageService.ui('Activar persona')
+            }}
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Structured Auth Contract Preview -->
+  <section class="nx-card">
+    <div class="nx-card-header">
+      <h3 class="nx-card-title">
+        {{ languageService.ui('Vista Previa de Contratos IAM (501 RFC 9457)') }}
+      </h3>
+      <div class="nx-tabs">
+        <button
+          type="button"
+          class="nx-tab"
+          [class.nx-tab-active]="activeTab() === 'signin'"
+          (click)="activeTab.set('signin')">
+          Sign-In
+        </button>
+        <button
+          type="button"
+          class="nx-tab"
+          [class.nx-tab-active]="activeTab() === 'signup'"
+          (click)="activeTab.set('signup')">
+          Sign-Up
+        </button>
+        <button
+          type="button"
+          class="nx-tab"
+          [class.nx-tab-active]="activeTab() === 'reset'"
+          (click)="activeTab.set('reset')">
+          Password Reset
+        </button>
+      </div>
+    </div>
+
+    @if (activeTab() === 'signin') {
+      <form class="nx-form-grid" (ngSubmit)="submitSignIn()">
+        <div class="nx-field">
+          <label class="nx-label" for="iam-signin-email">Email</label>
+          <input
+            id="iam-signin-email"
+            class="nx-input"
+            name="signInEmail"
+            [(ngModel)]="signInEmail"
+            required />
+        </div>
+        <div class="nx-field">
+          <label class="nx-label" for="iam-signin-pass">Password</label>
+          <input
+            id="iam-signin-pass"
+            class="nx-input"
+            type="password"
+            name="signInPassword"
+            [(ngModel)]="signInPassword"
+            required />
+        </div>
+        <div class="nx-field nx-field-full">
+          <button type="submit" class="nx-btn nx-btn-primary" [disabled]="submitting()">
+            POST /api/v1/auth/sign-in
+          </button>
+        </div>
+      </form>
+    } @else if (activeTab() === 'signup') {
+      <form class="nx-form-grid" (ngSubmit)="submitSignUp()">
+        <div class="nx-field">
+          <label class="nx-label" for="iam-su-name">Full Name</label>
+          <input
+            id="iam-su-name"
+            class="nx-input"
+            name="signUpFullName"
+            [(ngModel)]="signUpFullName"
+            required />
+        </div>
+        <div class="nx-field">
+          <label class="nx-label" for="iam-su-email">Email</label>
+          <input
+            id="iam-su-email"
+            class="nx-input"
+            name="signUpEmail"
+            [(ngModel)]="signUpEmail"
+            required />
+        </div>
+        <div class="nx-field">
+          <label class="nx-label" for="iam-su-phone">Phone</label>
+          <input
+            id="iam-su-phone"
+            class="nx-input"
+            name="signUpPhone"
+            [(ngModel)]="signUpPhone"
+            required />
+        </div>
+        <div class="nx-field">
+          <label class="nx-label" for="iam-su-role">Role</label>
+          <select id="iam-su-role" class="nx-select" name="signUpRole" [(ngModel)]="signUpRole">
+            <option value="WORKER">WORKER</option>
+            <option value="TRUSTED_CONTACT">TRUSTED_CONTACT</option>
+          </select>
+        </div>
+        <div class="nx-field nx-field-full">
+          <button type="submit" class="nx-btn nx-btn-primary" [disabled]="submitting()">
+            POST /api/v1/auth/sign-up
+          </button>
+        </div>
+      </form>
+    } @else {
+      <form class="nx-form-grid" (ngSubmit)="submitPasswordReset()">
+        <div class="nx-field nx-field-full">
+          <label class="nx-label" for="iam-reset-email">Account Email</label>
+          <input
+            id="iam-reset-email"
+            class="nx-input"
+            name="resetEmail"
+            [(ngModel)]="resetEmail"
+            required />
+        </div>
+        <div class="nx-field nx-field-full">
+          <button type="submit" class="nx-btn nx-btn-primary" [disabled]="submitting()">
+            POST /api/v1/auth/password-reset
+          </button>
+        </div>
+      </form>
+    }
+
+    @if (lastDeferredResponse()) {
+      <div class="nx-banner">
+        <div>
+          <strong>RFC 9457 Response:</strong> {{ lastDeferredResponse() }}
+        </div>
+      </div>
+    }
+  </section>
+</div>

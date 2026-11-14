@@ -1,94 +1,92 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { catchError, forkJoin, map, Observable, of } from 'rxjs';
+import { CommunityService } from '../../community/infrastructure/community.service';
+import { CommuteResource } from '../../commute/domain/model/commute.entity';
+import { CommuteService } from '../../commute/infrastructure/commute.service';
+import { TrustLinkResource } from '../../iam/domain/model/trusted-contact.entity';
+import { AccountProfileResource } from '../../iam/domain/model/user-profile.entity';
+import { TrustedContactsService } from '../../iam/infrastructure/trusted-contacts.service';
+import { UserProfileService } from '../../iam/infrastructure/user-profile.service';
+import {
+  PlanResource,
+  SubscriptionResource,
+} from '../../subscriptions/domain/model/collective-benefit.entity';
+import { SubscriptionsService } from '../../subscriptions/infrastructure/subscriptions.service';
+import { WellnessSummaryResource } from '../../wellness/domain/model/sleep-record.entity';
+import { WellnessService } from '../../wellness/infrastructure/wellness.service';
 
-/**
- * Represents aggregated dashboard statistics and active shift summary for the nocturnal worker.
- */
-export interface DashboardData {
-  /** Record unique identifier */
-  id: number;
-  /** Percentage score of completed safe trips without security incidents */
-  safeTripsPercentage: number;
-  /** Human-readable string of confirmed trips */
-  confirmedTrips: string;
-  /** Name of the active linked trusted contact */
-  trustedContactName: string;
-  /** Connection and channel status of the trusted contact */
-  trustedContactStatus: string;
-  /** Familial relationship or bond */
-  trustedContactRelation: string;
-  /** Total sleep duration logged in the last rest session */
-  restDuration: string;
-  /** Comparison text versus previous day */
-  restComparison: string;
-  /** Number of community-validated 24h services near the route */
-  servicesCount: number;
-  /** Community validation status badge text */
-  servicesStatus: string;
-  /** Current state of the scheduled commute */
-  journeyStatus: string;
-  /** Short name of origin point */
-  origin: string;
-  /** Full street address of origin */
-  originAddress: string;
-  /** Short name of destination point */
-  destination: string;
-  /** Full street address of destination */
-  destinationAddress: string;
-  /** Route distance */
-  distance: string;
-  /** Estimated duration in transit */
-  estimatedTime: string;
-  /** Safe tolerance buffer */
-  tolerance: string;
-  /** Transport mode */
-  transport: string;
+export interface LiveDashboardSnapshot {
+  profile: AccountProfileResource | null;
+  activeCommute: CommuteResource | null;
+  completedTrips: number;
+  recentCommutes: CommuteResource[];
+  activeContactsCount: number;
+  pendingContactsCount: number;
+  contacts: TrustLinkResource[];
+  wellnessSummary: WellnessSummaryResource | null;
+  approvedServicesCount: number;
+  communityPostsCount: number;
+  activeSubscriptionPlan: string;
 }
 
-/**
- * Fallback static dashboard metrics.
- */
-const DEFAULT_DASHBOARD_DATA: DashboardData = {
-  id: 1,
-  safeTripsPercentage: 100,
-  confirmedTrips: '28 de 28 confirmados',
-  trustedContactName: 'Rosa Elena',
-  trustedContactStatus: 'Conectada (WhatsApp)',
-  trustedContactRelation: 'Madre · Vinculada',
-  restDuration: '6h 45m',
-  restComparison: '+45m vs ayer',
-  servicesCount: 14,
-  servicesStatus: 'Validados por la red',
-  journeyStatus: 'Esperando Salida',
-  origin: 'Planta Industrial San Martín',
-  originAddress: 'Av. Universitaria Nº 3400, Los Olivos',
-  destination: 'Hogar Familiar',
-  destinationAddress: 'Jr. Lampa Nº 820, Cercado de Lima',
-  distance: '12.4 km',
-  estimatedTime: '35 min',
-  tolerance: '+10 min',
-  transport: 'Moto Lineal',
-};
-
-/**
- * Service providing high-level operational overview and health indicators for the worker dashboard.
- */
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class DashboardService {
-  private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/dashboard`;
+  private readonly profileService = inject(UserProfileService);
+  private readonly commuteService = inject(CommuteService);
+  private readonly contactsService = inject(TrustedContactsService);
+  private readonly wellnessService = inject(WellnessService);
+  private readonly communityService = inject(CommunityService);
+  private readonly subscriptionsService = inject(SubscriptionsService);
 
-  /**
-   * Fetches dashboard metric entries.
-   */
-  getDashboardData(): Observable<DashboardData[]> {
-    return this.http
-      .get<DashboardData[]>(this.baseUrl)
-      .pipe(catchError(() => of([DEFAULT_DASHBOARD_DATA])));
+  loadSnapshot(): Observable<LiveDashboardSnapshot> {
+    return forkJoin({
+      profile: this.profileService.getProfile().pipe(catchError(() => of(null))),
+      commutes: this.commuteService.getMyCommutes(0, 20).pipe(catchError(() => of(null))),
+      contacts: this.contactsService.getContacts().pipe(catchError(() => of([]))),
+      wellness: this.wellnessService.getWellnessSummary().pipe(catchError(() => of(null))),
+      services: this.communityService.listServices({ page: 0, size: 1 }).pipe(catchError(() => of(null))),
+      posts: this.communityService.listPosts(undefined, 0, 1).pipe(catchError(() => of(null))),
+      subscriptions: this.subscriptionsService.getMySubscriptions().pipe(catchError(() => of([]))),
+      plans: this.subscriptionsService.getPlans().pipe(catchError(() => of([]))),
+    }).pipe(
+      // Assemble live snapshot across bounded contexts
+      mapSnapshot,
+    );
   }
 }
+
+const mapSnapshot = map(
+  (data: {
+    profile: AccountProfileResource | null;
+    commutes: { items: CommuteResource[]; total: number } | null;
+    contacts: TrustLinkResource[];
+    wellness: WellnessSummaryResource | null;
+    services: { total: number } | null;
+    posts: { total: number } | null;
+    subscriptions: SubscriptionResource[];
+    plans: PlanResource[];
+  }): LiveDashboardSnapshot => {
+    const items = data.commutes?.items ?? [];
+    const activeCommute = items.find((c) => c.status !== 'ARRIVED') ?? null;
+    const totalCommutes = data.commutes?.total ?? items.length;
+    const completedTrips = Math.max(0, totalCommutes - (activeCommute ? 1 : 0));
+    const activeContactsCount = data.contacts.filter((c) => c.status === 'ACTIVE').length;
+    const pendingContactsCount = data.contacts.filter((c) => c.status === 'PENDING').length;
+    const activeSub = data.subscriptions.find((s) => s.status === 'ACTIVE');
+    const freePlan = data.plans.find((p) => p.code === 'ESSENTIAL' || p.monthlyPrice === 0);
+
+    return {
+      profile: data.profile,
+      activeCommute,
+      completedTrips,
+      recentCommutes: items.slice(0, 5),
+      activeContactsCount,
+      pendingContactsCount,
+      contacts: data.contacts,
+      wellnessSummary: data.wellness,
+      approvedServicesCount: data.services?.total ?? 0,
+      communityPostsCount: data.posts?.total ?? 0,
+      activeSubscriptionPlan: activeSub?.planName ?? freePlan?.name ?? 'Essential',
+    };
+  },
+);

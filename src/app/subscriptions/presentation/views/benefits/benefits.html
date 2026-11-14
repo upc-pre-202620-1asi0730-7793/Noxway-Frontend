@@ -1,98 +1,334 @@
-<section class="benefits-container">
-
-  <!-- Active Plan Hero Banner -->
-  <mat-card class="membership-card">
-    <div class="membership-info">
-      <span class="membership-badge">
-        <mat-icon class="badge-mat-icon">verified</mat-icon>
-        <span>{{ subscription()?.status }}</span>
-      </span>
-
-      <h1 class="plan-title">{{ subscription()?.planName }} · {{ subscription()?.price }}</h1>
-
-      <p class="plan-desc">
-        {{ subscription()?.billingDetails }}
+<div class="nx-page">
+  <div class="nx-header">
+    <div>
+      <h2 class="nx-title">{{ languageService.ui('Planes, Beneficios & Grupo Familiar') }}</h2>
+      <p class="nx-subtitle">
+        {{
+          languageService.ui(
+            'Suscripciones Essential, Sentinel Pro y Family Crew, pagos offline, cupones y referidos.'
+          )
+        }}
       </p>
     </div>
-
-    <button
-      mat-flat-button
-      class="manage-btn"
-      (click)="onManageMembership()">
-      <mat-icon class="btn-icon">settings</mat-icon>
-      <span>Administrar Membresía</span>
+    <button type="button" class="nx-btn nx-btn-secondary" (click)="loadAll()">
+      {{ languageService.ui('Actualizar') }}
     </button>
-  </mat-card>
+  </div>
 
-  <!-- Negotiated Collective Agreements Section -->
-  <section class="agreements-section">
-    <div class="section-header">
-      <h2 class="section-title">Convenios Colectivos Negociados</h2>
+  @if (loading()) {
+    <div class="nx-card">
+      <p class="nx-muted">{{ languageService.ui('Cargando catálogo de planes y beneficios...') }}</p>
     </div>
+  } @else {
+    <!-- Plans Catalog -->
+    <section class="nx-card">
+      <div class="nx-card-header">
+        <h3 class="nx-card-title">{{ languageService.ui('Catálogo de Planes Noxway') }}</h3>
+      </div>
 
-    <div class="benefits-grid">
-      @for (benefit of subscription()?.benefits; track benefit.id) {
-        <mat-card class="benefit-card">
-
-          <div class="benefit-header">
-            <div class="benefit-icon-wrapper">
-              <mat-icon class="benefit-mat-icon">{{ benefit.icon }}</mat-icon>
+      <div class="nx-grid-3">
+        @for (plan of plans(); track plan.id) {
+          <div class="nx-card nx-plan-card">
+            <div class="nx-card-header">
+              <strong>{{ plan.name }}</strong>
+              <span class="nx-badge nx-badge-emerald">{{ languageService.code(plan.code) }}</span>
             </div>
-
-            <div class="benefit-titles">
-              <strong class="benefit-name">{{ benefit.name }}</strong>
-              <span class="benefit-subtitle">{{ benefit.subtitle }}</span>
+            <div class="nx-kpi-value">S/ {{ plan.monthlyPrice | number: '1.2-2' }}</div>
+            <div class="nx-muted">
+              {{ languageService.ui('Hasta') }} {{ plan.maxContacts }} {{ languageService.ui('contacto(s)') }} · {{ plan.maxWorkers }} {{ languageService.ui('trabajador(es)') }}
             </div>
-          </div>
-
-          <p class="benefit-desc">
-            {{ benefit.description }}
-          </p>
-
-          <div class="benefit-footer">
-            <div class="code-info">
-              <span class="code-label">{{ benefit.codeLabel }}:</span>
-              <strong class="code-value">{{ benefit.code }}</strong>
-            </div>
-
             <button
-              mat-stroked-button
-              class="action-btn"
-              (click)="onViewCoupon(benefit)">
-              <span>{{ benefit.actionLabel }}</span>
+              type="button"
+              class="nx-btn nx-btn-primary nx-btn-sm"
+              [disabled]="busy()"
+              (click)="subscribePlan(plan)">
+              {{ languageService.ui('Suscribirme') }}
             </button>
           </div>
+        }
+      </div>
+    </section>
 
-        </mat-card>
-      }
+    <!-- Subscriptions & Offline Payments -->
+    <div class="nx-grid-2">
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Mis Suscripciones') }}</h3>
+          <span class="nx-badge nx-badge-slate">{{ subscriptions().length }}</span>
+        </div>
+
+        <div class="nx-list">
+          @for (sub of subscriptions(); track sub.id) {
+            <div class="nx-list-item">
+              <div>
+                <strong>{{ sub.planName }} ({{ languageService.code(sub.planCode) }})</strong>
+                <div class="nx-muted">
+                  {{ sub.owner ? languageService.ui('Propietario') : languageService.ui('Miembro invitado') }} · {{ languageService.ui('Vence') }} {{ sub.endsAt | date: 'shortDate' }}
+                </div>
+              </div>
+              <div class="nx-actions">
+                <span
+                  class="nx-badge"
+                  [class.nx-badge-emerald]="sub.status === 'ACTIVE'"
+                  [class.nx-badge-amber]="sub.status === 'PENDING_PAYMENT'"
+                  [class.nx-badge-red]="sub.status === 'CANCELLED'">
+                  {{ languageService.code(sub.status) }}
+                </span>
+                @if (sub.status === 'PENDING_PAYMENT' && !hasPendingPayment(sub.id)) {
+                  <button
+                    type="button"
+                    class="nx-btn nx-btn-primary nx-btn-sm"
+                    (click)="requestPayment(sub.id)">
+                    {{ languageService.ui('Solicitar Pago') }}
+                  </button>
+                }
+                @if (sub.status !== 'CANCELLED' && sub.owner) {
+                  <button
+                    type="button"
+                    class="nx-btn nx-btn-secondary nx-btn-sm"
+                    (click)="cancelSub(sub.id)">
+                    {{ languageService.ui('Cancelar') }}
+                  </button>
+                }
+              </div>
+            </div>
+          } @empty {
+            <div class="nx-empty">{{ languageService.ui('Sin suscripciones registradas.') }}</div>
+          }
+        </div>
+      </section>
+
+      <!-- Offline Payments -->
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Pagos Offline (Yape / Plin / Agente)') }}</h3>
+        </div>
+
+        <div class="nx-field">
+          <label class="nx-label" for="off-ref">{{ languageService.ui('Referencia de comprobante') }}</label>
+          <input
+            id="off-ref"
+            class="nx-input"
+            [(ngModel)]="offlineReference"
+            placeholder="Ej. YAPE-987654" />
+        </div>
+
+        <div class="nx-list">
+          @for (pay of payments(); track pay.id) {
+            <div class="nx-list-item">
+              <div>
+                <strong>{{ languageService.code(pay.planCode) }} · {{ pay.currency }} {{ pay.amount }}</strong>
+                <div class="nx-muted">
+                  {{ pay.workerName }} · {{ languageService.ui('Ref') }}: {{ pay.reference || languageService.ui('Pendiente') }}
+                </div>
+              </div>
+              <div class="nx-actions">
+                <span
+                  class="nx-badge"
+                  [class.nx-badge-amber]="pay.status === 'PENDING'"
+                  [class.nx-badge-emerald]="pay.status === 'CONFIRMED'"
+                  [class.nx-badge-red]="pay.status === 'REJECTED'">
+                  {{ languageService.code(pay.status) }}
+                </span>
+                @if (actorContext.isAdmin() && pay.status === 'PENDING') {
+                  <button
+                    type="button"
+                    class="nx-btn nx-btn-success nx-btn-sm"
+                    (click)="confirmOffline(pay.id)">
+                    {{ languageService.ui('Confirmar') }}
+                  </button>
+                  <button
+                    type="button"
+                    class="nx-btn nx-btn-danger nx-btn-sm"
+                    (click)="rejectPayment(pay.id)">
+                    {{ languageService.ui('Rechazar') }}
+                  </button>
+                }
+              </div>
+            </div>
+          } @empty {
+            <div class="nx-empty">{{ languageService.ui('No hay pagos registrados.') }}</div>
+          }
+        </div>
+      </section>
     </div>
-  </section>
 
-  <!-- Referral Program Banner -->
-  <mat-card class="referral-card">
+    <!-- Collective Benefits & Claims -->
+    <div class="nx-grid-2">
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Beneficios Colectivos') }}</h3>
+          <span class="nx-badge nx-badge-emerald">{{ benefits().length }}</span>
+        </div>
+        <div class="nx-list">
+          @for (benefit of benefits(); track benefit.id) {
+            <div class="nx-list-item">
+              <div>
+                <strong>{{ benefit.name }}</strong>
+                <span class="nx-badge nx-badge-slate" style="margin-left: 8px">{{ languageService.code(benefit.planCode) }}</span>
+                <div class="nx-muted">{{ benefit.description }}</div>
+              </div>
+              <button
+                type="button"
+                class="nx-btn nx-btn-primary nx-btn-sm"
+                (click)="claimBenefit(benefit.id)">
+                {{ languageService.ui('Canjear') }}
+              </button>
+            </div>
+          }
+        </div>
+      </section>
 
-    <div class="referral-content">
-      <span class="referral-badge">
-        <mat-icon class="badge-mat-icon">card_giftcard</mat-icon>
-        <span>PROGRAMA DE REFERIDOS</span>
-      </span>
-
-      <h2 class="referral-title">{{ subscription()?.referralBonus }}</h2>
-      <p class="referral-desc">{{ subscription()?.referralDesc }}</p>
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Mis Cupones Canjeados') }}</h3>
+          <span class="nx-badge nx-badge-blue">{{ claims().length }}</span>
+        </div>
+        <div class="nx-list">
+          @for (claim of claims(); track claim.id) {
+            <div class="nx-list-item">
+              <div>
+                <strong>{{ claim.benefitName }}</strong>
+                <div class="nx-muted">{{ claim.benefitDescription }}</div>
+              </div>
+              <span class="nx-badge nx-badge-emerald nx-mono">{{ claim.code }}</span>
+            </div>
+          } @empty {
+            <div class="nx-empty">{{ languageService.ui('Todavía no has canjeado beneficios.') }}</div>
+          }
+        </div>
+      </section>
     </div>
 
-    <div class="referral-code-box">
-      <span class="code-box-label">TU CÓDIGO ÚNICO</span>
-      <strong class="code-box-value">{{ subscription()?.referralCode }}</strong>
-      <button
-        mat-flat-button
-        class="copy-code-btn"
-        (click)="onCopyReferralCode()">
-        <mat-icon class="btn-icon">content_copy</mat-icon>
-        <span>Copiar Enlace</span>
-      </button>
+    <!-- Family Crew & Referrals -->
+    <div class="nx-grid-2">
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Cuadrilla Familiar') }}</h3>
+        </div>
+
+        @if (ownedFamilySub(); as familySub) {
+          <form class="nx-form-grid" (ngSubmit)="inviteCrewMember()">
+            <div class="nx-field nx-field-full">
+              <label class="nx-label" for="crew-email">{{ languageService.ui('Invitar trabajador (email)') }}</label>
+              <input
+                id="crew-email"
+                class="nx-input"
+                type="email"
+                name="inviteWorkerEmail"
+                [(ngModel)]="inviteWorkerEmail"
+                placeholder="trabajador@noxway.pe"
+                required />
+            </div>
+            <div class="nx-field nx-field-full">
+              <button type="submit" class="nx-btn nx-btn-primary nx-btn-sm">
+                {{ languageService.ui('Invitar al Plan') }} {{ familySub.planName }}
+              </button>
+            </div>
+          </form>
+
+          <div class="nx-list">
+            @for (member of familyMembers(); track member.id) {
+              <div class="nx-list-item">
+                <div>
+                  <strong>{{ member.workerName }}</strong>
+                  <div class="nx-muted">{{ member.workerEmail }}</div>
+                </div>
+                <div class="nx-actions">
+                  <span class="nx-badge nx-badge-blue">{{ languageService.code(member.status) }}</span>
+                  @if (member.status !== 'REVOKED') {
+                    <button
+                      type="button"
+                      class="nx-btn nx-btn-secondary nx-btn-sm"
+                      (click)="removeCrewMember(member.id)">
+                      {{ languageService.ui('Remover') }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="nx-muted">
+            {{
+              languageService.ui(
+                'Activa una suscripción de Cuadrilla Familiar para invitar hasta 5 trabajadores.'
+              )
+            }}
+          </p>
+        }
+
+        @if (invitations().length > 0) {
+          <div class="nx-list">
+            <div class="nx-kpi-label">{{ languageService.ui('Invitaciones Familiares Recibidas') }}</div>
+            @for (inv of invitations(); track inv.id) {
+              <div class="nx-list-item">
+                <div>
+                  <strong>{{ inv.planName }}</strong> · {{ languageService.ui('de') }} {{ inv.ownerName }}
+                </div>
+                <div class="nx-actions">
+                  <span class="nx-badge nx-badge-amber">{{ languageService.code(inv.status) }}</span>
+                  @if (inv.status === 'PENDING') {
+                    <button
+                      type="button"
+                      class="nx-btn nx-btn-success nx-btn-sm"
+                      (click)="respondInvitation(inv.id, true)">
+                      {{ languageService.ui('Aceptar') }}
+                    </button>
+                    <button
+                      type="button"
+                      class="nx-btn nx-btn-danger nx-btn-sm"
+                      (click)="respondInvitation(inv.id, false)">
+                      {{ languageService.ui('Rechazar') }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Programa de Referidos') }}</h3>
+          <span class="nx-badge nx-badge-emerald nx-mono">{{ myReferralCode() || '...' }}</span>
+        </div>
+
+        <form class="nx-form-grid" (ngSubmit)="applyReferralCode()">
+          <div class="nx-field nx-field-full">
+            <label class="nx-label" for="ref-code">{{ languageService.ui('Ingresar código de referido') }}</label>
+            <input id="ref-code" class="nx-input" name="referralCodeInput" [(ngModel)]="referralCodeInput" />
+          </div>
+          <div class="nx-field nx-field-full">
+            <button type="submit" class="nx-btn nx-btn-primary nx-btn-sm">{{ languageService.ui('Aplicar Código') }}</button>
+          </div>
+        </form>
+
+        <div class="nx-list">
+          @for (reward of rewards(); track reward.id) {
+            <div class="nx-list-item">
+              <div>
+                <strong>+{{ reward.days }} {{ languageService.ui('días de protección') }}</strong>
+                <div class="nx-muted">{{ reward.createdAt | date: 'shortDate' }}</div>
+              </div>
+              <div class="nx-actions">
+                <span class="nx-badge nx-badge-blue">{{ languageService.code(reward.status) }}</span>
+                @if (reward.status === 'AVAILABLE') {
+                  <button
+                    type="button"
+                    class="nx-btn nx-btn-success nx-btn-sm"
+                    (click)="redeemReward(reward.id)">
+                    {{ languageService.ui('Canjear días') }}
+                  </button>
+                }
+              </div>
+            </div>
+          } @empty {
+            <div class="nx-empty">{{ languageService.ui('Sin recompensas de referidos aún.') }}</div>
+          }
+        </div>
+      </section>
     </div>
-
-  </mat-card>
-
-</section>
+  }
+</div>

@@ -1,145 +1,128 @@
-﻿<section class="profile-container">
-
-  @if (profile(); as p) {
-    <div class="profile-main-grid">
-
-      <!-- Left Column: Profile Details & Privacy -->
-      <mat-card class="profile-card">
-
-        <!-- User Header Banner -->
-        <div class="user-header">
-          <div class="user-avatar-large">
-            {{ p.avatar }}
-          </div>
-
-          <div class="user-titles">
-            <h1 class="user-fullname">{{ p.fullName }}</h1>
-            <p class="user-role">{{ p.role }}</p>
-            <span class="user-meta">DNI: {{ p.dni }} · {{ p.memberSince }}</span>
-          </div>
-        </div>
-
-        <!-- Form Fields Grid (2 columns) -->
-        <div class="form-fields-grid">
-
-          <div class="form-group">
-            <label class="form-label">NOMBRE COMPLETO</label>
-            <input
-              type="text"
-              class="form-input"
-              [(ngModel)]="p.fullName" />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">TELÉFONO MÓVIL</label>
-            <input
-              type="text"
-              class="form-input"
-              [(ngModel)]="p.phone" />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">CORREO ELECTRÓNICO</label>
-            <input
-              type="email"
-              class="form-input"
-              [(ngModel)]="p.email" />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">HORARIO HABITUAL DE TURNO</label>
-            <input
-              type="text"
-              class="form-input"
-              [(ngModel)]="p.schedule" />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">TRANSPORTE PRINCIPAL</label>
-            <input
-              type="text"
-              class="form-input"
-              [(ngModel)]="p.transport" />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">DISTRITO DE RESIDENCIA</label>
-            <input
-              type="text"
-              class="form-input"
-              [(ngModel)]="p.district" />
-          </div>
-
-        </div>
-
-        <!-- Privacy & Geolocation Settings -->
-        <div class="privacy-section">
-          <h2 class="privacy-section-title">Ajustes de Privacidad y Geolocalización</h2>
-
-          <div class="checkbox-group">
-            <mat-checkbox
-              color="primary"
-              [(ngModel)]="p.privacyGpsActiveOnly">
-              Compartir GPS únicamente durante check-ins activos
-            </mat-checkbox>
-
-            <mat-checkbox
-              color="primary"
-              [(ngModel)]="p.privacyEncryptedHistory">
-              Historial de rutas cifrado de extremo a extremo
-            </mat-checkbox>
-
-            <mat-checkbox
-              color="primary"
-              [(ngModel)]="p.privacyAnonymousRatings">
-              Calificaciones anónimas en mapa comunitario
-            </mat-checkbox>
-          </div>
-        </div>
-
-        <!-- Save Button -->
-        <div class="form-actions">
-          <button
-            mat-flat-button
-            class="save-btn"
-            (click)="onSave()">
-            <mat-icon class="btn-icon">save</mat-icon>
-            <span>Guardar Modificaciones</span>
-          </button>
-        </div>
-
-      </mat-card>
-
-      <!-- Right Column: Security & Sessions -->
-      <aside class="profile-aside">
-
-        <!-- Account Security Card -->
-        <mat-card class="aside-card">
-          <h3 class="aside-title">Seguridad de Cuenta</h3>
-          <p class="aside-desc">{{ p.passwordUpdated }}</p>
-
-          <button
-            mat-stroked-button
-            class="change-password-btn"
-            (click)="onChangePassword()">
-            <mat-icon class="btn-icon">lock_reset</mat-icon>
-            <span>Cambiar Contraseña</span>
-          </button>
-        </mat-card>
-
-        <!-- Active Sessions Card -->
-        <mat-card class="aside-card">
-          <h3 class="aside-title">Sesiones Activas</h3>
-
-          <div class="session-item">
-            <span class="session-dot"></span>
-            <span class="session-label">{{ p.activeSessions }}</span>
-          </div>
-        </mat-card>
-
-      </aside>
-
+<div class="nx-page">
+  <div class="nx-header">
+    <div>
+      <h2 class="nx-title">{{ languageService.ui('Mi Perfil & Jornada') }}</h2>
+      <p class="nx-subtitle">
+        {{ profile()?.email ?? actorContext.activePersona().email }} ·
+        <span class="nx-badge nx-badge-blue">{{ languageService.code(profile()?.role ?? actorContext.activePersona().role) }}</span>
+      </p>
     </div>
+    <button type="button" class="nx-btn nx-btn-secondary" (click)="loadData()">
+      {{ languageService.ui('Recargar') }}
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="nx-error">{{ errorMessage() }}</div>
   }
 
-</section>
+  @if (loading()) {
+    <div class="nx-card">
+      <p class="nx-muted">{{ languageService.ui('Cargando perfil...') }}</p>
+    </div>
+  } @else {
+    <div class="nx-grid-2">
+      <!-- Account Form -->
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Datos Personales y Turno') }}</h3>
+        </div>
+
+        <form class="nx-form-grid" (ngSubmit)="saveProfile()">
+          <div class="nx-field nx-field-full">
+            <label class="nx-label" for="prof-name">{{ languageService.ui('Nombre completo') }}</label>
+            <input id="prof-name" class="nx-input" name="fullName" [(ngModel)]="fullName" required />
+          </div>
+
+          <div class="nx-field">
+            <label class="nx-label" for="prof-phone">{{ languageService.ui('Teléfono (+51...)') }}</label>
+            <input id="prof-phone" class="nx-input" name="phone" [(ngModel)]="phone" required />
+          </div>
+
+          <div class="nx-field">
+            <label class="nx-label" for="prof-tz">{{ languageService.ui('Zona horaria') }}</label>
+            <select id="prof-tz" class="nx-select" name="timeZone" [(ngModel)]="timeZone">
+              <option value="America/Lima">America/Lima</option>
+              <option value="America/Bogota">America/Bogota</option>
+              <option value="America/Santiago">America/Santiago</option>
+            </select>
+          </div>
+
+          @if (profile()?.role === 'WORKER') {
+            <div class="nx-field">
+              <label class="nx-label" for="prof-shift">{{ languageService.ui('Tipo de turno') }}</label>
+              <select id="prof-shift" class="nx-select" name="shiftType" [(ngModel)]="shiftType">
+                <option value="DAY">{{ languageService.code('DAY') }}</option>
+                <option value="NIGHT">{{ languageService.code('NIGHT') }}</option>
+                <option value="ROTATING">{{ languageService.code('ROTATING') }}</option>
+              </select>
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="prof-start">{{ languageService.ui('Inicio turno') }}</label>
+              <input id="prof-start" class="nx-input" type="time" name="shiftStart" [(ngModel)]="shiftStart" />
+            </div>
+
+            <div class="nx-field">
+              <label class="nx-label" for="prof-end">{{ languageService.ui('Fin turno') }}</label>
+              <input id="prof-end" class="nx-input" type="time" name="shiftEnd" [(ngModel)]="shiftEnd" />
+            </div>
+          }
+
+          <div class="nx-field nx-field-full">
+            <button type="submit" class="nx-btn nx-btn-primary" [disabled]="saving()">
+              {{ saving() ? languageService.ui('Guardando...') : languageService.ui('Guardar Cambios') }}
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Notification Preferences -->
+      <section class="nx-card">
+        <div class="nx-card-header">
+          <h3 class="nx-card-title">{{ languageService.ui('Canales de Notificación') }}</h3>
+          <span class="nx-badge nx-badge-slate">{{ preferences().length }} {{ languageService.ui('canales') }}</span>
+        </div>
+
+        @if (missingChannels().length > 0) {
+          <div class="nx-actions" style="margin-bottom: 12px">
+            @for (channel of missingChannels(); track channel) {
+              <button
+                type="button"
+                class="nx-btn nx-btn-secondary nx-btn-sm"
+                (click)="configureChannel(channel)">
+                + {{ languageService.ui('Activar') }} {{ languageService.code(channel) }}
+              </button>
+            }
+          </div>
+        }
+
+        @if (preferences().length === 0) {
+          <div class="nx-empty">{{ languageService.ui('Sin canales configurados.') }}</div>
+        } @else {
+          <div class="nx-list">
+            @for (pref of preferences(); track pref.channel) {
+              <div class="nx-list-item nx-pref-row">
+                <div>
+                  <strong>{{ languageService.code(pref.channel) }}</strong>
+                  <div class="nx-muted">
+                    {{ pref.priorityStart }} - {{ pref.priorityEnd }} ({{ pref.timeZone }})
+                  </div>
+                </div>
+                <div class="nx-actions">
+                  <label class="nx-checkbox-row">
+                    <input
+                      type="checkbox"
+                      [checked]="pref.enabled"
+                      (change)="pref.enabled = $any($event.target).checked; savePreference(pref)" />
+                    <span>{{ pref.enabled ? languageService.ui('Activo') : languageService.ui('Pausado') }}</span>
+                  </label>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  }
+</div>

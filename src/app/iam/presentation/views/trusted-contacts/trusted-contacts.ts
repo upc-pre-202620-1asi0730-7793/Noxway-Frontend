@@ -1,78 +1,123 @@
-﻿import { Component, inject, OnInit, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { TrustedContact } from '../../../domain/model/trusted-contact.entity';
+﻿import { CommonModule } from '@angular/common';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { catchError, forkJoin, of } from 'rxjs';
+import { TrustLinkResource } from '../../../domain/model/trusted-contact.entity';
+import { AccountProfileResource } from '../../../domain/model/user-profile.entity';
 import { TrustedContactsService } from '../../../infrastructure/trusted-contacts.service';
+import { UserProfileService } from '../../../infrastructure/user-profile.service';
+import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
+import { LanguageService } from '../../../../shared/infrastructure/language.service';
+import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
+import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
 
 @Component({
   selector: 'app-trusted-contacts',
-  imports: [MatButtonModule, MatIconModule, MatCardModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './trusted-contacts.html',
   styleUrl: './trusted-contacts.css',
 })
-export class TrustedContacts implements OnInit {
+export class TrustedContacts {
   private readonly contactsService = inject(TrustedContactsService);
+  private readonly profileService = inject(UserProfileService);
+  private readonly toast = inject(NotificationToastService);
+  readonly actorContext = inject(ActorContextService);
+  readonly languageService = inject(LanguageService);
 
-  readonly contacts = signal<TrustedContact[]>([]);
+  readonly loading = signal(true);
+  readonly submitting = signal(false);
+  readonly errorMessage = signal<string | null>(null);
+  readonly links = signal<TrustLinkResource[]>([]);
+  readonly directory = signal<AccountProfileResource[]>([]);
 
-  ngOnInit(): void {
-    this.contactsService.getContacts().subscribe((data) => {
-      this.contacts.set(data);
+  contactEmail = '';
+
+  readonly companionCandidates = computed(() =>
+    this.directory().filter((account) => account.role === 'TRUSTED_CONTACT'),
+  );
+
+  readonly activeCount = computed(
+    () => this.links().filter((link) => link.status === 'ACTIVE').length,
+  );
+
+  constructor() {
+    effect(() => {
+      this.actorContext.revision();
+      untracked(() => this.loadAll());
     });
   }
 
-  onLinkContact(): void {
-    const name = prompt('Nombre del contacto de confianza a vincular:');
-    if (!name) return;
-    const phone = prompt('Número de teléfono móvil (+51 ...):');
-    if (!phone) return;
-    const rel = prompt('Vínculo o parentesco (ej. Hermana, Pareja, Amigo):') || 'Familiar';
+  loadAll(): void {
+    this.loading.set(true);
+    this.errorMessage.set(null);
 
-    const initials = name
-      .split(' ')
-      .map((part) => part[0])
-      .join('')
-      .substring(0, 2)
-      .toUpperCase();
-
-    const newContact: TrustedContact = {
-      id: Date.now(),
-      avatar: initials || 'TC',
-      name: name,
-      relationship: `${rel} · Invitación enviada`,
-      status: 'Pendiente Enlace',
-      statusType: 'pending',
-      phone: phone,
-      sentDate: 'Enviado hoy vía enlace web SMS',
-      note: 'No requiere descargar ninguna app',
-      description:
-        'Tu contacto podrá acompañarte desde cualquier navegador web con el enlace único.',
-    };
-
-    this.contacts.set([...this.contacts(), newContact]);
-    alert(`Invitación generada para ${name}. Se envió el enlace de acompañamiento seguro por SMS.`);
+    forkJoin({
+      links: this.contactsService.getContacts().pipe(catchError(() => of([]))),
+      directory: this.profileService.getDirectory().pipe(catchError(() => of([]))),
+    }).subscribe(({ links, directory }) => {
+      this.links.set(links);
+      this.directory.set(directory);
+      this.loading.set(false);
+    });
   }
 
-  onSendTestPing(contact: TrustedContact): void {
-    alert(
-      `Ping de prueba enviado a ${contact.name} (${contact.phone}). Notificación simulada por WhatsApp y Push.`,
+  inviteContact(): void {
+    const email = this.contactEmail.trim();
+    if (!email) return;
+
+    this.submitting.set(true);
+    this.errorMessage.set(null);
+
+    this.contactsService.inviteContact(email).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.toast.success(this.languageService.ui('Invitación enviada correctamente.'));
+        this.loadAll();
+      },
+      error: (err) => {
+        this.submitting.set(false);
+        const msg = extractProblemMessage(err, 'No se pudo enviar la invitación.');
+        this.errorMessage.set(msg);
+        this.toast.error(msg);
+      },
+    });
+  }
+
+  acceptLink(link: TrustLinkResource): void {
+    this.contactsService.acceptInvitation(link.id).subscribe({
+      next: () => {
+        this.toast.success(this.languageService.ui('Vínculo aceptado.'));
+        this.loadAll();
+      },
+      error: (err) => this.toast.error(extractProblemMessage(err, 'Error al aceptar vínculo.')),
+    });
+  }
+
+  rejectLink(link: TrustLinkResource): void {
+    this.contactsService.rejectInvitation(link.id).subscribe({
+      next: () => {
+        this.toast.info(this.languageService.ui('Invitación rechazada.'));
+        this.loadAll();
+      },
+      error: (err) => this.toast.error(extractProblemMessage(err, 'Error al rechazar vínculo.')),
+    });
+  }
+
+  revokeLink(link: TrustLinkResource): void {
+    this.contactsService.revokeContact(link.id).subscribe({
+      next: () => {
+        this.toast.info(this.languageService.ui('Contacto revocado.'));
+        this.loadAll();
+      },
+      error: (err) => this.toast.error(extractProblemMessage(err, 'Error al revocar vínculo.')),
+    });
+  }
+
+  isIncomingPending(link: TrustLinkResource): boolean {
+    return (
+      link.status === 'PENDING' && link.contactId === this.actorContext.activeActorId()
     );
-  }
-
-  onViewCompanion(contact: TrustedContact): void {
-    alert(
-      `Modo Acompañante (Companion View): Abriendo la vista en tiempo real que ve ${contact.name} durante tus trayectos.`,
-    );
-  }
-
-  onResendLink(contact: TrustedContact): void {
-    alert(`Enlace web de invitación reenviado con éxito al número ${contact.phone}.`);
-  }
-
-  onCancelInvitation(contact: TrustedContact): void {
-    if (confirm(`¿Deseas cancelar la invitación pendiente a ${contact.name}?`)) {
-      this.contacts.set(this.contacts().filter((c) => c.id !== contact.id));
-    }
   }
 }

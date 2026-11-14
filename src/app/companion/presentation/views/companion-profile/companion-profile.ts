@@ -1,66 +1,81 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
-import { CompanionService } from '../../../infrastructure/companion.service';
-import { CompanionProfile as CompanionProfileEntity } from '../../../domain/model/companion.entity';
+import { UserProfileService } from '../../../../iam/infrastructure/user-profile.service';
+import { AccountProfileResource } from '../../../../iam/domain/model/user-profile.entity';
+import { SessionService } from '../../../../iam/infrastructure/session.service';
+import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
+import { LanguageService } from '../../../../shared/infrastructure/language.service';
+import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
+import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
 
 @Component({
   selector: 'app-companion-profile',
-  imports: [FormsModule, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './companion-profile.html',
   styleUrl: './companion-profile.css',
 })
-export class CompanionProfile implements OnInit {
-  private readonly companionService = inject(CompanionService);
+export class CompanionProfile {
+  private readonly profileService = inject(UserProfileService);
+  private readonly session = inject(SessionService);
+  private readonly toast = inject(NotificationToastService);
+  readonly actorContext = inject(ActorContextService);
+  readonly languageService = inject(LanguageService);
 
-  readonly profile = signal<CompanionProfileEntity | null>(null);
-  readonly isSaving = signal<boolean>(false);
-  readonly saveSuccess = signal<boolean>(false);
+  readonly loading = signal(true);
+  readonly saving = signal(false);
+  readonly profile = signal<AccountProfileResource | null>(null);
 
-  // Form model fields
   fullName = '';
-  dni = '';
   phone = '';
-  email = '';
-  address = '';
+  timeZone = 'America/Lima';
 
-  ngOnInit(): void {
-    this.companionService.getProfile().subscribe((data) => {
-      this.profile.set(data);
-      this.fullName = data.fullName;
-      this.dni = data.dni;
-      this.phone = data.phone;
-      this.email = data.email;
-      this.address = data.address;
+  constructor() {
+    effect(() => {
+      this.actorContext.revision();
+      untracked(() => this.loadProfile());
     });
   }
 
-  onSaveProfile(): void {
-    this.isSaving.set(true);
-    setTimeout(() => {
-      this.companionService
-        .updateProfile({
-          fullName: this.fullName,
-          phone: this.phone,
-          email: this.email,
-          address: this.address,
-        })
-        .subscribe((updated) => {
-          this.profile.set(updated);
-          this.isSaving.set(false);
-          this.saveSuccess.set(true);
-          alert('Cambios de perfil de contacto guardados correctamente.');
-          setTimeout(() => this.saveSuccess.set(false), 3000);
-        });
-    }, 600);
+  loadProfile(): void {
+    this.loading.set(true);
+    this.profileService.getProfile().subscribe({
+      next: (res) => {
+        this.profile.set(res);
+        this.fullName = res.fullName;
+        this.phone = res.phone;
+        this.timeZone = res.timeZone || 'America/Lima';
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.toast.error(extractProblemMessage(err, 'No se pudo cargar perfil del contacto.'));
+      },
+    });
   }
 
-  onLogout(): void {
-    if (confirm('¿Deseas cerrar la sesión segura de contacto de confianza?')) {
-      alert('Sesión cerrada con éxito.');
-    }
+  save(): void {
+    this.saving.set(true);
+    this.session
+      .saveProfile({
+        fullName: this.fullName.trim(),
+        phone: this.phone.trim(),
+        shiftType: null,
+        shiftStart: null,
+        shiftEnd: null,
+        timeZone: this.timeZone,
+      })
+      .subscribe({
+        next: (updated) => {
+          this.profile.set(updated);
+          this.saving.set(false);
+          this.toast.success(this.languageService.ui('Perfil de contacto actualizado.'));
+        },
+        error: (err) => {
+          this.saving.set(false);
+          this.toast.error(extractProblemMessage(err, 'No se pudo actualizar perfil.'));
+        },
+      });
   }
 }

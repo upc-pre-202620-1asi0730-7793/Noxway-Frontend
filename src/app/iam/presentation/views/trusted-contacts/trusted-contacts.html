@@ -1,143 +1,118 @@
-﻿<section class="contacts-container">
-
-  <!-- Hero Banner -->
-  <mat-card class="hero-banner-card">
-    <div class="banner-info">
-      <span class="privacy-badge">
-        <mat-icon class="badge-mat-icon">lock</mat-icon>
-        <span>PRIVACIDAD GARANTIZADA</span>
-      </span>
-
-      <h1 class="banner-title">Red de Contactos de Confianza Vinculados</h1>
-      <p class="banner-desc">
-        Tus contactos vinculados reciben notificaciones automáticas al iniciar trayecto, llegar o ante demoras.
+﻿<div class="nx-page">
+  <div class="nx-header">
+    <div>
+      <h2 class="nx-title">{{ languageService.ui('Red de Contactos de Confianza') }}</h2>
+      <p class="nx-subtitle">
+        {{ languageService.ui('Vínculos activos') }}: <strong>{{ activeCount() }}</strong> ·
+        {{ languageService.ui('Total') }}: {{ links().length }}
       </p>
     </div>
-
-    <button
-      mat-flat-button
-      class="link-contact-btn"
-      (click)="onLinkContact()">
-      <mat-icon class="btn-icon">person_add</mat-icon>
-      <span>Vincular Contacto</span>
+    <button type="button" class="nx-btn nx-btn-secondary" (click)="loadAll()">
+      {{ languageService.ui('Actualizar') }}
     </button>
-  </mat-card>
-
-  <!-- Contacts 2-column Grid -->
-  <div class="contacts-grid">
-    @for (contact of contacts(); track contact.id) {
-      <mat-card class="contact-card" [class.pending-card]="contact.statusType === 'pending'">
-
-        <!-- Header -->
-        <div class="card-header-row">
-          <div class="contact-avatar-wrapper" [class.pending-avatar]="contact.statusType === 'pending'">
-            {{ contact.avatar }}
-          </div>
-
-          <div class="contact-titles">
-            <h2 class="contact-name">{{ contact.name }}</h2>
-            <span class="contact-relation">{{ contact.relationship }}</span>
-          </div>
-
-          <span
-            class="status-tag"
-            [class.active-tag]="contact.statusType === 'active'"
-            [class.pending-tag]="contact.statusType === 'pending'">
-            <mat-icon class="status-mat-icon">
-              {{ contact.statusType === 'active' ? 'check_circle' : 'hourglass_empty' }}
-            </mat-icon>
-            <span>{{ contact.status }}</span>
-          </span>
-        </div>
-
-        <!-- Details Fields List -->
-        <div class="fields-list">
-          <div class="field-item">
-            <span class="item-label">Teléfono:</span>
-            <strong class="item-value">{{ contact.phone }}</strong>
-          </div>
-
-          @if (contact.channel) {
-            <div class="field-item">
-              <span class="item-label">Canal:</span>
-              <strong class="item-value">{{ contact.channel }}</strong>
-            </div>
-          }
-
-          @if (contact.permissions) {
-            <div class="field-item">
-              <span class="item-label">Permisos:</span>
-              <strong class="item-value">{{ contact.permissions }}</strong>
-            </div>
-          }
-
-          @if (contact.sentDate) {
-            <div class="field-item">
-              <span class="item-label">Enviado:</span>
-              <strong class="item-value">{{ contact.sentDate }}</strong>
-            </div>
-          }
-
-          @if (contact.note) {
-            <div class="field-item">
-              <span class="item-label">Nota:</span>
-              <strong class="item-value">{{ contact.note }}</strong>
-            </div>
-          }
-        </div>
-
-        <!-- Information / Last Interaction Box -->
-        @if (contact.lastInteraction) {
-          <div class="interaction-box">
-            <small class="box-label">ÚLTIMA INTERACCIÓN</small>
-            <p class="box-text">{{ contact.lastInteraction }}</p>
-          </div>
-        }
-
-        @if (contact.description) {
-          <div class="info-note-box">
-            <p class="box-text">{{ contact.description }}</p>
-          </div>
-        }
-
-        <!-- Actions Row -->
-        <div class="card-actions-row">
-          @if (contact.statusType === 'active') {
-            <button
-              mat-stroked-button
-              class="test-ping-btn"
-              (click)="onSendTestPing(contact)">
-              <mat-icon class="btn-icon">sensors</mat-icon>
-              <span>Enviar Ping de Prueba</span>
-            </button>
-
-            <button
-              mat-flat-button
-              class="companion-view-btn"
-              (click)="onViewCompanion(contact)">
-              <mat-icon class="btn-icon">visibility</mat-icon>
-              <span>Ver como Contacto (Companion)</span>
-            </button>
-          } @else {
-            <button
-              mat-stroked-button
-              class="resend-btn"
-              (click)="onResendLink(contact)">
-              <mat-icon class="btn-icon">send</mat-icon>
-              <span>Reenviar Enlace de Invitación</span>
-            </button>
-
-            <button
-              mat-stroked-button
-              class="cancel-btn"
-              (click)="onCancelInvitation(contact)">
-              <span>Cancelar</span>
-            </button>
-          }
-        </div>
-
-      </mat-card>
-    }
   </div>
 
-</section>
+  @if (errorMessage()) {
+    <div class="nx-error">
+      <div>{{ errorMessage() }}</div>
+      <div style="margin-top: 8px">
+        <a routerLink="/benefits" class="nx-btn nx-btn-secondary nx-btn-sm">
+          {{ languageService.ui('Ver Planes & Beneficios') }}
+        </a>
+      </div>
+    </div>
+  }
+
+  <!-- Invite Form -->
+  <section class="nx-card">
+    <div class="nx-card-header">
+      <h3 class="nx-card-title">{{ languageService.ui('Invitar Contacto de Confianza') }}</h3>
+    </div>
+
+    <form class="nx-form-grid" (ngSubmit)="inviteContact()">
+      <div class="nx-field nx-field-full">
+        <label class="nx-label" for="tc-email">{{ languageService.ui('Correo del contacto registrado') }}</label>
+        <input
+          id="tc-email"
+          class="nx-input"
+          type="email"
+          name="contactEmail"
+          [(ngModel)]="contactEmail"
+          placeholder="rosa.paredes@noxway.pe"
+          required />
+      </div>
+
+      @if (companionCandidates().length > 0) {
+        <div class="nx-field nx-field-full">
+          <span class="nx-muted">{{ languageService.ui('Contactos disponibles en el directorio') }}:</span>
+          <div class="nx-actions">
+            @for (candidate of companionCandidates(); track candidate.id) {
+              <button
+                type="button"
+                class="nx-btn nx-btn-secondary nx-btn-sm"
+                (click)="contactEmail = candidate.email">
+                {{ candidate.fullName }} ({{ candidate.email }})
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="nx-field nx-field-full">
+        <button type="submit" class="nx-btn nx-btn-primary" [disabled]="submitting()">
+          {{ submitting() ? languageService.ui('Enviando...') : languageService.ui('Enviar Invitación') }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Contacts List -->
+  <section class="nx-card">
+    <div class="nx-card-header">
+      <h3 class="nx-card-title">{{ languageService.ui('Vínculos de Confianza') }}</h3>
+    </div>
+
+    @if (loading()) {
+      <p class="nx-muted">{{ languageService.ui('Cargando contactos...') }}</p>
+    } @else if (links().length === 0) {
+      <div class="nx-empty">{{ languageService.ui('No hay vínculos de confianza registrados todavía.') }}</div>
+    } @else {
+      <div class="nx-list">
+        @for (link of links(); track link.id) {
+          <div class="nx-list-item">
+            <div>
+              <strong>{{ link.contactName }}</strong>
+              <span class="nx-muted"> · {{ link.contactEmail }} ({{ link.contactPhone }})</span>
+              <div class="nx-muted">
+                {{ languageService.ui('Trabajador') }}: {{ link.workerName }} ({{ languageService.code(link.workerShiftType ?? 'N/A') }})
+              </div>
+            </div>
+
+            <div class="nx-actions">
+              <span
+                class="nx-badge"
+                [class.nx-badge-emerald]="link.status === 'ACTIVE'"
+                [class.nx-badge-amber]="link.status === 'PENDING'"
+                [class.nx-badge-red]="link.status === 'REJECTED' || link.status === 'REVOKED'">
+                {{ languageService.code(link.status) }}
+              </span>
+
+              @if (isIncomingPending(link)) {
+                <button type="button" class="nx-btn nx-btn-success nx-btn-sm" (click)="acceptLink(link)">
+                  {{ languageService.ui('Aceptar') }}
+                </button>
+                <button type="button" class="nx-btn nx-btn-danger nx-btn-sm" (click)="rejectLink(link)">
+                  {{ languageService.ui('Rechazar') }}
+                </button>
+              } @else if (link.status === 'ACTIVE' || link.status === 'PENDING') {
+                <button type="button" class="nx-btn nx-btn-secondary nx-btn-sm" (click)="revokeLink(link)">
+                  {{ languageService.ui('Revocar') }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>

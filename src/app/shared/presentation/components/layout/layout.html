@@ -11,8 +11,6 @@
         <h1>Noxway</h1>
         @if (isCompanion()) {
           <span class="companion-tag">COMPANION PORTAL</span>
-        } @else {
-          <span>BY NOCTIVA &bull; 2026</span>
         }
       </div>
     </div>
@@ -21,28 +19,30 @@
       <!-- Companion User Identity Card -->
       <div class="user-card companion-user">
         <div class="avatar avatar-companion">
-          RP
+          {{ userInitials() }}
         </div>
         <div class="user-info">
-          <strong>Rosa Elena Paredes</strong>
-          <span class="user-badge companion-badge">{{ languageService.translate('sidebar.companionRole') }}</span>
+          <strong>{{ activeDisplayName() }}</strong>
+          <span class="user-badge companion-badge">{{ roleLabel() }}</span>
         </div>
       </div>
 
-      <!-- Accompanied Worker Telemetry Status Box -->
+      <!-- Accompanied Worker Live Summary -->
       <div class="accompanied-card">
-        <div class="accompanied-label">{{ languageService.translate('sidebar.accompaniedBy') }}</div>
+        <div class="accompanied-label">{{ languageService.t('sidebar.accompaniedBy') }}</div>
         <div class="accompanied-worker">
-          <span class="worker-name">Jorge Luis Huamán</span>
+          <span class="worker-name">
+            {{ liveMonitoredName() ?? languageService.ui('Red de confianza') }}
+          </span>
           <span class="worker-status">
             <span class="dot-online"></span>
-            {{ languageService.translate('sidebar.onMotorcycle') }}
+            {{ liveMonitoredTransport() ?? languageService.t('sidebar.onMotorcycle') }}
           </span>
         </div>
       </div>
 
       <p class="menu-title">
-        {{ languageService.translate('sidebar.contactPanel') }}
+        {{ languageService.t('sidebar.contactPanel') }}
       </p>
 
       <nav class="navigation">
@@ -51,13 +51,8 @@
             [routerLink]="option.link"
             routerLinkActive="active"
             class="nav-item">
-
             <span class="nav-bullet"></span>
-
-            <span class="nav-label">
-              {{ option.label }}
-            </span>
-
+            <span class="nav-label">{{ option.label }}</span>
             @if (option.badge) {
               <span
                 class="nav-badge"
@@ -66,7 +61,6 @@
                 {{ option.badge }}
               </span>
             }
-
           </a>
         }
       </nav>
@@ -74,28 +68,29 @@
       <div class="sidebar-footer">
         <button
           mat-flat-button
+          type="button"
           class="call-worker-button"
-          (click)="onCallJorgeClick()">
-          <mat-icon class="btn-icon">phone</mat-icon>
-          {{ languageService.translate('sidebar.callJorge') }}
+          (click)="onCallWorkerClick()">
+          <mat-icon class="btn-icon">visibility</mat-icon>
+          {{ languageService.t('nav.companion.live') }}
         </button>
       </div>
 
     } @else {
-      <!-- Worker User Identity Card -->
+      <!-- Worker / Admin Identity Card -->
       <div class="user-card">
         <div class="avatar">
-          JL
+          {{ userInitials() }}
         </div>
 
         <div class="user-info">
-          <strong>Jorge Luis Huamán</strong>
-          <span class="user-badge">{{ languageService.translate('sidebar.workerRole') }}</span>
+          <strong>{{ activeDisplayName() }}</strong>
+          <span class="user-badge">{{ roleLabel() }}</span>
         </div>
       </div>
 
       <p class="menu-title">
-        {{ languageService.translate('sidebar.workerModules') }}
+        {{ languageService.t('sidebar.workerModules') }}
       </p>
 
       <nav class="navigation">
@@ -104,13 +99,8 @@
             [routerLink]="option.link"
             routerLinkActive="active"
             class="nav-item">
-
             <span class="nav-bullet"></span>
-
-            <span class="nav-label">
-              {{ option.label }}
-            </span>
-
+            <span class="nav-label">{{ option.label }}</span>
             @if (option.badge) {
               <span
                 class="nav-badge"
@@ -119,7 +109,6 @@
                 {{ option.badge }}
               </span>
             }
-
           </a>
         }
       </nav>
@@ -127,10 +116,11 @@
       <div class="sidebar-footer">
         <button
           mat-flat-button
+          type="button"
           class="sos-button"
           (click)="onSosClick()">
           <mat-icon class="sos-icon">warning</mat-icon>
-          {{ languageService.translate('sidebar.sosAlert') }}
+          {{ languageService.t('sidebar.sosAlert') }}
         </button>
       </div>
     }
@@ -145,80 +135,71 @@
         {{ currentPageTitle() }}
       </div>
 
-      @if (isCompanion()) {
-        <!-- Companion Active Commute Pill in Topbar -->
-        <div class="companion-header-status">
-          <span class="status-dot"></span>
-          <span>{{ languageService.translate('topbar.activeJourney') }}</span>
-        </div>
+      <div class="network-status">
+        <span class="status-dot"></span>
+        <span>{{ languageService.t('topbar.activeNetwork') }}</span>
+      </div>
 
-        <div class="topbar-actions">
-          <!-- Language Switcher Component -->
-          <app-language-switcher/>
-
-          <div class="clock companion-clock">
-            <span>{{ companionTime() }}</span>
-          </div>
-
-          <a
-            mat-flat-button
-            routerLink="/dashboard"
-            class="hub-button">
-            {{ languageService.translate('topbar.hubScreens') }}
-          </a>
-
+      <div class="topbar-actions">
+        <div
+          class="nx-theme-switch"
+          role="group"
+          [attr.aria-label]="languageService.t('topbar.themeSelector')">
           <button
-            mat-icon-button
-            class="icon-action-btn"
-            aria-label="Refresh view"
-            (click)="onRefreshClick()">
-            <mat-icon>refresh</mat-icon>
+            type="button"
+            class="nx-theme-btn nx-theme-day"
+            [class.active]="themeService.isLight()"
+            [attr.aria-pressed]="themeService.isLight()"
+            (click)="themeService.setTheme('light')">
+            <mat-icon class="theme-icon">light_mode</mat-icon>
+            <span>{{ languageService.t('topbar.dayMode') }}</span>
+          </button>
+          <button
+            type="button"
+            class="nx-theme-btn nx-theme-night"
+            [class.active]="themeService.isDark()"
+            [attr.aria-pressed]="themeService.isDark()"
+            (click)="themeService.setTheme('dark')">
+            <mat-icon class="theme-icon">dark_mode</mat-icon>
+            <span>{{ languageService.t('topbar.nightMode') }}</span>
           </button>
         </div>
 
-      } @else {
-        <!-- Worker Network Indicator in Topbar -->
-        <div class="network-status">
-          <span class="status-dot"></span>
-          <span>{{ languageService.translate('topbar.activeNetwork') }}</span>
-        </div>
+        <app-language-switcher />
 
-        <div class="topbar-actions">
-          <!-- Language Switcher Component -->
-          <app-language-switcher/>
-
-          <a
-            mat-stroked-button
-            routerLink="/companion/live"
-            class="switch-portal-btn"
-            title="Open trusted companion view">
-            <mat-icon class="portal-icon">visibility</mat-icon>
-            <span>{{ languageService.translate('sidebar.switchPortal') }}</span>
+        @if (isCompanion()) {
+          <div class="clock companion-clock">
+            <span>{{ companionTime() }}</span>
+          </div>
+          <a mat-flat-button routerLink="/dashboard" class="hub-button">
+            {{ languageService.ui('Portal Trabajador') }}
           </a>
-
+        } @else {
+          <a mat-stroked-button routerLink="/companion/live" class="switch-portal-btn">
+            <mat-icon class="portal-icon">visibility</mat-icon>
+            <span>{{ languageService.t('sidebar.switchPortal') }}</span>
+          </a>
           <div class="clock">
             <mat-icon class="clock-icon">schedule</mat-icon>
             <span>{{ currentTime() }}</span>
           </div>
+        }
 
-          <button
-            class="alert-dot-button"
-            aria-label="Network activity indicator">
-            <span class="red-ping"></span>
-          </button>
-
-          <button mat-stroked-button class="logout-btn">
-            <span>{{ languageService.translate('sidebar.logout') }}</span>
-            <mat-icon class="logout-icon">open_in_new</mat-icon>
-          </button>
-        </div>
-      }
+        <button
+          mat-icon-button
+          type="button"
+          class="icon-action-btn"
+          aria-label="Refresh view"
+          (click)="onRefreshClick()">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
 
     </header>
 
     <main class="content">
-      <div class="content-wrapper">
-        <router-outlet/>
+      <div class="content-wrapper" [class.wide-content]="wideContent()">
+        <router-outlet />
       </div>
     </main>
 
