@@ -35,7 +35,7 @@
             <div>
               <h3 class="nx-card-title">{{ worker.workerName }}</h3>
               <div class="nx-muted">
-                {{ worker.workerPhone }} · {{ worker.shiftType ?? 'N/A' }}
+                {{ worker.workerPhone }} · {{ languageService.code(worker.shiftType ?? 'N/A') }}
                 @if (worker.shiftStart) {
                   ({{ worker.shiftStart }} - {{ worker.shiftEnd }})
                 }
@@ -47,7 +47,7 @@
               [class.nx-badge-blue]="worker.activeCommute?.status === 'ACTIVE'"
               [class.nx-badge-amber]="worker.activeCommute?.status === 'DELAYED'"
               [class.nx-badge-red]="worker.activeCommute?.status === 'OVERDUE'">
-              {{ worker.activeCommute?.status ?? 'EN REPOSO' }}
+              {{ worker.activeCommute ? languageService.code(worker.activeCommute.status) : languageService.ui('En reposo') }}
             </span>
           </div>
 
@@ -56,38 +56,46 @@
               <div>
                 <strong>{{ commute.origin }} -> {{ commute.destination }}</strong>
                 <div class="nx-muted">
-                  {{ commute.transport }} · ETA: {{ commute.estimatedArrivalTime | date: 'shortTime' }}
+                  {{ commute.transport }} · {{ languageService.ui('Llegada est.') }}: {{ commute.estimatedArrivalTime | date: 'shortTime' }}
                 </div>
               </div>
               <span class="nx-badge nx-badge-slate">
-                {{ worker.recentAlertCount }} alerta(s)
+                {{ worker.recentAlertCount }} {{ languageService.ui('alerta(s)') }}
               </span>
             </div>
           }
 
           @if (worker.latestPing; as ping) {
             <div class="nx-list-item">
-              <span>Último GPS</span>
-              <span class="nx-mono">
-                {{ ping.latitude | number: '1.4-4' }}, {{ ping.longitude | number: '1.4-4' }} ({{ ping.speed }} km/h)
-              </span>
+              <div>
+                <span>{{ languageService.ui('Último GPS') }}</span>
+                <div class="nx-mono">
+                  {{ ping.latitude | number: '1.4-4' }}, {{ ping.longitude | number: '1.4-4' }} ({{ ping.speed }} km/h)
+                </div>
+              </div>
+              <button
+                type="button"
+                class="nx-btn nx-btn-secondary nx-btn-sm"
+                (click)="openPingOnMap(worker.workerName, ping.latitude, ping.longitude)">
+                {{ languageService.ui('Ver en mapa') }}
+              </button>
             </div>
           }
 
           @if (worker.openIncidents.length > 0) {
             <div class="nx-list">
-              <div class="nx-kpi-label">Incidentes Abiertos ({{ worker.openIncidents.length }})</div>
+              <div class="nx-kpi-label">{{ languageService.ui('Incidentes Abiertos') }} ({{ worker.openIncidents.length }})</div>
               @for (inc of worker.openIncidents; track inc.id) {
                 <div class="nx-list-item">
                   <div>
-                    <strong class="nx-badge nx-badge-red">{{ inc.type }}</strong>
+                    <strong class="nx-badge nx-badge-red">{{ languageService.code(inc.type) }}</strong>
                     <span style="margin-left: 8px">{{ inc.description }}</span>
                   </div>
                   <button
                     type="button"
                     class="nx-btn nx-btn-success nx-btn-sm"
                     (click)="resolveIncident(inc.id)">
-                    Resolver
+                    {{ languageService.ui('Resolver') }}
                   </button>
                 </div>
               }

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, of } from 'rxjs';
 import { CommuteService } from '../../../../commute/infrastructure/commute.service';
 import { CompanionLiveResource } from '../../../domain/model/companion.entity';
@@ -17,6 +18,7 @@ import { extractProblemMessage } from '../../../../shared/infrastructure/problem
   styleUrl: './companion-live.css',
 })
 export class CompanionLive {
+  private readonly router = inject(Router);
   private readonly companionService = inject(CompanionService);
   private readonly commuteService = inject(CommuteService);
   private readonly toast = inject(NotificationToastService);
@@ -51,6 +53,16 @@ export class CompanionLive {
         this.loadLive();
       },
       error: (err) => this.toast.error(extractProblemMessage(err, 'No se pudo resolver.')),
+    });
+  }
+
+  openPingOnMap(workerName: string, latitude: number, longitude: number): void {
+    void this.router.navigate(['/map'], {
+      queryParams: {
+        lat: latitude,
+        lng: longitude,
+        title: `Último GPS · ${workerName}`,
+      },
     });
   }
 }

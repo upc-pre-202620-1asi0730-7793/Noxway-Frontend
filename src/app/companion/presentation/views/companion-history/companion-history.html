@@ -18,7 +18,7 @@
         class="nx-tab"
         [class.nx-tab-active]="channelFilter() === channel"
         (click)="channelFilter.set(channel)">
-        {{ channel }}
+        {{ languageService.code(channel) }}
       </button>
     }
   </div>
@@ -47,7 +47,7 @@
               <td>{{ item.createdAt | date: 'short' }}</td>
               <td>{{ item.workerName }}</td>
               <td>
-                <span class="nx-badge nx-badge-slate">{{ item.channel }}</span>
+                <span class="nx-badge nx-badge-slate">{{ languageService.code(item.channel) }}</span>
               </td>
               <td>{{ item.message }}</td>
               <td>
@@ -56,7 +56,7 @@
                   [class.nx-badge-emerald]="item.status === 'DELIVERED'"
                   [class.nx-badge-amber]="item.status === 'PENDING' || item.status === 'PENDING_PROVIDER'"
                   [class.nx-badge-red]="item.status === 'FAILED'">
-                  {{ item.status }}
+                  {{ languageService.code(item.status) }}
                 </span>
               </td>
             </tr>

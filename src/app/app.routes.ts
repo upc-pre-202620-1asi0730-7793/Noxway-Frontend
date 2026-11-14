@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { Journey } from './commute/presentation/views/journey/journey';
 import { CompanionAlerts } from './companion/presentation/views/companion-alerts/companion-alerts';
 import { CompanionEmergency } from './companion/presentation/views/companion-emergency/companion-emergency';
 import { CompanionHistory } from './companion/presentation/views/companion-history/companion-history';
@@ -23,7 +22,12 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard, title: 'Noxway - Dashboard' },
-      { path: 'journey', component: Journey, title: 'Noxway - Mi Trayecto' },
+      {
+        path: 'journey',
+        loadComponent: () =>
+          import('./commute/presentation/views/journey/journey').then((m) => m.Journey),
+        title: 'Noxway - Mi Trayecto',
+      },
       { path: 'my-journeys', redirectTo: 'journey', pathMatch: 'full' },
       {
         path: 'map',

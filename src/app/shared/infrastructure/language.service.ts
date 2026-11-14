@@ -16,10 +16,206 @@ export interface TranslationDictionary {
 export class LanguageService {
   readonly currentLang = signal<SupportedLanguage>('es');
 
-  readonly ui = (text: string): string =>
-    this.currentLang() === 'en' && Object.hasOwn(accountTranslations, text)
-      ? accountTranslations[text]
-      : text;
+  private readonly codeLabels: Record<SupportedLanguage, TranslationDictionary> = {
+    es: {
+      // Turnos / Shifts
+      DAY: 'Diurno',
+      NIGHT: 'Nocturno',
+      ROTATING: 'Rotativo',
+      FLEX: 'Flexible',
+      'N/A': 'No asignado',
+
+      // Roles
+      WORKER: 'Trabajador',
+      TRUSTED_CONTACT: 'Contacto de Confianza',
+      ADMIN: 'Administrador',
+      MODERATOR: 'Moderador',
+
+      // Planes / Plans
+      ESSENTIAL: 'Esencial',
+      SENTINEL_PRO: 'Sentinel Pro',
+      FAMILY_CREW: 'Cuadrilla Familiar',
+      NONE: 'Sin plan',
+      FREE: 'Gratuito',
+
+      // Estados / Statuses
+      STANDBY: 'En espera',
+      ACTIVE: 'Activo',
+      ARRIVED: 'Llegó a destino',
+      DELAYED: 'Demorado',
+      OVERDUE: 'Retraso crítico',
+      CANCELLED: 'Cancelado',
+      PENDING: 'Pendiente',
+      PENDING_PAYMENT: 'Pendiente de pago',
+      CONFIRMED: 'Confirmado',
+      REJECTED: 'Rechazado',
+      APPROVED: 'Aprobado',
+      REVOKED: 'Revocado',
+      AVAILABLE: 'Disponible',
+      REDEEMED: 'Canjeado',
+      CLAIMED: 'Canjeado',
+      EXPIRED: 'Vencido',
+      OPEN: 'Abierto',
+      RESOLVED: 'Resuelto',
+      'EN REPOSO': 'En reposo',
+      DELIVERED: 'Entregado',
+      PENDING_PROVIDER: 'En envío (proveedor)',
+      FAILED: 'Fallido',
+      SENT: 'Enviado',
+      INACTIVE: 'Inactivo',
+
+      // Canales de notificación / Notification channels
+      ALL: 'Todos',
+      IN_APP: 'En la app',
+      EMAIL: 'Correo',
+      SMS: 'SMS',
+      WHATSAPP: 'WhatsApp',
+      PUSH: 'Notificación push',
+
+      // Incidentes / Incidents
+      SOS: 'Emergencia SOS',
+      DELAY: 'Demora',
+      DEVIATION: 'Desvío de ruta',
+      OTHER: 'Otro',
+
+      // Niveles de riesgo / Risk levels
+      LOW: 'Bajo',
+      MEDIUM: 'Medio',
+      HIGH: 'Alto',
+      CRITICAL: 'Crítico',
+
+      // Moderación y tipos / Moderation & types
+      SERVICE: 'Servicio',
+      RISK: 'Zona de riesgo',
+      RISK_ZONE: 'Zona de riesgo',
+      REVIEW: 'Reseña',
+      COMMENT: 'Comentario',
+      APPROVE: 'Aprobar',
+      REJECT: 'Rechazar',
+      PHARMACY: 'Farmacia',
+      GAS_STATION: 'Grifo',
+      HOSPITAL: 'Hospital / Clínica',
+      POLICE: 'Comisaría / Serenazgo',
+      SUPERMARKET: 'Supermercado',
+      STORE: 'Tienda / Minimarket',
+    },
+    en: {
+      // Shifts
+      DAY: 'Day',
+      NIGHT: 'Night',
+      ROTATING: 'Rotating',
+      FLEX: 'Flexible',
+      'N/A': 'Unassigned',
+
+      // Roles
+      WORKER: 'Worker',
+      TRUSTED_CONTACT: 'Trusted Contact',
+      ADMIN: 'Administrator',
+      MODERATOR: 'Moderator',
+
+      // Plans
+      ESSENTIAL: 'Essential',
+      SENTINEL_PRO: 'Sentinel Pro',
+      FAMILY_CREW: 'Family Crew',
+      NONE: 'No plan',
+      FREE: 'Free',
+
+      // Statuses
+      STANDBY: 'Standby',
+      ACTIVE: 'Active',
+      ARRIVED: 'Arrived',
+      DELAYED: 'Delayed',
+      OVERDUE: 'Overdue',
+      CANCELLED: 'Cancelled',
+      PENDING: 'Pending',
+      PENDING_PAYMENT: 'Pending payment',
+      CONFIRMED: 'Confirmed',
+      REJECTED: 'Rejected',
+      APPROVED: 'Approved',
+      REVOKED: 'Revoked',
+      AVAILABLE: 'Available',
+      REDEEMED: 'Redeemed',
+      CLAIMED: 'Claimed',
+      EXPIRED: 'Expired',
+      OPEN: 'Open',
+      RESOLVED: 'Resolved',
+      'EN REPOSO': 'Resting',
+      DELIVERED: 'Delivered',
+      PENDING_PROVIDER: 'Pending provider',
+      FAILED: 'Failed',
+      SENT: 'Sent',
+      INACTIVE: 'Inactive',
+
+      // Notification channels
+      ALL: 'All',
+      IN_APP: 'In-App',
+      EMAIL: 'Email',
+      SMS: 'SMS',
+      WHATSAPP: 'WhatsApp',
+      PUSH: 'Push notification',
+
+      // Incidents
+      SOS: 'SOS Emergency',
+      DELAY: 'Delay',
+      DEVIATION: 'Route deviation',
+      OTHER: 'Other',
+
+      // Risk levels
+      LOW: 'Low',
+      MEDIUM: 'Medium',
+      HIGH: 'High',
+      CRITICAL: 'Critical',
+
+      // Moderation & types
+      SERVICE: 'Service',
+      RISK: 'Risk zone',
+      RISK_ZONE: 'Risk zone',
+      REVIEW: 'Review',
+      COMMENT: 'Comment',
+      APPROVE: 'Approve',
+      REJECT: 'Reject',
+      PHARMACY: 'Pharmacy',
+      GAS_STATION: 'Gas station',
+      HOSPITAL: 'Hospital / Clinic',
+      POLICE: 'Police / Security',
+      SUPERMARKET: 'Supermarket',
+      STORE: 'Store / Minimarket',
+    },
+  };
+
+  readonly ui = (text: string): string => {
+    const lang = this.currentLang();
+    if (lang === 'en' && Object.hasOwn(accountTranslations, text)) {
+      return accountTranslations[text];
+    }
+    if (Object.hasOwn(this.codeLabels[lang], text)) {
+      return this.codeLabels[lang][text];
+    }
+    return text;
+  };
+
+  readonly code = (value: string | null | undefined): string => {
+    if (!value) {
+      return '';
+    }
+    const normalized = value.trim();
+    if (!normalized) {
+      return '';
+    }
+    const lang = this.currentLang();
+    const mapped = this.codeLabels[lang];
+    if (Object.hasOwn(mapped, normalized)) {
+      return mapped[normalized];
+    }
+    const upper = normalized.toUpperCase();
+    if (Object.hasOwn(mapped, upper)) {
+      return mapped[upper];
+    }
+    if (lang === 'en' && Object.hasOwn(accountTranslations, normalized)) {
+      return accountTranslations[normalized];
+    }
+    return normalized.replace(/_/g, ' ');
+  };
 
   private readonly translations: Record<SupportedLanguage, TranslationDictionary> = {
     es: {

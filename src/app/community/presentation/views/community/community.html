@@ -177,7 +177,7 @@
               class="nx-tab"
               [class.nx-tab-active]="reportFilter() === status"
               (click)="changeReportFilter(status)">
-              {{ status }}
+              {{ languageService.code(status) }}
             </button>
           }
         </div>
@@ -196,7 +196,7 @@
         @for (report of reports(); track report.id) {
           <div class="nx-list-item">
             <div>
-              <strong>[{{ report.targetType }}] {{ report.targetTitle }}</strong>
+              <strong>[{{ languageService.code(report.targetType) }}] {{ report.targetTitle }}</strong>
               <div class="nx-muted">
                 {{ report.reason }} · {{ report.reporterName }}
               </div>
@@ -208,7 +208,7 @@
                 [class.nx-badge-amber]="report.status === 'PENDING'"
                 [class.nx-badge-emerald]="report.status === 'APPROVED'"
                 [class.nx-badge-red]="report.status === 'REJECTED'">
-                {{ report.status }}
+                {{ languageService.code(report.status) }}
               </span>
 
               @if (actorContext.isAdmin() && report.status === 'PENDING') {
@@ -244,7 +244,7 @@
           <div class="nx-kpi-label">Auditoría reporte {{ selectedReportId() }}</div>
           @for (action of selectedActions(); track action.id) {
             <div class="nx-list-item">
-              <span>{{ action.moderatorName }} · <strong>{{ action.decision }}</strong></span>
+              <span>{{ action.moderatorName }} · <strong>{{ languageService.code(action.decision) }}</strong></span>
               <span class="nx-muted">{{ action.notes }} · {{ action.createdAt | date: 'short' }}</span>
             </div>
           } @empty {
@@ -450,9 +450,9 @@
             <div class="nx-field">
               <label class="nx-label" for="rz-lvl">{{ languageService.ui('Nivel de riesgo') }}</label>
               <select id="rz-lvl" class="nx-select" name="riskLevel" [(ngModel)]="riskLevel">
-                <option value="LOW">LOW</option>
-                <option value="MEDIUM">MEDIUM</option>
-                <option value="HIGH">HIGH</option>
+                <option value="LOW">{{ languageService.code('LOW') }}</option>
+                <option value="MEDIUM">{{ languageService.code('MEDIUM') }}</option>
+                <option value="HIGH">{{ languageService.code('HIGH') }}</option>
               </select>
             </div>
 

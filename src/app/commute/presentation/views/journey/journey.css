@@ -3,6 +3,10 @@
   padding: 14px;
 }
 
+.nx-ping-map-wrap {
+  margin-bottom: 10px;
+}
+
 .nx-rating-inline {
   width: 100%;
   display: grid;

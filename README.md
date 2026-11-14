@@ -1,36 +1,101 @@
-# Noxway Frontend
+# Noxway Frontend — Web Application (SPA)
 
-Aplicación web Angular (standalone components, signals, detección zoneless y Angular Material) integrada en tiempo real con el backend `/api/v1` de **Noxway Platform**.
+Aplicación web **Single-Page Application (SPA)** de **Noxway** desarrollada con **Angular 21**, **TypeScript 5.9**, **Angular Signals**, **Angular Material** y cartografía interactiva **Leaflet + OpenStreetMap + OpenFreeMap Vector Tiles**, conectada en tiempo real con el backend REST `/api/v1` de **Noxway Platform**.
 
-## Arquitectura por Bounded Contexts
+---
 
-- `iam`: `IamService`, `SessionService`, `UserProfileService`, `TrustedContactsService`, `authGuard` abierto y vistas `Access`, `Profile` y `TrustedContacts`.
-- `commute`: `CommuteService` y vista `Journey` (inicio de trayecto, telemetría GPS, demora, incidentes SOS, resolución, llegada segura y calificación de ruta).
-- `community`: `CommunityService` y vistas `MapView` (mapa metropolitano 24h con horarios, votación `+1`/`-1` y zonas de riesgo) y `Community` (tablón por distrito, envío de puntos/riesgos y cola de moderación administrativa).
-- `wellness`: `WellnessService` y vista `Wellness` (bitácora de descanso, meta diaria y gráfico semanal).
-- `subscriptions`: `SubscriptionsService` y vista `Benefits` (planes `ESSENTIAL`/`SENTINEL_PRO`/`FAMILY_CREW`, pagos offline, cupones de beneficios, grupo familiar y referidos).
-- `companion`: `CompanionService` y portal completo (`/companion/live`, `history`, `alerts`, `emergency`, `invitations`, `profile`).
-- `dashboard` & `shared`: `DashboardService`, `ActorContextService`, `actorContextInterceptor` (`X-Actor-Id` y `Accept-Language`), `NotificationToastService`, `LanguageService` (ES/EN) y shell `Layout`.
+## Tech Stack
 
-## IAM Estructurado y Selector de Persona Demo
+- **Framework:** Angular 21 (Standalone Components, Signals, Control Flow `@if` / `@for`)
+- **Lenguaje:** TypeScript 5.9
+- **Cartografía y Geodatos:**
+  - **Leaflet 1.9** + **OpenStreetMap** (tiles raster interactivos y selector de coordenadas `<app-report-location>`)
+  - **OpenFreeMap Vector Tiles** decodificados en navegador con `pbf` y `@mapbox/vector-tile` para POIs metropolitanos (farmacias, supermercados, grifos, hospitales y comisarías)
+- **UI & Estilos:** Tokens CSS adaptativos `--nx-*` (**Modo Día / Modo Noche**), modales nativos `<dialog>` y Angular Material Icons/Buttons
+- **Internacionalización:** Bilingüe Español (`ES`) / Inglés (`EN`) vía `LanguageService` + cabecera `Accept-Language`
+- **Manejo de Errores API:** Compatible con **RFC 9457 Problem Details** (`extractProblemMessage`)
+- **Pruebas:** Vitest + Angular TestBed (`ng test`)
 
-Mientras el IAM definitivo permanece diferido (`environment.iamEnabled = false`):
+---
 
-- `authGuard` deja habilitadas todas las rutas sin bloqueo de sesión.
-- `actorContextInterceptor` adjunta el header `X-Actor-Id` e idioma `Accept-Language` a cada petición `/api/v1/**`.
-- Desde el selector superior/lateral o la vista `/access` puedes cambiar al instante entre `Worker` (`0101`, `0102`), `Companion` (`0201`, `0202`) y `Admin` (`0901`), además de inspeccionar la respuesta estructurada `501` RFC 9457 de `/api/v1/auth/*`.
+## Requisitos Previos
 
-## Configuración de Desarrollo
+- **Node.js 20.19+ o 22.12+** y **npm 10+**
+- **Noxway Platform Backend** ejecutándose en `http://localhost:8080` (el archivo [proxy.conf.json](proxy.conf.json) redirige `/api/v1/**` hacia `http://127.0.0.1:8080`)
 
-El archivo [proxy.conf.json](proxy.conf.json) redirige `/api/v1/**` hacia `http://127.0.0.1:8080`. Asegúrate de tener el backend corriendo en el puerto `8080` antes de levantar el servidor de desarrollo (`ng serve` requiere Node.js compatible con Angular CLI v22).
+---
 
-## Verificación Técnica y Pruebas
+## Estructura del Proyecto por Bounded Contexts
 
-```powershell
-npm ci
-npx ngc -p tsconfig.app.json --noEmit
-npx ngc -p tsconfig.spec.json --noEmit
-npx vitest run --environment jsdom
+El código fuente dentro de `src/app/` está organizado por **Bounded Contexts** siguiendo la estructura de 3 capas (`domain`, `infrastructure`, `presentation`):
+
+```text
+src/app/
+├── iam/            # Perfil del trabajador/contacto, directorio, preferencias de notificación y TrustLinks
+├── commute/        # Mi Trayecto (/journey): check-in, ping GPS con mapa OSM, demoras, SOS y calificación
+├── community/      # Mapa 24h (/map) con OpenStreetMap + OpenFreeMap y Comunidad (/community) con modal de avisos
+├── wellness/       # Bienestar (/wellness): bitácora de descanso, meta diaria (240-720 min) y gráfico de 7 días
+├── subscriptions/  # Beneficios y Planes (/benefits): planes, pagos offline, cupones, FAMILY_CREW y referidos
+├── companion/      # Companion Portal (/companion/*): monitoreo en vivo, alertas, cola de entregas y emergencias
+├── dashboard/      # Resumen operativo en vivo (/dashboard)
+└── shared/         # Layout shell, ThemeService (Día/Noche), LanguageService (ES/EN), ActorContextService e interceptor
 ```
 
-> Nota de entorno: si el equipo usa Node.js `v24`, `@angular/cli` (`ng`) bloquea la ejecución directa por restricción de versión de motor; las comprobaciones de compilación (`ngc`) y pruebas unitarias (`vitest`) se ejecutan directamente sobre las configuraciones del proyecto.
+---
+
+## Portales y Rutas Principales
+
+### 1. Portal del Trabajador
+- `/dashboard` — **Resumen Operativo**: KPIs de jornada nocturna, trayectos completados, red de confianza, descanso promedio y accesos rápidos.
+- `/journey` — **Mi Trayecto & Monitoreo Activo**: inicio de trayecto seguro, selector interactivo OpenStreetMap + botón *Usar mi ubicación* para registrar pings GPS, reporte de demoras, emisión de alertas SOS y calificación de rutas.
+- `/map` — **Mapa Comunitario 24h y Zonas de Riesgo**: explorador interactivo con filtros (*Todos*, *Farmacias*, *Supermercados*, *Grifos*, *Hospitales*, *Comisarías*, *Puntos Noxway 24h*, *Zonas de riesgo*), filtro *Solo abiertos 24 horas*, *Buscar en esta zona*, votación de confianza (`+1` / `-1`) y acceso directo para reportar locales o peligros.
+- `/community` — **Comunidad & Reportes Colaborativos**: filtro por distrito, botón **+ Publicar aviso** con modal `<dialog>` (categoría, título, descripción, distrito opcional y mapa interactivo `<app-report-location>`), enlace directo **Ver ubicación del aviso** hacia el mapa 24h y cola de moderación administrativa.
+- `/wellness` — **Bienestar & Recuperación de Sueño**: KPIs semanales, gráfico de barras de 7 días, registro de sesiones sin solapamientos y meta diaria.
+- `/benefits` — **Planes, Beneficios & Grupo Familiar**: catálogo `ESSENTIAL`, `SENTINEL_PRO` y `FAMILY_CREW`, pagos offline (`Yape / Plin / Agente`), canje de cupones, invitaciones familiares y programa de referidos.
+- `/trusted-contacts` — **Red de Contactos de Confianza**: invitación por correo y gestión de vínculos `ACTIVE` / `PENDING`.
+- `/profile` — **Mi Perfil & Jornada**: datos personales, horario de turno y canales de notificación (`IN_APP`, `EMAIL`, `SMS`, `WHATSAPP`).
+
+### 2. Companion Portal (Contacto de Confianza)
+- `/companion/live` — **Monitoreo en Vivo**: seguimiento de trabajadores vinculados, último ping GPS con botón **Ver en mapa** y resolución de incidentes.
+- `/companion/history` — **Historial de Rutas & Eventos**: bitácora filtrable por canal.
+- `/companion/alerts` — **Centro de Avisos & Cola de Entregas**: alertas recibidas, canales habilitados y despacho/reintento de entregas.
+- `/companion/emergency` — **Directorio de Auxilio & Central de Emergencias**: incidentes SOS activos con enlace al mapa y líneas oficiales de emergencia en Perú (`105`, `106`, `116`, `100`).
+- `/companion/invitations` — **Invitaciones de Vínculos & Planes**: aceptación o rechazo de solicitudes `TrustLink` y `FAMILY_CREW`.
+- `/companion/profile` — **Mi Perfil de Contacto de Confianza**.
+
+---
+
+## Ejecución en Desarrollo
+
+1. Asegúrate de iniciar primero el backend en el puerto `8080`:
+   ```powershell
+   .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
+   ```
+2. Instala las dependencias e inicia el servidor de desarrollo de Angular:
+   ```powershell
+   npm install
+   npm start
+   ```
+3. Abre en tu navegador: `http://localhost:4200`
+
+---
+
+## Compilación y Pruebas Automatizadas
+
+```powershell
+# Compilar bundle de producción (verifica tipos, templates y presupuestos de bundle)
+npm run build
+
+# Ejecutar las 28 pruebas unitarias en 14 suites con Vitest
+npx ng test --watch=false
+```
+
+---
+
+## Documentación Técnica (`docs/`)
+
+Consulta la carpeta `docs/` para los diagramas y especificaciones del frontend:
+- [Diagrama de Clases y Componentes (PlantUML)](docs/class-diagram.puml) y [Vista Modular Mermaid](docs/class-diagram.md)
+- [Arquitectura de Software (Structurizr C4 DSL)](docs/software-architecture.dsl) y [Guía C4 + Flujo OpenStreetMap](docs/software-architecture.md)
+- [Historias de Usuario y Criterios de Aceptación UI](docs/user-stories.md)
+- [Architecture Decision Records (ADRs Frontend)](docs/adrs.md)

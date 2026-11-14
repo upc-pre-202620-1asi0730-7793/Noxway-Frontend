@@ -72,16 +72,15 @@
       <section class="nx-card">
         <div class="nx-card-header">
           <h3 class="nx-card-title">{{ languageService.ui('Registrar Sesión de Descanso') }}</h3>
-          <span class="nx-badge nx-badge-emerald">POST /wellness/rest-sessions</span>
         </div>
 
         <form class="nx-form-grid" (ngSubmit)="logSession()">
           <div class="nx-field">
-            <label class="nx-label" for="w-date">Fecha</label>
+            <label class="nx-label" for="w-date">{{ languageService.ui('Fecha') }}</label>
             <input id="w-date" class="nx-input" type="date" name="logDate" [(ngModel)]="logDate" required />
           </div>
           <div class="nx-field">
-            <label class="nx-label" for="w-qual">Calidad (1-5)</label>
+            <label class="nx-label" for="w-qual">{{ languageService.ui('Calidad (1-5)') }}</label>
             <select id="w-qual" class="nx-select" name="quality" [(ngModel)]="quality">
               <option [ngValue]="5">5 - Excelente</option>
               <option [ngValue]="4">4 - Buena</option>
@@ -91,15 +90,15 @@
             </select>
           </div>
           <div class="nx-field">
-            <label class="nx-label" for="w-start">Inicio</label>
+            <label class="nx-label" for="w-start">{{ languageService.ui('Inicio') }}</label>
             <input id="w-start" class="nx-input" type="time" name="startTimeStr" [(ngModel)]="startTimeStr" required />
           </div>
           <div class="nx-field">
-            <label class="nx-label" for="w-end">Fin</label>
+            <label class="nx-label" for="w-end">{{ languageService.ui('Fin') }}</label>
             <input id="w-end" class="nx-input" type="time" name="endTimeStr" [(ngModel)]="endTimeStr" required />
           </div>
           <div class="nx-field nx-field-full">
-            <label class="nx-label" for="w-notes">Notas</label>
+            <label class="nx-label" for="w-notes">{{ languageService.ui('Notas') }}</label>
             <input
               id="w-notes"
               class="nx-input"
@@ -119,7 +118,6 @@
       <section class="nx-card">
         <div class="nx-card-header">
           <h3 class="nx-card-title">{{ languageService.ui('Ajustar Meta Diaria de Sueño') }}</h3>
-          <span class="nx-badge nx-badge-slate">PUT /wellness/goal</span>
         </div>
 
         <form class="nx-form-grid" (ngSubmit)="saveGoal()">
@@ -165,14 +163,14 @@
                 <span class="nx-badge nx-badge-blue" style="margin-left: 8px">Calidad {{ item.quality }}/5</span>
                 <div class="nx-muted">
                   {{ item.startTime | date: 'short' }} -> {{ item.endTime | date: 'shortTime' }} ·
-                  {{ item.notes || 'Sin notas' }}
+                  {{ item.notes || languageService.ui('Sin notas') }}
                 </div>
               </div>
               <button
                 type="button"
                 class="nx-btn nx-btn-danger nx-btn-sm"
                 (click)="deleteSession(item.id)">
-                Eliminar
+                {{ languageService.ui('Eliminar') }}
               </button>
             </div>
           }
