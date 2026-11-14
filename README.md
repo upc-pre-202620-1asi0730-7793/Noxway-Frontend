@@ -1,88 +1,36 @@
-# NoxwayFrontend
+# Noxway Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.8.
+Aplicación web Angular (standalone components, signals, detección zoneless y Angular Material) integrada en tiempo real con el backend `/api/v1` de **Noxway Platform**.
 
-## Prueba local de Noxway
+## Arquitectura por Bounded Contexts
 
-Desde la carpeta que contiene `package.json`, con Node.js 24 instalado:
+- `iam`: `IamService`, `SessionService`, `UserProfileService`, `TrustedContactsService`, `authGuard` abierto y vistas `Access`, `Profile` y `TrustedContacts`.
+- `commute`: `CommuteService` y vista `Journey` (inicio de trayecto, telemetría GPS, demora, incidentes SOS, resolución, llegada segura y calificación de ruta).
+- `community`: `CommunityService` y vistas `MapView` (mapa metropolitano 24h con horarios, votación `+1`/`-1` y zonas de riesgo) y `Community` (tablón por distrito, envío de puntos/riesgos y cola de moderación administrativa).
+- `wellness`: `WellnessService` y vista `Wellness` (bitácora de descanso, meta diaria y gráfico semanal).
+- `subscriptions`: `SubscriptionsService` y vista `Benefits` (planes `ESSENTIAL`/`SENTINEL_PRO`/`FAMILY_CREW`, pagos offline, cupones de beneficios, grupo familiar y referidos).
+- `companion`: `CompanionService` y portal completo (`/companion/live`, `history`, `alerts`, `emergency`, `invitations`, `profile`).
+- `dashboard` & `shared`: `DashboardService`, `ActorContextService`, `actorContextInterceptor` (`X-Actor-Id` y `Accept-Language`), `NotificationToastService`, `LanguageService` (ES/EN) y shell `Layout`.
+
+## IAM Estructurado y Selector de Persona Demo
+
+Mientras el IAM definitivo permanece diferido (`environment.iamEnabled = false`):
+
+- `authGuard` deja habilitadas todas las rutas sin bloqueo de sesión.
+- `actorContextInterceptor` adjunta el header `X-Actor-Id` e idioma `Accept-Language` a cada petición `/api/v1/**`.
+- Desde el selector superior/lateral o la vista `/access` puedes cambiar al instante entre `Worker` (`0101`, `0102`), `Companion` (`0201`, `0202`) y `Admin` (`0901`), además de inspeccionar la respuesta estructurada `501` RFC 9457 de `/api/v1/auth/*`.
+
+## Configuración de Desarrollo
+
+El archivo [proxy.conf.json](proxy.conf.json) redirige `/api/v1/**` hacia `http://127.0.0.1:8080`. Asegúrate de tener el backend corriendo en el puerto `8080` antes de levantar el servidor de desarrollo (`ng serve` requiere Node.js compatible con Angular CLI v22).
+
+## Verificación Técnica y Pruebas
 
 ```powershell
 npm ci
-npm run server
+npx ngc -p tsconfig.app.json --noEmit
+npx ngc -p tsconfig.spec.json --noEmit
+npx vitest run --environment jsdom
 ```
 
-Deja esa terminal abierta. En otra terminal, en la misma carpeta:
-
-```powershell
-npm start
-```
-
-Abre [http://localhost:4200](http://localhost:4200). Pulsa **Crear una cuenta** y
-registra un nombre, correo de prueba, tipo de turno y una contraseña exclusiva para
-la entrevista. Después inicia sesión. En **Mi Perfil** puedes editar y guardar tus
-datos y preferencias. En **Mi Trayecto** puedes registrar una salida, confirmar la
-llegada y ver tu historial. Pulsa **Salir** entre entrevistas.
-
-El servidor temporal escucha en el puerto 3000. Guarda las cuentas, los trayectos y los registros personales
-en `server/accounts.local.json`, que se crea al arrancar y se excluye de Git.
-Al reiniciar la API, los datos se conservan y es necesario iniciar sesión de nuevo.
-
-Las cuentas registradas empiezan con listas vacías. El dashboard resume los
-trayectos, los descansos, los contactos y los avisos de cada cuenta.
-Los planes empiezan sin suscripción activa.
-
-La prueba local guarda las preferencias de privacidad. La integración con
-Spring Boot y MySQL, la publicación comunitaria, los envíos
-de invitaciones, el cifrado del historial y la contratación de planes están
-pendientes.
-
-Servicios Cercanos lee los puntos de interés de OpenStreetMap mediante OpenFreeMap y requiere conexión
-a Internet. Puedes filtrar farmacias, supermercados y grifos en la zona visible.
-Los avisos se crean en Comunidad, que también muestra los reportes privados
-guardados antes desde Servicios Cercanos.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+> Nota de entorno: si el equipo usa Node.js `v24`, `@angular/cli` (`ng`) bloquea la ejecución directa por restricción de versión de motor; las comprobaciones de compilación (`ngc`) y pruebas unitarias (`vitest`) se ejecutan directamente sobre las configuraciones del proyecto.

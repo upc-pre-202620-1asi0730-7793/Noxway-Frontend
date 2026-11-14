@@ -1,60 +1,46 @@
-import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { UserProfile } from '../domain/model/user-profile.entity';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import {
+  AccountProfileResource,
+  CreateProfilePayload,
+  NotificationPreferenceResource,
+  UpdateNotificationPreferencePayload,
+  UpdateProfilePayload,
+} from '../domain/model/user-profile.entity';
 
-/**
- * Fallback static user profile for the shift worker.
- */
-const DEFAULT_PROFILE: UserProfile = {
-  id: 1,
-  fullName: 'Jorge Luis Huamán Quispe',
-  role: 'Vigilante de Seguridad Privada · Securitas Perú (Planta San Martín)',
-  dni: '44892015',
-  memberSince: 'Miembro Activo desde Agosto 2026',
-  avatar: 'JL',
-  phone: '+51 987 654 321',
-  email: 'jorge.huaman@vigilancia.pe',
-  schedule: '22:00 a 06:00 (+1 día) · Lunes a Sábado',
-  shiftType: 'night',
-  transport: 'Moto Lineal (Personal)',
-  district: 'Cercado de Lima',
-  privacyGpsActiveOnly: true,
-  privacyEncryptedHistory: true,
-  privacyAnonymousRatings: true,
-  passwordUpdated: 'Contraseña actualizada hace 20 días.',
-  activeSessions: '1 dispositivo conectado (Lima, PE)',
-};
-
-/**
- * Service managing user identity, security settings, and profile details.
- */
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class UserProfileService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/userProfile`;
+  private readonly baseUrl = `${environment.apiBaseUrl}/accounts`;
 
-  /**
-   * Fetches the authenticated worker's profile entity.
-   */
-  saveProfile(profile: UserProfile): void {
-    localStorage.setItem('noxway_worker_profile', JSON.stringify(profile));
+  getProfile(): Observable<AccountProfileResource> {
+    return this.http.get<AccountProfileResource>(`${this.baseUrl}/me`);
   }
 
-  getProfile(): Observable<UserProfile> {
-    return this.http.get<UserProfile[]>(this.baseUrl).pipe(
-      map((list) => (list && list.length > 0 ? list[0] : DEFAULT_PROFILE)),
-      catchError(() => of(DEFAULT_PROFILE)),
-      map((profile) => {
-        try {
-          const saved = JSON.parse(localStorage.getItem('noxway_worker_profile') || 'null');
-          return saved && saved.id === profile.id ? { ...profile, ...saved } : profile;
-        } catch { return profile; }
-      }),
+  updateProfile(payload: UpdateProfilePayload): Observable<AccountProfileResource> {
+    return this.http.put<AccountProfileResource>(`${this.baseUrl}/me`, payload);
+  }
+
+  getDirectory(): Observable<AccountProfileResource[]> {
+    return this.http.get<AccountProfileResource[]>(`${this.baseUrl}/directory`);
+  }
+
+  createProfile(payload: CreateProfilePayload): Observable<AccountProfileResource> {
+    return this.http.post<AccountProfileResource>(this.baseUrl, payload);
+  }
+
+  getNotificationPreferences(): Observable<NotificationPreferenceResource[]> {
+    return this.http.get<NotificationPreferenceResource[]>(`${this.baseUrl}/me/notification-preferences`);
+  }
+
+  updateNotificationPreference(
+    payload: UpdateNotificationPreferencePayload,
+  ): Observable<NotificationPreferenceResource> {
+    return this.http.put<NotificationPreferenceResource>(
+      `${this.baseUrl}/me/notification-preferences`,
+      payload,
     );
   }
 }

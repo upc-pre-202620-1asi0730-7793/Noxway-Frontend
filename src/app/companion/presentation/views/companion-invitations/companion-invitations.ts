@@ -1,47 +1,78 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
-import { CompanionService } from '../../../infrastructure/companion.service';
-import {
-  AccompaniedWorker,
-  InvitationStep,
-  PendingInvitation,
-} from '../../../domain/model/companion.entity';
+import { CommonModule } from '@angular/common';
+import { Component, effect, inject, signal, untracked } from '@angular/core';
+import { catchError, forkJoin, of } from 'rxjs';
+import { TrustLinkResource } from '../../../../iam/domain/model/trusted-contact.entity';
+import { TrustedContactsService } from '../../../../iam/infrastructure/trusted-contacts.service';
+import { SubscriptionInvitationResource } from '../../../../subscriptions/domain/model/collective-benefit.entity';
+import { SubscriptionsService } from '../../../../subscriptions/infrastructure/subscriptions.service';
+import { ActorContextService } from '../../../../shared/infrastructure/actor-context.service';
+import { LanguageService } from '../../../../shared/infrastructure/language.service';
+import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
+import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
 
 @Component({
   selector: 'app-companion-invitations',
-  imports: [RouterLink, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './companion-invitations.html',
   styleUrl: './companion-invitations.css',
 })
-export class CompanionInvitations implements OnInit {
-  private readonly companionService = inject(CompanionService);
+export class CompanionInvitations {
+  private readonly contactsService = inject(TrustedContactsService);
+  private readonly subService = inject(SubscriptionsService);
+  private readonly toast = inject(NotificationToastService);
+  readonly actorContext = inject(ActorContextService);
+  readonly languageService = inject(LanguageService);
 
-  readonly pending = signal<PendingInvitation | null>(null);
-  readonly activeWorkers = signal<AccompaniedWorker[]>([]);
-  readonly steps = signal<InvitationStep[]>([]);
-  readonly pendingStatus = signal<'pending' | 'accepted' | 'rejected'>('pending');
+  readonly loading = signal(true);
+  readonly trustLinks = signal<TrustLinkResource[]>([]);
+  readonly familyInvites = signal<SubscriptionInvitationResource[]>([]);
 
-  ngOnInit(): void {
-    this.companionService.getInvitations().subscribe((data) => {
-      this.pending.set(data.pending);
-      this.activeWorkers.set(data.activeWorkers);
-      this.steps.set(data.steps);
+  constructor() {
+    effect(() => {
+      this.actorContext.revision();
+      untracked(() => this.loadAll());
     });
   }
 
-  onAcceptInvitation(): void {
-    this.pendingStatus.set('accepted');
-    alert(
-      'Vínculo de confianza aceptado con éxito. Ahora también podrás acompañar a Carlos en sus turnos diurnos o nocturnos.',
-    );
+  loadAll(): void {
+    this.loading.set(true);
+
+    forkJoin({
+      links: this.contactsService.getContacts().pipe(catchError(() => of([]))),
+      family: this.subService.getInvitations().pipe(catchError(() => of([]))),
+    }).subscribe(({ links, family }) => {
+      this.trustLinks.set(links);
+      this.familyInvites.set(family);
+      this.loading.set(false);
+    });
   }
 
-  onRejectInvitation(): void {
-    this.pendingStatus.set('rejected');
-    alert('Solicitud rechazada. Se ha notificado al remitente de forma respetuosa.');
+  respondTrustLink(id: string, accept: boolean): void {
+    const call$ = accept
+      ? this.contactsService.acceptInvitation(id)
+      : this.contactsService.rejectInvitation(id);
+
+    call$.subscribe({
+      next: () => {
+        this.toast.success(accept ? 'Vínculo aceptado' : 'Vínculo rechazado');
+        this.loadAll();
+      },
+      error: (err) => this.toast.error(extractProblemMessage(err, 'Error procesando vínculo.')),
+    });
+  }
+
+  respondFamilyInvite(id: string, accept: boolean): void {
+    const call$ = accept
+      ? this.subService.acceptInvitation(id)
+      : this.subService.rejectInvitation(id);
+
+    call$.subscribe({
+      next: () => {
+        this.toast.success(accept ? 'Plan familiar aceptado' : 'Invitación rechazada');
+        this.loadAll();
+      },
+      error: (err) => this.toast.error(extractProblemMessage(err, 'Error procesando invitación.')),
+    });
   }
 }

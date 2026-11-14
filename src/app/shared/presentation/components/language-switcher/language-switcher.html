@@ -1,9 +1,21 @@
-<mat-button-toggle-group
-  [value]="currentLanguage()"
-  (change)="onLanguageChange($event.value)"
-  aria-label="Language Selector"
-  class="lang-toggle-group"
-  hideSingleSelectionIndicator>
-  <mat-button-toggle value="es" class="lang-toggle-btn">ES</mat-button-toggle>
-  <mat-button-toggle value="en" class="lang-toggle-btn">EN</mat-button-toggle>
-</mat-button-toggle-group>
+<div
+  class="nx-lang-switch"
+  role="group"
+  [attr.aria-label]="languageService.currentLang() === 'en' ? 'Language selector' : 'Selector de idioma'">
+  <button
+    type="button"
+    class="nx-lang-btn"
+    [class.active]="languageService.currentLang() === 'es'"
+    [attr.aria-pressed]="languageService.currentLang() === 'es'"
+    (click)="selectLanguage('es')">
+    ES
+  </button>
+  <button
+    type="button"
+    class="nx-lang-btn"
+    [class.active]="languageService.currentLang() === 'en'"
+    [attr.aria-pressed]="languageService.currentLang() === 'en'"
+    (click)="selectLanguage('en')">
+    EN
+  </button>
+</div>

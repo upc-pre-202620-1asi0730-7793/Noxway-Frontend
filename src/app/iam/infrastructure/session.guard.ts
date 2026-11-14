@@ -1,16 +1,10 @@
-import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
-import { map } from 'rxjs';
-import { SessionService } from './session.service';
+import { CanActivateFn } from '@angular/router';
 
-export const requireSession: CanActivateFn = () => {
-  const session = inject(SessionService);
-  const router = inject(Router);
-  return session.restore().pipe(map((allowed) => allowed || router.parseUrl('/login')));
-};
+/**
+ * Structured pass-through IAM route guard while authentication is deferred
+ * (environment.iamEnabled === false). Keeps routing architecture ready for future JWT enforcement.
+ */
+export const authGuard: CanActivateFn = () => true;
 
-export const requireDemo: CanActivateFn = () => {
-  const session = inject(SessionService);
-  const router = inject(Router);
-  return session.demo() || router.parseUrl('/dashboard');
-};
+export const requireSession: CanActivateFn = authGuard;
+export const requireDemo: CanActivateFn = authGuard;

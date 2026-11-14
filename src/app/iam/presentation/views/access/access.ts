@@ -1,49 +1,122 @@
-import { LanguageService } from '../../../../shared/infrastructure/language.service';
-import { Component, inject, signal } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { finalize, Observable } from 'rxjs';
-import { UserProfile } from '../../../domain/model/user-profile.entity';
+import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { SessionService } from '../../../infrastructure/session.service';
+import { IamService, SecurityStatusResource } from '../../../infrastructure/iam.service';
+import { ActorContextService, DemoPersona } from '../../../../shared/infrastructure/actor-context.service';
+import { LanguageService } from '../../../../shared/infrastructure/language.service';
+import { NotificationToastService } from '../../../../shared/infrastructure/notification-toast.service';
+import { extractProblemMessage } from '../../../../shared/infrastructure/problem-detail.util';
 
 @Component({
-  imports: [FormsModule, RouterLink],
+  selector: 'app-access',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './access.html',
   styleUrl: './access.css',
 })
-export class Access {
-  readonly t = inject(LanguageService).ui;
-  private readonly session = inject(SessionService);
+export class Access implements OnInit {
+  readonly iam = inject(IamService);
+  readonly actorContext = inject(ActorContextService);
+  readonly session = inject(SessionService);
+  readonly languageService = inject(LanguageService);
+  private readonly toast = inject(NotificationToastService);
   private readonly router = inject(Router);
-  readonly registering = inject(ActivatedRoute).snapshot.data['registering'] === true;
-  readonly busy = signal(false);
-  readonly error = signal('');
-  readonly registered = inject(ActivatedRoute).snapshot.queryParamMap.has('registered');
 
-  fullName = '';
-  email = '';
-  phone = '';
-  password = '';
-  shiftType: NonNullable<UserProfile['shiftType']> | '' = '';
+  readonly loadingStatus = signal(true);
+  readonly status = signal<SecurityStatusResource | null>(null);
+  readonly activeTab = signal<'signin' | 'signup' | 'reset'>('signin');
+  readonly lastDeferredResponse = signal<string | null>(null);
+  readonly submitting = signal(false);
 
-  submit(form: NgForm): void {
-    if (form.invalid || this.busy()) return;
-    this.error.set('');
-    this.busy.set(true);
-    const credentials = { email: this.email, password: this.password };
-    const request: Observable<unknown> = this.registering
-      ? this.session.register({ ...credentials, fullName: this.fullName, phone: this.phone, shiftType: this.shiftType as NonNullable<UserProfile['shiftType']> })
-      : this.session.login(credentials);
-    request.pipe(finalize(() => this.busy.set(false))).subscribe({
-      next: () => {
-        if (this.registering) {
-          void this.router.navigate(['/login'], { queryParams: { registered: 1 } });
-        } else {
-          void this.router.navigate(['/dashboard']);
-        }
-      },
-      error: (error) => this.error.set((error.status >= 400 && error.status < 500 ? error.error?.message : undefined) || 'No se pudo conectar con la API local. Comprueba que npm run server esté ejecutándose.'),
+  signInEmail = 'jorge.huaman@noxway.pe';
+  signInPassword = 'NoxwayPreview!2026';
+
+  signUpFullName = 'Lucía Mendoza';
+  signUpEmail = 'lucia.mendoza@noxway.pe';
+  signUpPhone = '+51999111222';
+  signUpRole: 'WORKER' | 'TRUSTED_CONTACT' = 'WORKER';
+  signUpPassword = 'NoxwayPreview!2026';
+
+  resetEmail = 'jorge.huaman@noxway.pe';
+
+  ngOnInit(): void {
+    this.iam.loadStatus().subscribe((res) => {
+      this.status.set(res);
+      this.loadingStatus.set(false);
     });
   }
 
+  selectPersona(persona: DemoPersona): void {
+    this.session.switchPersona(persona.id);
+    this.toast.info(`${persona.name} (${persona.role})`);
+    if (persona.role === 'TRUSTED_CONTACT') {
+      this.router.navigateByUrl('/companion/live');
+    } else {
+      this.router.navigateByUrl('/dashboard');
+    }
+  }
+
+  submitSignIn(): void {
+    this.submitting.set(true);
+    this.lastDeferredResponse.set(null);
+    this.iam.signIn({ email: this.signInEmail, password: this.signInPassword }).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.toast.success('Signed in');
+      },
+      error: (err) => {
+        this.submitting.set(false);
+        const msg = extractProblemMessage(err, '501 Not Implemented (IAM deferred)');
+        this.lastDeferredResponse.set(msg);
+        this.toast.info(msg);
+      },
+    });
+  }
+
+  submitSignUp(): void {
+    this.submitting.set(true);
+    this.lastDeferredResponse.set(null);
+    this.iam
+      .signUp({
+        email: this.signUpEmail,
+        password: this.signUpPassword,
+        fullName: this.signUpFullName,
+        phone: this.signUpPhone,
+        role: this.signUpRole,
+        shiftType: 'NIGHT',
+        shiftStart: '22:00',
+        shiftEnd: '06:00',
+        timeZone: 'America/Lima',
+      })
+      .subscribe({
+        next: () => {
+          this.submitting.set(false);
+          this.toast.success('Signed up');
+        },
+        error: (err) => {
+          this.submitting.set(false);
+          const msg = extractProblemMessage(err, '501 Not Implemented (IAM deferred)');
+          this.lastDeferredResponse.set(msg);
+          this.toast.info(msg);
+        },
+      });
+  }
+
+  submitPasswordReset(): void {
+    this.submitting.set(true);
+    this.lastDeferredResponse.set(null);
+    this.iam.requestPasswordReset(this.resetEmail).subscribe({
+      next: () => {
+        this.submitting.set(false);
+      },
+      error: (err) => {
+        this.submitting.set(false);
+        const msg = extractProblemMessage(err, '501 Not Implemented (IAM deferred)');
+        this.lastDeferredResponse.set(msg);
+        this.toast.info(msg);
+      },
+    });
+  }
 }

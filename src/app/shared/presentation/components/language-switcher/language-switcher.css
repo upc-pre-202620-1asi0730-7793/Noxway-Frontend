@@ -1,39 +1,49 @@
-:host {
-  display: inline-block;
+.nx-lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 36px;
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--nx-surface-elevated);
+  border: 1px solid var(--nx-border);
+  box-shadow: var(--nx-shadow-control);
+  transition: background-color 180ms ease, border-color 180ms ease;
 }
 
-.lang-toggle-group {
-  height: 34px !important;
-  background: #111c34 !important;
-  border: 1px solid #1c2a47 !important;
-  border-radius: 8px !important;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+.nx-lang-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--nx-text-muted);
+  height: 28px;
+  min-width: 36px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
 }
 
-::ng-deep .lang-toggle-group .mat-button-toggle {
-  background: transparent !important;
-  color: #94a3b8 !important;
-  border: none !important;
-  font-size: 11.5px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.5px !important;
-  min-width: 38px !important;
-  line-height: 32px !important;
-  transition: all 150ms ease !important;
+.nx-lang-btn:hover:not(.active) {
+  background: var(--nx-surface-hover);
+  color: var(--nx-text);
 }
 
-::ng-deep .lang-toggle-group .mat-button-toggle-checked {
-  background: #2563eb !important;
-  color: #ffffff !important;
+.nx-lang-btn.active {
+  background: var(--nx-primary);
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35);
 }
 
-::ng-deep .lang-toggle-group .mat-button-toggle-button {
-  padding: 0 10px !important;
-  height: 32px !important;
-}
-
-::ng-deep .lang-toggle-group .mat-button-toggle:hover:not(.mat-button-toggle-checked) {
-  background: #162443 !important;
-  color: #cbd5e1 !important;
+.nx-lang-btn:focus-visible {
+  outline: 2px solid var(--nx-primary-focus);
+  outline-offset: 1px;
 }

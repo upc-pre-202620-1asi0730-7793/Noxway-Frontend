@@ -1,52 +1,8 @@
-.access {
-  display: grid;
-  place-items: center;
-  min-height: 100dvh;
-  padding: 24px;
-  background: radial-gradient(circle closest-side, #0e162d 99%, #090e1b 100%);
-  color: #f8fafc;
-  font-family: system-ui, sans-serif;
+.nx-persona-card {
+  gap: 8px;
 }
 
-.panel {
-  display: grid;
-  gap: 16px;
-  width: min(100%, 430px);
-  box-sizing: border-box;
-  padding: clamp(20px, 5vw, 32px);
-  border: 1px solid #253552;
-  border-radius: 16px;
-  background: #10192b;
+.nx-persona-active {
+  border-color: var(--nx-primary-focus);
+  background: var(--nx-primary-soft-bg);
 }
-
-.panel > img {
-  justify-self: center;
-}
-
-h1, p { margin: 0; }
-h1 { font-size: 1.55rem; }
-p, small { color: #cbd5e1; }
-form, label { display: grid; gap: 8px; }
-form { gap: 16px; }
-input, select, button {
-  font: inherit;
-  color: inherit;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #4b6082;
-  background: #0b1323;
-}
-
-button {
-  background: #1d4ed8;
-  cursor: pointer;
-}
-
-button:disabled { opacity: .65; cursor: default; }
-.register-panel { width: min(100%, 600px); }
-.panel h1, .access-intro, .panel > a { text-align: center; }
-.account-type { padding: 8px; border: 1px solid #315599; background: #163467; border-radius: 6px; text-align: center; color: #dbeafe; font-weight: 600; }
-.panel form > button { background: #2563eb; font-weight: 600; }
-label { font-size: .86rem; }
-a { color: #a6c9ff; }
-.error { color: #fda4af; }

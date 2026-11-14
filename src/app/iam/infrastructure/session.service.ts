@@ -1,86 +1,54 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
-import { UserProfile } from '../domain/model/user-profile.entity';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { Observable, tap } from 'rxjs';
+import { ActorContextService } from '../../shared/infrastructure/actor-context.service';
+import {
+  AccountProfileResource,
+  UpdateProfilePayload,
+} from '../domain/model/user-profile.entity';
+import { UserProfileService } from './user-profile.service';
 
-interface Credentials {
-  email: string;
-  password: string;
-}
-
-interface Registration extends Credentials {
-  fullName: string;
-  phone?: string;
-  shiftType: NonNullable<UserProfile['shiftType']>;
-}
-
-export const localApi = '/api/local';
-const sessionKey = 'noxway_local_session';
-
+/**
+ * Coordinates the active actor profile with the backend /api/v1/accounts/me endpoint.
+ * Replaces legacy demo/Express session management while IAM enforcement is deferred.
+ */
 @Injectable({ providedIn: 'root' })
 export class SessionService {
-  private readonly http = inject(HttpClient);
-  private token = sessionStorage.getItem(sessionKey);
-  private readonly demoMode = signal(false);
-  private readonly currentProfile = signal<UserProfile | null>(null);
+  private readonly profileService = inject(UserProfileService);
+  private readonly actorContext = inject(ActorContextService);
 
-  readonly demo = this.demoMode.asReadonly();
-  readonly profile = this.currentProfile.asReadonly();
+  private readonly currentProfile = signal<AccountProfileResource | null>(null);
+  readonly profile = computed(() => {
+    const loaded = this.currentProfile();
+    return loaded && loaded.id === this.actorContext.activeActorId() ? loaded : null;
+  });
+  readonly demo = computed(() => true);
+  readonly activeActor = this.actorContext.activePersona;
 
-  register(data: Registration): Observable<void> {
-    return this.http.post<void>(`${localApi}/auth/register`, data);
-  }
-
-  login(data: Credentials): Observable<{ token: string; profile: UserProfile }> {
-    return this.http.post<{ token: string; profile: UserProfile }>(`${localApi}/auth/login`, data).pipe(
-      tap(({ token, profile }) => {
-        this.clear();
-        this.token = token;
-        sessionStorage.setItem(sessionKey, token);
-        this.currentProfile.set(profile);
-      }),
-    );
-  }
-
-  restore(): Observable<boolean> {
-    if (this.demo() || this.profile()) return of(true);
-    if (!this.token) return of(false);
-    return this.http.get<UserProfile>(`${localApi}/me/profile`, this.requestOptions()).pipe(
+  loadProfile(): Observable<AccountProfileResource> {
+    return this.profileService.getProfile().pipe(
       tap((profile) => this.currentProfile.set(profile)),
-      map(() => true),
-      catchError((error) => {
-        if (error.status === 401) this.clear();
-        return of(false);
-      }),
     );
   }
 
-  saveProfile(profile: UserProfile): Observable<UserProfile> {
-    return this.http.patch<UserProfile>(`${localApi}/me/profile`, profile, this.requestOptions()).pipe(
+  saveProfile(payload: UpdateProfilePayload): Observable<AccountProfileResource> {
+    return this.profileService.updateProfile(payload).pipe(
       tap((updated) => this.currentProfile.set(updated)),
-      catchError((error) => {
-        if (error.status === 401) this.clear();
-        return throwError(() => error);
-      }),
     );
   }
 
-  logout(): void {
-    if (this.token) {
-      this.http.post<void>(`${localApi}/me/logout`, {}, this.requestOptions()).subscribe({ error: () => {} });
+  bindPortal(isCompanion: boolean): boolean {
+    const switched = this.actorContext.syncPortal(isCompanion);
+    if (switched) {
+      this.currentProfile.set(null);
     }
-    this.clear();
+    return switched;
   }
 
-  private clear(): void {
-    this.token = null;
-    sessionStorage.removeItem(sessionKey);
-    sessionStorage.removeItem('noxway_demo');
-    this.demoMode.set(false);
-    this.currentProfile.set(null);
-  }
-
-  requestOptions() {
-    return { headers: { Authorization: `Bearer ${this.token}` } };
+  switchPersona(actorId: string): void {
+    if (this.currentProfile()?.id !== actorId) {
+      this.currentProfile.set(null);
+    }
+    this.actorContext.setActor(actorId);
+    this.loadProfile().subscribe({ error: () => {} });
   }
 }

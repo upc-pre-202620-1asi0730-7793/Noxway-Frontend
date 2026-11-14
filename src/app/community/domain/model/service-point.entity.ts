@@ -1,39 +1,84 @@
-import { BaseEntity } from '../../../shared/domain/model/base-entity';
+export interface ServiceOpeningIntervalResource {
+  dayOfWeek: number;
+  opensAt: string;
+  closesAt: string;
+  closesNextDay: boolean;
+  is24Hours: boolean;
+}
 
-/**
- * Categorization for points of interest rendered on the community services map.
- */
-export type MapPointType = 'pharmacy' | 'gas_station' | 'risk_zone';
-
-/**
- * Represents a service point of interest, safe haven, or hazard zone on the map.
- */
-export interface OpeningInterval { opens: string; closes: string; }
-
-export interface MapPoint extends BaseEntity {
-  /** Daily local opening intervals. Missing means unknown, not always open. */
-  openingHours?: OpeningInterval[];
-  timeZone?: string;
-  /** Point classification */
-  type: MapPointType;
-  /** Human-readable category label (e.g. 'FARMACIA 24H', 'ZONA DE RIESGO') */
-  typeLabel: string;
-  /** Commercial or geographical designation */
+export interface ServicePointResource {
+  id: string;
+  reportedBy: string;
+  reporterName: string;
   name: string;
-  /** Distance and district description relative to the worker */
-  distance: string;
-  /** Trust metric evaluated by the community */
-  communityTrust: string;
-  /** Validation note showing shift worker endorsements */
-  validatedBy: string;
-  /** List of concrete safety attributes or hazard notes */
-  safetyMeasures: string[];
-  /** Latitude coordinate */
-  lat: number;
-  /** Longitude coordinate */
-  lng: number;
-  /** Material icon identifier */
-  icon: string;
-  /** Compact tag displayed on the map pin */
-  tag: string;
+  type: 'PHARMACY' | 'GAS_STATION' | 'HOSPITAL' | 'POLICE_STATION' | 'OTHER' | string;
+  latitude: number;
+  longitude: number;
+  timeZone: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | string;
+  openingHours: ServiceOpeningIntervalResource[];
+  trustScore: number;
+  upvotes: number;
+  downvotes: number;
+  myVote: number;
+  openAtReference: boolean;
+  referenceTime?: string;
+  createdAt: string;
+}
+
+export interface SubmitServicePointPayload {
+  name: string;
+  type: 'PHARMACY' | 'GAS_STATION' | 'HOSPITAL' | 'POLICE_STATION' | 'OTHER';
+  latitude: number;
+  longitude: number;
+  timeZone: string;
+  openingHours: ServiceOpeningIntervalResource[];
+}
+
+export interface ServiceVoteResource {
+  id: string;
+  serviceId: string;
+  accountId: string;
+  direction: number;
+  createdAt: string;
+}
+
+export interface RiskZoneResource {
+  id: string;
+  reportedBy: string;
+  reporterName: string;
+  description: string;
+  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | string;
+  latitude: number;
+  longitude: number;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'RESOLVED' | string;
+  createdAt: string;
+}
+
+export interface ReportRiskZonePayload {
+  description: string;
+  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+  latitude: number;
+  longitude: number;
+}
+
+export interface RouteRatingResource {
+  id: string;
+  commuteId: string;
+  workerId: string;
+  score: number;
+  comments: string;
+  createdAt: string;
+}
+
+export interface MapPoint {
+  type: string;
+  timeZone?: string;
+  openingHours?: { opens: string; closes: string }[];
+}
+
+export interface RateRoutePayload {
+  commuteId: string;
+  score: number;
+  comments: string;
 }
