@@ -27,7 +27,6 @@
   <section class="nx-card">
     <div class="nx-card-header">
       <h3 class="nx-card-title">{{ languageService.ui('Invitar Contacto de Confianza') }}</h3>
-      <span class="nx-badge nx-badge-blue">POST /trust-links</span>
     </div>
 
     <form class="nx-form-grid" (ngSubmit)="inviteContact()">
@@ -85,7 +84,7 @@
               <strong>{{ link.contactName }}</strong>
               <span class="nx-muted"> · {{ link.contactEmail }} ({{ link.contactPhone }})</span>
               <div class="nx-muted">
-                Worker: {{ link.workerName }} ({{ link.workerShiftType ?? 'N/A' }})
+                {{ languageService.ui('Trabajador') }}: {{ link.workerName }} ({{ languageService.code(link.workerShiftType ?? 'N/A') }})
               </div>
             </div>
 
@@ -95,7 +94,7 @@
                 [class.nx-badge-emerald]="link.status === 'ACTIVE'"
                 [class.nx-badge-amber]="link.status === 'PENDING'"
                 [class.nx-badge-red]="link.status === 'REJECTED' || link.status === 'REVOKED'">
-                {{ link.status }}
+                {{ languageService.code(link.status) }}
               </span>
 
               @if (isIncomingPending(link)) {

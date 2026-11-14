@@ -116,7 +116,7 @@
               </button>
             </div>
           } @else if (item.riskZone; as zone) {
-            <p class="nx-place-status">{{ zone.riskLevel }} · {{ zone.status }}</p>
+            <p class="nx-place-status">{{ languageService.code(zone.riskLevel) }} · {{ languageService.code(zone.status) }}</p>
             @if (zone.status !== 'RESOLVED') {
               <div class="nx-actions" style="margin: 8px 0">
                 <button

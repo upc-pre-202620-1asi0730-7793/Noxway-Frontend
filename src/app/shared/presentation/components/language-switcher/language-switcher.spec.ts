@@ -52,4 +52,24 @@ describe('LanguageSwitcher', () => {
     expect(buttons[1].getAttribute('aria-pressed')).toBe('true');
     expect(store.get('noxway_lang')).toBe('en');
   });
+
+  it('should format domain enum codes in Spanish and English without raw underscores', () => {
+    const languageService = TestBed.inject(LanguageService);
+
+    languageService.setLanguage('es');
+    expect(languageService.code('NIGHT')).toBe('Nocturno');
+    expect(languageService.code('FAMILY_CREW')).toBe('Cuadrilla Familiar');
+    expect(languageService.code('WORKER')).toBe('Trabajador');
+    expect(languageService.code('TRUSTED_CONTACT')).toBe('Contacto de Confianza');
+    expect(languageService.code('PENDING')).toBe('Pendiente');
+    expect(languageService.code('ACTIVE')).toBe('Activo');
+
+    languageService.setLanguage('en');
+    expect(languageService.code('NIGHT')).toBe('Night');
+    expect(languageService.code('FAMILY_CREW')).toBe('Family Crew');
+    expect(languageService.code('WORKER')).toBe('Worker');
+    expect(languageService.code('TRUSTED_CONTACT')).toBe('Trusted Contact');
+    expect(languageService.code('PENDING')).toBe('Pending');
+    expect(languageService.code('ACTIVE')).toBe('Active');
+  });
 });

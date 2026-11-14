@@ -4,7 +4,7 @@
       <h2 class="nx-title">{{ languageService.ui('Mi Perfil & Jornada') }}</h2>
       <p class="nx-subtitle">
         {{ profile()?.email ?? actorContext.activePersona().email }} ·
-        <span class="nx-badge nx-badge-blue">{{ profile()?.role ?? actorContext.activePersona().role }}</span>
+        <span class="nx-badge nx-badge-blue">{{ languageService.code(profile()?.role ?? actorContext.activePersona().role) }}</span>
       </p>
     </div>
     <button type="button" class="nx-btn nx-btn-secondary" (click)="loadData()">
@@ -26,7 +26,6 @@
       <section class="nx-card">
         <div class="nx-card-header">
           <h3 class="nx-card-title">{{ languageService.ui('Datos Personales y Turno') }}</h3>
-          <span class="nx-badge nx-badge-emerald">PUT /accounts/me</span>
         </div>
 
         <form class="nx-form-grid" (ngSubmit)="saveProfile()">
@@ -53,9 +52,9 @@
             <div class="nx-field">
               <label class="nx-label" for="prof-shift">{{ languageService.ui('Tipo de turno') }}</label>
               <select id="prof-shift" class="nx-select" name="shiftType" [(ngModel)]="shiftType">
-                <option value="DAY">DAY</option>
-                <option value="NIGHT">NIGHT</option>
-                <option value="ROTATING">ROTATING</option>
+                <option value="DAY">{{ languageService.code('DAY') }}</option>
+                <option value="NIGHT">{{ languageService.code('NIGHT') }}</option>
+                <option value="ROTATING">{{ languageService.code('ROTATING') }}</option>
               </select>
             </div>
 
@@ -82,7 +81,7 @@
       <section class="nx-card">
         <div class="nx-card-header">
           <h3 class="nx-card-title">{{ languageService.ui('Canales de Notificación') }}</h3>
-          <span class="nx-badge nx-badge-slate">{{ preferences().length }} canales</span>
+          <span class="nx-badge nx-badge-slate">{{ preferences().length }} {{ languageService.ui('canales') }}</span>
         </div>
 
         @if (missingChannels().length > 0) {
@@ -92,7 +91,7 @@
                 type="button"
                 class="nx-btn nx-btn-secondary nx-btn-sm"
                 (click)="configureChannel(channel)">
-                + Activar {{ channel }}
+                + {{ languageService.ui('Activar') }} {{ languageService.code(channel) }}
               </button>
             }
           </div>
@@ -105,7 +104,7 @@
             @for (pref of preferences(); track pref.channel) {
               <div class="nx-list-item nx-pref-row">
                 <div>
-                  <strong>{{ pref.channel }}</strong>
+                  <strong>{{ languageService.code(pref.channel) }}</strong>
                   <div class="nx-muted">
                     {{ pref.priorityStart }} - {{ pref.priorityEnd }} ({{ pref.timeZone }})
                   </div>

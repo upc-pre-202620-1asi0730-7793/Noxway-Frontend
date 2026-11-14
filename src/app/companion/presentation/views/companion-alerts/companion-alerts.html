@@ -38,7 +38,7 @@
             <div class="nx-list-item">
               <div>
                 <strong>{{ alert.workerName }}</strong>
-                <span class="nx-badge nx-badge-slate" style="margin-left: 8px">{{ alert.channel }}</span>
+                <span class="nx-badge nx-badge-slate" style="margin-left: 8px">{{ languageService.code(alert.channel) }}</span>
                 <div class="nx-muted">{{ alert.message }}</div>
                 <div class="nx-muted">{{ alert.createdAt | date: 'short' }}</div>
               </div>
@@ -47,7 +47,7 @@
                 [class.nx-badge-emerald]="alert.status === 'DELIVERED'"
                 [class.nx-badge-amber]="alert.status === 'PENDING' || alert.status === 'PENDING_PROVIDER'"
                 [class.nx-badge-red]="alert.status === 'FAILED'">
-                {{ alert.status }}
+                {{ languageService.code(alert.status) }}
               </span>
             </div>
           } @empty {
@@ -69,7 +69,7 @@
                   type="button"
                   class="nx-btn nx-btn-secondary nx-btn-sm"
                   (click)="configureChannel(channel)">
-                  + Activar {{ channel }}
+                  + {{ languageService.ui('Activar') }} {{ languageService.code(channel) }}
                 </button>
               }
             </div>
@@ -78,7 +78,7 @@
             @for (pref of preferences(); track pref.channel) {
               <div class="nx-list-item">
                 <div>
-                  <strong>{{ pref.channel }}</strong>
+                  <strong>{{ languageService.code(pref.channel) }}</strong>
                   <div class="nx-muted">{{ pref.priorityStart }} - {{ pref.priorityEnd }}</div>
                 </div>
                 <label class="nx-checkbox-row">
@@ -86,7 +86,7 @@
                     type="checkbox"
                     [checked]="pref.enabled"
                     (change)="toggleChannel(pref, $any($event.target).checked)" />
-                  <span>{{ pref.enabled ? 'Activo' : 'Pausado' }}</span>
+                  <span>{{ pref.enabled ? languageService.ui('Activo') : languageService.ui('Pausado') }}</span>
                 </label>
               </div>
             }
@@ -102,11 +102,11 @@
             @for (item of deliveries(); track item.id) {
               <div class="nx-list-item">
                 <div>
-                  <strong>{{ item.channel }} · {{ item.workerName }}</strong>
+                  <strong>{{ languageService.code(item.channel) }} · {{ item.workerName }}</strong>
                   <div class="nx-muted">{{ item.message }}</div>
                 </div>
                 <div class="nx-actions">
-                  <span class="nx-badge nx-badge-amber">{{ item.status }}</span>
+                  <span class="nx-badge nx-badge-amber">{{ languageService.code(item.status) }}</span>
                   <button
                     type="button"
                     class="nx-btn nx-btn-secondary nx-btn-sm"

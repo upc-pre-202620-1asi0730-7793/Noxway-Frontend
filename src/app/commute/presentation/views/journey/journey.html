@@ -30,8 +30,8 @@
         <div>
           <h3 class="nx-card-title">{{ active.origin }} -> {{ active.destination }}</h3>
           <div class="nx-muted">
-            {{ active.transport }} · ETA: {{ active.estimatedArrivalTime | date: 'short' }} ·
-            Tolerancia: {{ active.toleranceMinutes }} min
+            {{ active.transport }} · {{ languageService.ui('Llegada est.') }}: {{ active.estimatedArrivalTime | date: 'short' }} ·
+            {{ languageService.ui('Tolerancia') }}: {{ active.toleranceMinutes }} min
           </div>
         </div>
         <span
@@ -39,7 +39,7 @@
           [class.nx-badge-blue]="active.status === 'ACTIVE'"
           [class.nx-badge-amber]="active.status === 'DELAYED'"
           [class.nx-badge-red]="active.status === 'OVERDUE'">
-          {{ active.status }}
+          {{ languageService.code(active.status) }}
         </span>
       </div>
 
@@ -71,7 +71,7 @@
           </div>
           <div class="nx-form-grid">
             <div class="nx-field">
-              <label class="nx-label" for="j-lat">Latitud</label>
+              <label class="nx-label" for="j-lat">{{ languageService.ui('Latitud') }}</label>
               <input
                 id="j-lat"
                 class="nx-input"
@@ -81,7 +81,7 @@
                 (ngModelChange)="syncPingLocationFromInputs()" />
             </div>
             <div class="nx-field">
-              <label class="nx-label" for="j-lng">Longitud</label>
+              <label class="nx-label" for="j-lng">{{ languageService.ui('Longitud') }}</label>
               <input
                 id="j-lng"
                 class="nx-input"
@@ -91,7 +91,7 @@
                 (ngModelChange)="syncPingLocationFromInputs()" />
             </div>
             <div class="nx-field">
-              <label class="nx-label" for="j-spd">Velocidad (km/h)</label>
+              <label class="nx-label" for="j-spd">{{ languageService.ui('Velocidad (km/h)') }}</label>
               <input id="j-spd" class="nx-input" type="number" [(ngModel)]="pingSpeed" />
             </div>
           </div>
@@ -105,20 +105,20 @@
           <h4 class="nx-card-title">{{ languageService.ui('Emitir Alerta / Incidente SOS') }}</h4>
           <div class="nx-form-grid">
             <div class="nx-field">
-              <label class="nx-label" for="j-inc-type">Tipo</label>
+              <label class="nx-label" for="j-inc-type">{{ languageService.ui('Tipo') }}</label>
               <select id="j-inc-type" class="nx-select" [(ngModel)]="incidentType">
-                <option value="SOS">SOS</option>
-                <option value="DELAY">DELAY</option>
-                <option value="DEVIATION">DEVIATION</option>
-                <option value="OTHER">OTHER</option>
+                <option value="SOS">{{ languageService.code('SOS') }}</option>
+                <option value="DELAY">{{ languageService.code('DELAY') }}</option>
+                <option value="DEVIATION">{{ languageService.code('DEVIATION') }}</option>
+                <option value="OTHER">{{ languageService.code('OTHER') }}</option>
               </select>
             </div>
             <div class="nx-field">
-              <label class="nx-label" for="j-delay">Demora (min)</label>
+              <label class="nx-label" for="j-delay">{{ languageService.ui('Demora (min)') }}</label>
               <input id="j-delay" class="nx-input" type="number" [(ngModel)]="delayMinutes" />
             </div>
             <div class="nx-field nx-field-full">
-              <label class="nx-label" for="j-inc-desc">Descripción</label>
+              <label class="nx-label" for="j-inc-desc">{{ languageService.ui('Descripción') }}</label>
               <input
                 id="j-inc-desc"
                 class="nx-input"
@@ -167,7 +167,7 @@
               @for (inc of incidents(); track inc.id) {
                 <div class="nx-list-item">
                   <div>
-                    <strong>{{ inc.type }}</strong>
+                    <strong>{{ languageService.code(inc.type) }}</strong>
                     <div class="nx-muted">{{ inc.description }}</div>
                   </div>
                   <div class="nx-actions">
@@ -175,7 +175,7 @@
                       class="nx-badge"
                       [class.nx-badge-red]="inc.status === 'OPEN'"
                       [class.nx-badge-emerald]="inc.status === 'RESOLVED'">
-                      {{ inc.status }}
+                      {{ languageService.code(inc.status) }}
                     </span>
                     @if (inc.status === 'OPEN') {
                       <button
@@ -198,12 +198,11 @@
     <section class="nx-card">
       <div class="nx-card-header">
         <h3 class="nx-card-title">{{ languageService.ui('Iniciar Nuevo Trayecto Seguro') }}</h3>
-        <span class="nx-badge nx-badge-blue">POST /commutes</span>
       </div>
 
       <form class="nx-form-grid" (ngSubmit)="startCommute()">
         <div class="nx-field">
-          <label class="nx-label" for="j-orig">Origen</label>
+          <label class="nx-label" for="j-orig">{{ languageService.ui('Origen') }}</label>
           <input
             id="j-orig"
             class="nx-input"
@@ -213,7 +212,7 @@
             required />
         </div>
         <div class="nx-field">
-          <label class="nx-label" for="j-dest">Destino</label>
+          <label class="nx-label" for="j-dest">{{ languageService.ui('Destino') }}</label>
           <input
             id="j-dest"
             class="nx-input"
@@ -223,7 +222,7 @@
             required />
         </div>
         <div class="nx-field">
-          <label class="nx-label" for="j-trans">Transporte</label>
+          <label class="nx-label" for="j-trans">{{ languageService.ui('Transporte') }}</label>
           <select id="j-trans" class="nx-select" name="transport" [(ngModel)]="transport">
             <option value="Motocicleta">Motocicleta</option>
             <option value="Bicicleta">Bicicleta</option>
@@ -233,11 +232,11 @@
           </select>
         </div>
         <div class="nx-field">
-          <label class="nx-label" for="j-dur">Duración estimada (min)</label>
+          <label class="nx-label" for="j-dur">{{ languageService.ui('Duración estimada (min)') }}</label>
           <input id="j-dur" class="nx-input" type="number" min="5" name="durationMinutes" [(ngModel)]="durationMinutes" />
         </div>
         <div class="nx-field">
-          <label class="nx-label" for="j-tol">Tolerancia antes de alerta (min)</label>
+          <label class="nx-label" for="j-tol">{{ languageService.ui('Tolerancia antes de alerta (min)') }}</label>
           <input id="j-tol" class="nx-input" type="number" min="5" name="toleranceMinutes" [(ngModel)]="toleranceMinutes" />
         </div>
         <div class="nx-field nx-field-full">
@@ -271,7 +270,7 @@
             </div>
 
             <div class="nx-actions">
-              <span class="nx-badge nx-badge-emerald">{{ item.status }}</span>
+              <span class="nx-badge nx-badge-emerald">{{ languageService.code(item.status) }}</span>
               @if (ratedCommuteIds().has(item.id)) {
                 <span class="nx-badge nx-badge-blue">{{ languageService.ui('Calificada') }}</span>
               } @else {
@@ -299,7 +298,7 @@
                   class="nx-btn nx-btn-primary nx-btn-sm"
                   [disabled]="busy()"
                   (click)="submitRouteRating(item.id)">
-                  Enviar
+                  {{ languageService.ui('Enviar') }}
                 </button>
               </div>
             }

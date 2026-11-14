@@ -5,7 +5,7 @@
       <p class="nx-subtitle">
         {{
           languageService.ui(
-            'Acepta o rechaza solicitudes de acompañamiento nocturno y membresías FAMILY_CREW.'
+            'Acepta o rechaza solicitudes de acompañamiento nocturno y membresías de Cuadrilla Familiar.'
           )
         }}
       </p>
@@ -36,7 +36,7 @@
               <div>
                 <strong>{{ link.workerName }} -> {{ link.contactName }}</strong>
                 <div class="nx-muted">
-                  {{ link.workerEmail }} · Turno: {{ link.workerShiftType ?? 'N/A' }}
+                  {{ link.workerEmail }} · {{ languageService.ui('Turno') }}: {{ languageService.code(link.workerShiftType ?? 'N/A') }}
                 </div>
               </div>
               <div class="nx-actions">
@@ -45,7 +45,7 @@
                   [class.nx-badge-emerald]="link.status === 'ACTIVE'"
                   [class.nx-badge-amber]="link.status === 'PENDING'"
                   [class.nx-badge-red]="link.status === 'REJECTED' || link.status === 'REVOKED'">
-                  {{ link.status }}
+                  {{ languageService.code(link.status) }}
                 </span>
 
                 @if (link.status === 'PENDING' && link.contactId === actorContext.activeActorId()) {
@@ -53,13 +53,13 @@
                     type="button"
                     class="nx-btn nx-btn-success nx-btn-sm"
                     (click)="respondTrustLink(link.id, true)">
-                    Aceptar
+                    {{ languageService.ui('Aceptar') }}
                   </button>
                   <button
                     type="button"
                     class="nx-btn nx-btn-danger nx-btn-sm"
                     (click)="respondTrustLink(link.id, false)">
-                    Rechazar
+                    {{ languageService.ui('Rechazar') }}
                   </button>
                 }
               </div>
@@ -81,23 +81,23 @@
           @for (inv of familyInvites(); track inv.id) {
             <div class="nx-list-item">
               <div>
-                <strong>{{ inv.planName }} ({{ inv.planCode }})</strong>
-                <div class="nx-muted">Titular: {{ inv.ownerName }}</div>
+                <strong>{{ inv.planName }} ({{ languageService.code(inv.planCode) }})</strong>
+                <div class="nx-muted">{{ languageService.ui('Titular') }}: {{ inv.ownerName }}</div>
               </div>
               <div class="nx-actions">
-                <span class="nx-badge nx-badge-amber">{{ inv.status }}</span>
+                <span class="nx-badge nx-badge-amber">{{ languageService.code(inv.status) }}</span>
                 @if (inv.status === 'PENDING') {
                   <button
                     type="button"
                     class="nx-btn nx-btn-success nx-btn-sm"
                     (click)="respondFamilyInvite(inv.id, true)">
-                    Aceptar
+                    {{ languageService.ui('Aceptar') }}
                   </button>
                   <button
                     type="button"
                     class="nx-btn nx-btn-danger nx-btn-sm"
                     (click)="respondFamilyInvite(inv.id, false)">
-                    Rechazar
+                    {{ languageService.ui('Rechazar') }}
                   </button>
                 }
               </div>

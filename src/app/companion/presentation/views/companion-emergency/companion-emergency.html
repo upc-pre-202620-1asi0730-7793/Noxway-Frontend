@@ -26,7 +26,7 @@
               <strong>{{ worker.workerName }} ({{ worker.workerPhone }})</strong>
               @for (inc of worker.openIncidents; track inc.id) {
                 <div class="nx-muted">
-                  <strong>{{ inc.type }}</strong> · {{ inc.description }}
+                  <strong>{{ languageService.code(inc.type) }}</strong> · {{ inc.description }}
                 </div>
               }
             </div>

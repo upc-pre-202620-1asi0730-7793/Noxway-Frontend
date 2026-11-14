@@ -4,7 +4,7 @@
       <h2 class="nx-title">{{ languageService.ui('Mi Perfil de Contacto de Confianza') }}</h2>
       <p class="nx-subtitle">
         {{ profile()?.email ?? actorContext.activePersona().email }} ·
-        <span class="nx-badge nx-badge-emerald">{{ profile()?.role ?? actorContext.activePersona().role }}</span>
+        <span class="nx-badge nx-badge-emerald">{{ languageService.code(profile()?.role ?? actorContext.activePersona().role) }}</span>
       </p>
     </div>
   </div>
@@ -17,7 +17,6 @@
     <section class="nx-card">
       <div class="nx-card-header">
         <h3 class="nx-card-title">{{ languageService.ui('Información de Contacto') }}</h3>
-        <span class="nx-badge nx-badge-emerald">PUT /accounts/me</span>
       </div>
 
       <form class="nx-form-grid" (ngSubmit)="save()">

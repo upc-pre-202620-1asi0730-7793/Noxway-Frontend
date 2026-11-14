@@ -73,7 +73,7 @@
     <div class="nx-grid-4">
       <div class="nx-card">
         <span class="nx-kpi-label">{{ languageService.ui('Jornada Nocturna') }}</span>
-        <span class="nx-kpi-value">{{ data.profile?.shiftType ?? data.profile?.role ?? 'NIGHT' }}</span>
+        <span class="nx-kpi-value">{{ languageService.code(data.profile?.shiftType ?? data.profile?.role ?? 'NIGHT') }}</span>
         <span class="nx-kpi-meta">
           {{
             data.profile?.shiftStart
@@ -89,7 +89,7 @@
         <span class="nx-kpi-meta">
           {{
             data.activeCommute
-              ? ('En curso: ' + data.activeCommute.destination)
+              ? (languageService.ui('En curso') + ': ' + data.activeCommute.destination)
               : languageService.ui('Sin trayecto abierto')
           }}
         </span>
@@ -107,7 +107,7 @@
         <span class="nx-kpi-label">{{ languageService.ui('Promedio Descanso (7d)') }}</span>
         <span class="nx-kpi-value">{{ sleepHoursLabel() }}</span>
         <span class="nx-kpi-meta">
-          Meta: {{ targetHoursLabel() }} · Plan: {{ data.activeSubscriptionPlan }}
+          {{ languageService.ui('Meta') }}: {{ targetHoursLabel() }} · {{ languageService.ui('Plan') }}: {{ languageService.code(data.activeSubscriptionPlan) }}
         </span>
       </div>
     </div>
@@ -123,7 +123,7 @@
             [class.nx-badge-amber]="data.activeCommute?.status === 'DELAYED'"
             [class.nx-badge-red]="data.activeCommute?.status === 'OVERDUE'"
             [class.nx-badge-blue]="data.activeCommute?.status === 'ACTIVE'">
-            {{ data.activeCommute?.status ?? 'STANDBY' }}
+            {{ languageService.code(data.activeCommute?.status ?? 'STANDBY') }}
           </span>
         </div>
 
@@ -159,7 +159,7 @@
       <section class="nx-card">
         <div class="nx-card-header">
           <h3 class="nx-card-title">{{ languageService.ui('Últimos Desplazamientos') }}</h3>
-          <a routerLink="/benefits" class="nx-badge nx-badge-blue">{{ data.activeSubscriptionPlan }}</a>
+          <a routerLink="/benefits" class="nx-badge nx-badge-blue">{{ languageService.code(data.activeSubscriptionPlan) }}</a>
         </div>
 
         @if (data.recentCommutes.length === 0) {
@@ -180,7 +180,7 @@
                   [class.nx-badge-amber]="item.status === 'DELAYED'"
                   [class.nx-badge-red]="item.status === 'OVERDUE'"
                   [class.nx-badge-blue]="item.status === 'ACTIVE'">
-                  {{ item.status }}
+                  {{ languageService.code(item.status) }}
                 </span>
               </div>
             }
