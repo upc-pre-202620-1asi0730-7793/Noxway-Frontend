@@ -55,15 +55,40 @@
       <div class="nx-grid-2">
         <!-- GPS Ping Box -->
         <div class="nx-card nx-subcard">
-          <h4 class="nx-card-title">{{ languageService.ui('Registrar Ping GPS') }}</h4>
+          <div class="nx-card-header">
+            <h4 class="nx-card-title">{{ languageService.ui('Registrar Ping GPS') }}</h4>
+            <button
+              type="button"
+              class="nx-btn nx-btn-secondary nx-btn-sm"
+              (click)="useMyLocationForPing()">
+              {{ languageService.ui('Usar mi ubicación') }}
+            </button>
+          </div>
+          <div class="nx-ping-map-wrap">
+            <app-report-location
+              [location]="pingLocation()"
+              (locationChange)="onPingLocationSelected($event)" />
+          </div>
           <div class="nx-form-grid">
             <div class="nx-field">
               <label class="nx-label" for="j-lat">Latitud</label>
-              <input id="j-lat" class="nx-input" type="number" step="0.0001" [(ngModel)]="pingLat" />
+              <input
+                id="j-lat"
+                class="nx-input"
+                type="number"
+                step="0.0001"
+                [(ngModel)]="pingLat"
+                (ngModelChange)="syncPingLocationFromInputs()" />
             </div>
             <div class="nx-field">
               <label class="nx-label" for="j-lng">Longitud</label>
-              <input id="j-lng" class="nx-input" type="number" step="0.0001" [(ngModel)]="pingLng" />
+              <input
+                id="j-lng"
+                class="nx-input"
+                type="number"
+                step="0.0001"
+                [(ngModel)]="pingLng"
+                (ngModelChange)="syncPingLocationFromInputs()" />
             </div>
             <div class="nx-field">
               <label class="nx-label" for="j-spd">Velocidad (km/h)</label>
@@ -117,8 +142,16 @@
             <div class="nx-list">
               @for (ping of telemetry(); track ping.id) {
                 <div class="nx-list-item">
-                  <span class="nx-mono">{{ ping.latitude | number: '1.4-4' }}, {{ ping.longitude | number: '1.4-4' }}</span>
-                  <span class="nx-muted">{{ ping.speed }} km/h · {{ ping.recordedAt | date: 'shortTime' }}</span>
+                  <div>
+                    <span class="nx-mono">{{ ping.latitude | number: '1.4-4' }}, {{ ping.longitude | number: '1.4-4' }}</span>
+                    <div class="nx-muted">{{ ping.speed }} km/h · {{ ping.recordedAt | date: 'shortTime' }}</div>
+                  </div>
+                  <button
+                    type="button"
+                    class="nx-btn nx-btn-secondary nx-btn-sm"
+                    (click)="openPingOnMap(ping)">
+                    {{ languageService.ui('Ver en mapa') }}
+                  </button>
                 </div>
               }
             </div>

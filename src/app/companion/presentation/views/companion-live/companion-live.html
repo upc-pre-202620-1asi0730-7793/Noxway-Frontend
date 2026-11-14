@@ -67,10 +67,18 @@
 
           @if (worker.latestPing; as ping) {
             <div class="nx-list-item">
-              <span>Último GPS</span>
-              <span class="nx-mono">
-                {{ ping.latitude | number: '1.4-4' }}, {{ ping.longitude | number: '1.4-4' }} ({{ ping.speed }} km/h)
-              </span>
+              <div>
+                <span>{{ languageService.ui('Último GPS') }}</span>
+                <div class="nx-mono">
+                  {{ ping.latitude | number: '1.4-4' }}, {{ ping.longitude | number: '1.4-4' }} ({{ ping.speed }} km/h)
+                </div>
+              </div>
+              <button
+                type="button"
+                class="nx-btn nx-btn-secondary nx-btn-sm"
+                (click)="openPingOnMap(worker.workerName, ping.latitude, ping.longitude)">
+                {{ languageService.ui('Ver en mapa') }}
+              </button>
             </div>
           }
 

@@ -1,9 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import { CommunityService } from '../../../../community/infrastructure/community.service';
 import { RouteRatingResource } from '../../../../community/domain/model/service-point.entity';
+import {
+  ReportCoordinates,
+  ReportLocation,
+} from '../../../../community/presentation/components/report-location/report-location';
 import {
   CommuteResource,
   SafetyIncidentResource,
@@ -18,11 +23,12 @@ import { extractProblemMessage } from '../../../../shared/infrastructure/problem
 @Component({
   selector: 'app-journey',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReportLocation],
   templateUrl: './journey.html',
   styleUrl: './journey.css',
 })
 export class Journey {
+  private readonly router = inject(Router);
   private readonly commuteService = inject(CommuteService);
   private readonly communityService = inject(CommunityService);
   private readonly toast = inject(NotificationToastService);
@@ -57,6 +63,10 @@ export class Journey {
   // Telemetry & Delay & Incident controls
   pingLat = -12.0114;
   pingLng = -77.0612;
+  readonly pingLocation = signal<ReportCoordinates | null>({
+    lat: -12.0114,
+    lon: -77.0612,
+  });
   pingSpeed = 34;
   delayMinutes = 15;
   incidentType: 'SOS' | 'DELAY' | 'DEVIATION' | 'OTHER' = 'SOS';
@@ -141,6 +151,57 @@ export class Journey {
           this.toast.error(msg);
         },
       });
+  }
+
+  onPingLocationSelected(coords: ReportCoordinates | null): void {
+    if (!coords) return;
+    this.pingLat = Number(coords.lat.toFixed(5));
+    this.pingLng = Number(coords.lon.toFixed(5));
+    this.pingLocation.set({ lat: this.pingLat, lon: this.pingLng });
+  }
+
+  syncPingLocationFromInputs(): void {
+    const lat = Number(this.pingLat);
+    const lon = Number(this.pingLng);
+    if (Number.isFinite(lat) && Number.isFinite(lon)) {
+      this.pingLocation.set({ lat, lon });
+    }
+  }
+
+  useMyLocationForPing(): void {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      this.onPingLocationSelected({ lat: -12.0464, lon: -77.0428 });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        this.onPingLocationSelected({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+        });
+        this.toast.info(this.languageService.ui('Ubicación GPS obtenida.'));
+      },
+      () => {
+        this.onPingLocationSelected({ lat: -12.0464, lon: -77.0428 });
+        this.toast.info(
+          this.languageService.ui('Usando ubicación de referencia en Lima Centro.'),
+        );
+      },
+      { enableHighAccuracy: true, timeout: 6000 },
+    );
+  }
+
+  openPingOnMap(ping: TelemetryPingResource): void {
+    const active = this.activeCommute();
+    const title = active ? `Ping GPS (${active.origin} -> ${active.destination})` : 'Ping GPS';
+    void this.router.navigate(['/map'], {
+      queryParams: {
+        lat: ping.latitude,
+        lng: ping.longitude,
+        title,
+      },
+    });
   }
 
   sendPing(): void {

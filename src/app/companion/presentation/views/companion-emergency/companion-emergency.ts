@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, of } from 'rxjs';
 import { CompanionLiveResource } from '../../../domain/model/companion.entity';
 import { CompanionService } from '../../../infrastructure/companion.service';
@@ -28,6 +29,7 @@ const PERU_EMERGENCY_LINES: readonly EmergencyLine[] = [
   styleUrl: './companion-emergency.css',
 })
 export class CompanionEmergency {
+  private readonly router = inject(Router);
   private readonly companionService = inject(CompanionService);
   readonly actorContext = inject(ActorContextService);
   readonly languageService = inject(LanguageService);
@@ -48,6 +50,16 @@ export class CompanionEmergency {
           .pipe(catchError(() => of([])))
           .subscribe((items) => this.monitored.set(items));
       });
+    });
+  }
+
+  openPingOnMap(workerName: string, latitude: number, longitude: number): void {
+    void this.router.navigate(['/map'], {
+      queryParams: {
+        lat: latitude,
+        lng: longitude,
+        title: `SOS · ${workerName}`,
+      },
     });
   }
 }

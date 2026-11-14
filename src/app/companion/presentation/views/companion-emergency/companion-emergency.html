@@ -31,9 +31,17 @@
               }
             </div>
             @if (worker.latestPing; as ping) {
-              <span class="nx-badge nx-badge-amber nx-mono">
-                GPS: {{ ping.latitude | number: '1.4-4' }}, {{ ping.longitude | number: '1.4-4' }}
-              </span>
+              <div class="nx-actions">
+                <span class="nx-badge nx-badge-amber nx-mono">
+                  GPS: {{ ping.latitude | number: '1.4-4' }}, {{ ping.longitude | number: '1.4-4' }}
+                </span>
+                <button
+                  type="button"
+                  class="nx-btn nx-btn-secondary nx-btn-sm"
+                  (click)="openPingOnMap(worker.workerName, ping.latitude, ping.longitude)">
+                  {{ languageService.ui('Ver en mapa') }}
+                </button>
+              </div>
             }
           </div>
         }

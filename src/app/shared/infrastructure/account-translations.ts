@@ -264,5 +264,9 @@ export const accountTranslations: Readonly<Record<string, string>> = {
   "No verificado": "Unverified",
   "Retirar voto": "Retract vote",
   "Marcar resuelta": "Mark resolved",
-  "Selecciona un establecimiento o punto del mapa para ver su detalle.": "Select a place or map pin to see its details."
+  "Selecciona un establecimiento o punto del mapa para ver su detalle.": "Select a place or map pin to see its details.",
+  "Ver en mapa": "View on map",
+  "Último GPS": "Latest GPS",
+  "Ubicación GPS obtenida.": "GPS location acquired.",
+  "Usando ubicación de referencia en Lima Centro.": "Using reference location in Downtown Lima."
 };
