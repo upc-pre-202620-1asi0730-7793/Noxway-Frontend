@@ -1,0 +1,354 @@
+@startuml
+' Noxway Frontend - Domain, Infrastructure & Presentation Class Diagram
+' Architecture: Bounded-Context Layered Architecture (Domain, Infrastructure, Presentation)
+' Technology Stack: Angular 21, Signals, TypeScript 5.9, Leaflet, OpenFreeMap PBF Vector Tiles
+
+title
+  <b>Noxway Frontend - Bounded-Context Class & Component Diagram</b>
+  <i>Architecture: Domain-Driven Frontend (domain / infrastructure / presentation)</i>
+  <i>Runtime: Angular 21 | Signals | Leaflet + OpenStreetMap + OpenFreeMap | RFC 9457 Problem Details</i>
+end title
+
+header Noxway Frontend - Architecture & Component Model
+footer Page %page% of %lastpage% - Domain-Driven Angular SPA
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam roundcorner 5
+skinparam dpi 150
+left to right direction
+
+skinparam class {
+  BackgroundColor White
+  ArrowColor #2C3E50
+  BorderColor #2C3E50
+}
+skinparam class<<entity>> {
+  BackgroundColor #E3F2FD
+  BorderColor #1565C0
+}
+skinparam class<<service>> {
+  BackgroundColor #F3E5F5
+  BorderColor #7B1FA2
+}
+skinparam class<<view>> {
+  BackgroundColor #FFFDE7
+  BorderColor #FBC02D
+}
+skinparam class<<component>> {
+  BackgroundColor #E8F5E9
+  BorderColor #2E7D32
+}
+skinparam class<<interceptor>> {
+  BackgroundColor #E0F7FA
+  BorderColor #00838F
+}
+
+legend right
+  |= Stereotype |= Classification |= Layer |
+  |<back:#E3F2FD> <<entity>> </back> | Domain Resource / Entity / Helper | domain/model |
+  |<back:#F3E5F5> <<service>> </back> | Infrastructure HTTP / State Service | infrastructure |
+  |<back:#E0F7FA> <<interceptor>> </back> | HTTP Interceptor / Guard | infrastructure |
+  |<back:#FFFDE7> <<view>> </back> | Routed Standalone View Component | presentation/views |
+  |<back:#E8F5E9> <<component>> </back> | Reusable Standalone UI Component | presentation/components |
+endlegend
+
+' ============================================================
+' 1. SHARED KERNEL (src/app/shared)
+' ============================================================
+package "app.shared" {
+  class ActorContextService <<service>> {
+    +activeActorId: Signal<string>
+    +activePersona: Signal<DemoPersona>
+    +revision: Signal<number>
+    +isAdmin(): boolean
+    +isCompanionRole(): boolean
+    +setActor(actorId: string): void
+    +syncDirectory(accounts: AccountProfileResource[]): void
+  }
+
+  class ThemeService <<service>> {
+    +theme: Signal<ThemeMode>
+    +isDark: Signal<boolean>
+    +isLight: Signal<boolean>
+    +setTheme(mode: ThemeMode): void
+    +toggleTheme(): void
+  }
+
+  class LanguageService <<service>> {
+    +currentLang: Signal<'es' | 'en'>
+    +t(key: string): string
+    +ui(text: string): string
+  }
+
+  class NotificationToastService <<service>> {
+    +success(msg: string): void
+    +error(msg: string): void
+    +info(msg: string): void
+  }
+
+  class actorContextInterceptor <<interceptor>> {
+    +intercept(req: HttpRequest, next: HttpHandlerFn): Observable<HttpEvent>
+  }
+
+  class Layout <<component>> {
+    +isCompanion: Signal<boolean>
+    +wideContent: Signal<boolean>
+    +workerOptions: Signal<NavOption[]>
+    +companionOptions: Signal<NavOption[]>
+    +syncShellContext(): void
+  }
+}
+
+' ============================================================
+' 2. IAM & PROFILES (src/app/iam)
+' ============================================================
+package "app.iam" {
+  class AccountProfileResource <<entity>> {
+    +id: string
+    +email: string
+    +fullName: string
+    +phone: string
+    +role: AccountRole
+    +shiftType: string | null
+    +shiftStart: string | null
+    +shiftEnd: string | null
+    +timeZone: string
+  }
+
+  class TrustLinkResource <<entity>> {
+    +id: string
+    +workerId: string
+    +workerName: string
+    +contactId: string
+    +contactName: string
+    +status: TrustLinkStatus
+  }
+
+  class SessionService <<service>> {
+    +profile: Signal<AccountProfileResource | null>
+    +loadProfile(): Observable<AccountProfileResource | null>
+    +saveProfile(payload: UpdateAccountProfileRequest): Observable<AccountProfileResource>
+    +bindPortal(companionPortal: boolean): void
+  }
+
+  class UserProfileService <<service>> {
+    +getProfile(): Observable<AccountProfileResource>
+    +updateProfile(payload: UpdateAccountProfileRequest): Observable<AccountProfileResource>
+    +getDirectory(): Observable<AccountProfileResource[]>
+    +getNotificationPreferences(): Observable<NotificationPreferenceResource[]>
+    +updateNotificationPreference(payload: UpdateNotificationPreferenceRequest): Observable<NotificationPreferenceResource>
+  }
+
+  class TrustedContactsService <<service>> {
+    +getContacts(): Observable<TrustLinkResource[]>
+    +inviteContact(contactEmail: string): Observable<TrustLinkResource>
+    +acceptInvitation(id: string): Observable<TrustLinkResource>
+    +rejectInvitation(id: string): Observable<TrustLinkResource>
+    +revokeContact(id: string): Observable<void>
+  }
+
+  class Profile <<view>>
+  class TrustedContacts <<view>>
+}
+
+' ============================================================
+' 3. COMMUTE & TELEMETRY (src/app/commute)
+' ============================================================
+package "app.commute" {
+  class CommuteResource <<entity>> {
+    +id: string
+    +workerId: string
+    +origin: string
+    +destination: string
+    +transport: string
+    +estimatedArrivalTime: string
+    +toleranceMinutes: number
+    +status: CommuteStatus
+  }
+
+  class TelemetryPingResource <<entity>> {
+    +id: string
+    +commuteId: string
+    +latitude: number
+    +longitude: number
+    +speed: number
+    +recordedAt: string
+  }
+
+  class SafetyIncidentResource <<entity>> {
+    +id: string
+    +commuteId: string
+    +type: IncidentType
+    +description: string
+    +status: IncidentStatus
+  }
+
+  class CommuteService <<service>> {
+    +startCommute(payload: StartCommuteRequest): Observable<CommuteResource>
+    +getMyCommutes(page: number, size: number): Observable<PagedResponse<CommuteResource>>
+    +recordTelemetry(commuteId: string, payload: RecordTelemetryRequest): Observable<TelemetryPingResource>
+    +getTelemetry(commuteId: string): Observable<TelemetryPingResource[]>
+    +delayCommute(commuteId: string, minutes: number): Observable<CommuteResource>
+    +arriveCommute(commuteId: string): Observable<CommuteResource>
+    +triggerIncident(commuteId: string, payload: TriggerIncidentRequest): Observable<SafetyIncidentResource>
+    +resolveIncident(incidentId: string): Observable<SafetyIncidentResource>
+  }
+
+  class Journey <<view>> {
+    +activeCommute: Signal<CommuteResource | null>
+    +telemetry: Signal<TelemetryPingResource[]>
+    +incidents: Signal<SafetyIncidentResource[]>
+    +pingLocation: Signal<ReportCoordinates | null>
+    +startCommute(): void
+    +sendPing(): void
+    +useMyLocationForPing(): void
+    +openPingOnMap(ping: TelemetryPingResource): void
+    +triggerIncident(): void
+    +arriveSafe(): void
+  }
+}
+
+' ============================================================
+' 4. COMMUNITY & 24H OPENSTREETMAP (src/app/community)
+' ============================================================
+package "app.community" {
+  class ServicePointResource <<entity>> {
+    +id: string
+    +name: string
+    +type: string
+    +latitude: number
+    +longitude: number
+    +openNow: boolean
+    +trustScore: number
+    +myVote: number
+  }
+
+  class CommunityPostResource <<entity>> {
+    +id: string
+    +authorName: string
+    +title: string
+    +content: string
+    +district: string
+    +category: string | null
+    +latitude: number | null
+    +longitude: number | null
+  }
+
+  class NearbyPlace <<entity>> {
+    +id: string
+    +name: string
+    +category: NearbyPlaceCategory
+    +lat: number
+    +lon: number
+    +distanceKm: number
+    +openingHours: string | null
+    +open24Hours: boolean
+  }
+
+  class CommunityService <<service>> {
+    +listServices(params): Observable<PagedResponse<ServicePointResource>>
+    +submitService(payload: SubmitServicePointRequest): Observable<ServicePointResource>
+    +voteService(id: string, direction: -1 | 0 | 1): Observable<ServiceVoteResource>
+    +listRiskZones(page: number, size: number): Observable<PagedResponse<RiskZoneResource>>
+    +reportRiskZone(payload: ReportRiskZoneRequest): Observable<RiskZoneResource>
+    +listPosts(district?: string): Observable<PagedResponse<CommunityPostResource>>
+    +createPost(payload: CreateCommunityPostRequest): Observable<CommunityPostResource>
+    +getModerationQueue(status?: string): Observable<PagedResponse<ModerationReportResource>>
+    +decideModeration(id: string, decision: 'APPROVE' | 'REJECT', notes: string): Observable<ModerationReportResource>
+  }
+
+  class NearbyPlacesService <<service>> {
+    +searchNearby(center: NearbySearchCenter, radiusKm: number): Promise<NearbyPlace[]>
+  }
+
+  class ReportLocation <<component>> {
+    +location: ModelSignal<ReportCoordinates | null>
+    +initialCenter: InputSignal<ReportCoordinates>
+    +selectCenter(): void
+  }
+
+  class MapView <<view>> {
+    +activeCategory: Signal<MapCategoryId>
+    +onlyOpen24Hours: Signal<boolean>
+    +osmPlaces: Signal<NearbyPlace[]>
+    +services: Signal<ServicePointResource[]>
+    +riskZones: Signal<RiskZoneResource[]>
+    +filteredItems: Signal<UnifiedMapItem[]>
+    +searchInCurrentArea(): Promise<void>
+    +useMyLocation(): void
+  }
+
+  class Community <<view>> {
+    +posts: Signal<CommunityPostResource[]>
+    +noticeLocation: Signal<ReportCoordinates | null>
+    +openCreateModal(kind: ComposerModalKind): void
+    +submitNotice(): void
+    +openPostOnMap(post: CommunityPostResource): void
+  }
+}
+
+' ============================================================
+' 5. COMPANION PORTAL (src/app/companion)
+' ============================================================
+package "app.companion" {
+  class CompanionLiveResource <<entity>>
+  class AlertResource <<entity>>
+
+  class CompanionService <<service>> {
+    +getLiveMonitoring(): Observable<CompanionLiveResource[]>
+    +getAlerts(page: number, size: number): Observable<PagedResponse<AlertResource>>
+    +getDeliveryQueue(): Observable<AlertResource[]>
+    +dispatchPendingDeliveries(): Observable<Record<string, number>>
+    +retryDelivery(id: string): Observable<AlertResource>
+  }
+
+  class CompanionLive <<view>>
+  class CompanionAlerts <<view>>
+  class CompanionHistory <<view>>
+  class CompanionEmergency <<view>>
+  class CompanionInvitations <<view>>
+  class CompanionProfile <<view>>
+}
+
+' ============================================================
+' 6. WELLNESS & SUBSCRIPTIONS & DASHBOARD
+' ============================================================
+package "app.wellness" {
+  class WellnessService <<service>>
+  class Wellness <<view>>
+}
+
+package "app.subscriptions" {
+  class SubscriptionsService <<service>>
+  class Benefits <<view>>
+}
+
+package "app.dashboard" {
+  class DashboardService <<service>>
+  class Dashboard <<view>>
+}
+
+' Relationships
+Layout --> SessionService
+Layout --> ActorContextService
+Layout --> ThemeService
+Layout --> LanguageService
+Dashboard --> DashboardService
+Journey --> CommuteService
+Journey --> CommunityService
+Journey --> ReportLocation
+MapView --> CommunityService
+MapView --> NearbyPlacesService
+Community --> CommunityService
+Community --> ReportLocation
+CompanionLive --> CompanionService
+CompanionLive --> CommuteService
+CompanionEmergency --> CompanionService
+Wellness --> WellnessService
+Benefits --> SubscriptionsService
+Profile --> UserProfileService
+TrustedContacts --> TrustedContactsService
+
+@enduml
